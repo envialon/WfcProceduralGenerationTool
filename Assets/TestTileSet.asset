@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c8e5fa640236c645bfbc930b046b736, type: 3}
   m_Name: TestTileSet
   m_EditorClassIdentifier: 
-  tiles: []
+  tiles:
+  - {fileID: 0}
