@@ -6,6 +6,7 @@ namespace WFC_Procedural_Generator_Framework
     [CreateAssetMenu(fileName = "newTileSet", menuName = "ScriptableObjects/TileSet", order = 1)]
     public class TileSet : ScriptableObject
     {
+        [SerializeField]
         public List<Tile> tiles;
     }
 }

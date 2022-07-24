@@ -15,14 +15,7 @@ namespace WFC_Procedural_Generator_Framework
 
         public void RandomGenerate()
         {
-            List<Socket> availableSockets;
-
-
-            for (int i = 0; i < maxTiles; i++)
-            {
-                Instantiate(tiles[(int)Random.Range(0, tiles.Count)].gameObject,
-                    new Vector3(0, i + 2, 0), Quaternion.identity);
-            }
+    
         }
 
     }

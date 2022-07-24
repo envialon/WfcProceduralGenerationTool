@@ -6,7 +6,7 @@ using UnityEngine;
 namespace WFC_Procedural_Generator_Framework
 {
     [Serializable]
-    public class Tile : MonoBehaviour
+    public class Tile 
     {
         public GameObject prefab;
         public string xPos;
