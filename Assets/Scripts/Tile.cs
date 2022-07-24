@@ -1,14 +1,14 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 
 namespace WFC_Procedural_Generator_Framework
 {
-    [System.Serializable]
+    [Serializable]
     public class Tile : MonoBehaviour
     {
-        public GameObject gameObject;
+        public GameObject prefab;
         public string xPos;
         public string yPos;
         public string zPos;
