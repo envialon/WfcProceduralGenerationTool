@@ -14,19 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tiles:
   - prefab: {fileID: 9194564933334337555, guid: 9cf268e192ca1774abc7712c982b826a, type: 3}
-    xPos: 
-    yPos: 
-    zPos: 
-    xNeg: 
-    yNeg: 
-    zNeg: 
+    xPos: 21L
+    yPos: 21J
+    zPos: 21J
+    xNeg: 3T
+    yNeg: 3T
+    zNeg: 3T
   - prefab: {fileID: 7397643882240794881, guid: 998c0dc56f29466479a92aaf6477d66a, type: 3}
-    xPos: 
-    yPos: 
-    zPos: 
-    xNeg: 
-    yNeg: 
-    zNeg: 
+    xPos: 3T
+    yPos: 4H
+    zPos: 521I
+    xNeg: 3T
+    yNeg: 3T
+    zNeg: 521I
   - prefab: {fileID: 8035450394785920628, guid: da552da5f6d82374dbe42ad9f24cb6ed, type: 3}
     xPos: 
     yPos: 
