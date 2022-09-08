@@ -19,7 +19,8 @@ namespace WFC_Procedural_Generator_Framework
         public void GenerateAdyacencyRules()
         {
             List<Tile> tiles = tileSet.tiles;
-            SortedSet<HashSet<Vector3>> uniqueFaces = new SortedSet<HashSet<Vector3>>();
+            Dictionary<HashSet<Vector3>, string> uniqueFaces = new Dictionary<HashSet<Vector3>, string>();
+            int uniqueFaceCounter = 0;
 
             for (int i = 0; i < tiles.Count; i++)
             {
@@ -31,9 +32,19 @@ namespace WFC_Procedural_Generator_Framework
                 {
                     string faceID = "";
 
-                    if (!uniqueFaces.Contains(faceVertices[j]))
+                    if (faceVertices[i].Count == 0) { 
+                        faceID = "-1";
+                    } 
+
+                    else if (!uniqueFaces.ContainsKey(faceVertices[j]))
                     {
-                        uniqueFaces.Add(faceVertices[j]);
+                        faceID = "" + uniqueFaceCounter;
+                        if (CheckSymmetry(faceVertices[j]))
+                        {
+                            faceID = faceID + "s";
+                        }
+                        uniqueFaces.Add(faceVertices[j], faceID);
+
 
 
                         // check for symmetry 
@@ -41,6 +52,7 @@ namespace WFC_Procedural_Generator_Framework
 
                         // transform all of the vertices to be mirrored 
                         // add the mirrored version of the face
+                        uniqueFaceCounter++;
                     }
 
                     //figure what's the faceID and update it 
@@ -73,9 +85,12 @@ namespace WFC_Procedural_Generator_Framework
 
             for (int i = 0; i < faceVertices.Count; i++)
             {
-
+                if (!faceVertices.Contains(threshold - faceVertices[i]))
+                {
+                    return false;
+                }
             }
-            return false;
+            return true;
         }
 
         private List<HashSet<Vector3>> GetFaceVertices(Vector3[] vertices)
