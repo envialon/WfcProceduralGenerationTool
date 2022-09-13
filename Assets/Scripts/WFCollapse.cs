@@ -19,72 +19,75 @@ namespace WFC_Procedural_Generator_Framework
         public void GenerateAdyacencyRules()
         {
             List<Tile> tiles = tileSet.tiles;
-            Dictionary<HashSet<Vector3>, string> uniqueFaces = new Dictionary<HashSet<Vector3>, string>();
+            Dictionary<HashSet<Vector2>, string> uniqueFaces = new Dictionary<HashSet<Vector2>, string>();
             int uniqueFaceCounter = 0;
 
             for (int i = 0; i < tiles.Count; i++)
             {
-                Tile currentTile = tiles[i];
-                Mesh currentMesh = currentTile.mesh;
-                List<HashSet<Vector3>> faceVertices = GetFaceVertices(currentMesh.vertices);
+                List<HashSet<Vector2>> faces = GetFaces(tiles[i].mesh.vertices);
 
-                for (int j = 0; j < faceVertices.Count; j++)
+                for (int j = 0; j < faces.Count; j++)
                 {
-                    string faceID = "";
+                    string faceID = j >= 4 ? "v" : "";
 
-                    if (faceVertices[i].Count == 0) { 
-                        faceID = "-1";
-                    } 
-
-                    else if (!uniqueFaces.ContainsKey(faceVertices[j]))
+                    if (faces[j].Count == 0)
                     {
-                        faceID = "" + uniqueFaceCounter;
-                        if (CheckSymmetry(faceVertices[j]))
+                        faceID = "-1";
+                    }
+                    else if (!uniqueFaces.ContainsKey(faces[j]))
+                    {
+                        faceID = faceID + uniqueFaceCounter;
+
+                        if (CheckFaceSymmetry(faces[j]))
                         {
+                            // if symmetric, add s 
                             faceID = faceID + "s";
                         }
-                        uniqueFaces.Add(faceVertices[j], faceID);
-
-
-
-                        // check for symmetry 
-                        // if symmetric, add s 
-
-                        // transform all of the vertices to be mirrored 
-                        // add the mirrored version of the face
+                        else
+                        {
+                            // transform all of the vertices to be mirrored
+                            // add the mirrored version of the face
+                            uniqueFaces.Add(MirrorFace(faces[j]), faceID + "f");
+                            // update counter
+                            uniqueFaceCounter++;
+                        }
                         uniqueFaceCounter++;
                     }
-
-                    //figure what's the faceID and update it 
+                    else
+                    {
+                        //figure what's the faceID and update it if it has been registered before
+                        faceID = uniqueFaces[faces[j]];
+                    }
                     //update the code for the face 
+                    tiles[i].faces[j] = faceID;
+                    uniqueFaces.Add(faces[j], faceID);
                 }
-
             }
         }
 
-        private bool CheckSymmetry(HashSet<Vector3> vertices)
+        private HashSet<Vector2> MirrorFace(HashSet<Vector2> faceVertex)
         {
-            List<Vector3> faceVertices = new List<Vector3>(vertices);
-            Vector3 threshold = faceVertices[0] + faceVertices[1];
-            if (threshold.x == 0)
+            List<Vector2> result = new List<Vector2>(faceVertex);
+            //MIRRORS OVER THE VERTICAL AXIS
+            for (int i = 0; i < result.Count; i++)
             {
-                threshold = new Vector3(0, tileSize, tileSize);
+                result[i] = new Vector2(tileSize, 0) - result[i];
             }
-            else if (threshold.y == 0)
-            {
-                threshold = new Vector3(tileSize, 0, tileSize);
-            }
-            else if (threshold.z == 0)
-            {
-                threshold = new Vector3(tileSize, tileSize, 0);
-            }
-            else
-            {
-                Debug.Log("Something went wrong during check symmetry");
-            }
+
+            return new HashSet<Vector2>(result);
+        }
+
+        private bool CheckFaceSymmetry(HashSet<Vector2> vertices)
+        {
+            List<Vector2> faceVertices = new List<Vector2>(vertices);
+            Vector2 threshold = new Vector2(tileSize, 0);
+
+            // ONLY CHECKS FOR SYMMETRY OVER THE VERTICAL AXIS
+
 
             for (int i = 0; i < faceVertices.Count; i++)
             {
+                Vector3 v = threshold - faceVertices[i];
                 if (!faceVertices.Contains(threshold - faceVertices[i]))
                 {
                     return false;
@@ -93,37 +96,42 @@ namespace WFC_Procedural_Generator_Framework
             return true;
         }
 
-        private List<HashSet<Vector3>> GetFaceVertices(Vector3[] vertices)
+        private List<HashSet<Vector2>> GetFaces(Vector3[] vertices)
         {
             int faceCount = 6;
-            List<HashSet<Vector3>> faceVertices = new List<HashSet<Vector3>>(faceCount);
+            List<HashSet<Vector2>> faceVertices = new List<HashSet<Vector2>>();
+            for (int i = 0; i < faceCount; i++)
+            {
+                faceVertices.Add(new HashSet<Vector2>());
+            }
+
             for (int i = 0; i < vertices.Length; i++)
             {
                 if (vertices[i].x == 0)
                 {
-                    faceVertices[0].Add(vertices[i]);
+                    faceVertices[0].Add(new Vector2(vertices[i].z, vertices[i].y));
                 }
                 else if (vertices[i].x == tileSize)
                 {
-                    faceVertices[3].Add(vertices[i]);
+                    faceVertices[1].Add(new Vector2(vertices[i].z, vertices[i].y));
                 }
 
                 if (vertices[i].y == 0)
                 {
-                    faceVertices[1].Add(vertices[i]);
+                    //faceVertices[2].Add(vertices[i]);
                 }
                 else if (vertices[i].y == tileSize)
                 {
-                    faceVertices[4].Add(vertices[i]);
+                    //faceVertices[3].Add(vertices[i]);
                 }
 
                 if (vertices[i].z == 0)
                 {
-                    faceVertices[2].Add(vertices[i]);
+                    faceVertices[4].Add(new Vector2(vertices[i].x, vertices[i].y));
                 }
                 else if (vertices[i].z == tileSize)
                 {
-                    faceVertices[5].Add(vertices[i]);
+                    faceVertices[5].Add(new Vector2(vertices[i].x, vertices[i].y));
                 }
             }
             return faceVertices;

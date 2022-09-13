@@ -330,10 +330,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b226c4c51fa192a4c8291d22219ad77c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tiles:
-  - {fileID: 5147765349011108350, guid: eb03f25e408b495408150b8987dc1c1d, type: 3}
-  - {fileID: 6559210933833959554, guid: 6af0fb226e466e94097ab25272798fae, type: 3}
-  maxTiles: 10
+  tileSet: {fileID: 11400000, guid: 43d87efc2f9a6014cb055b492a787204, type: 2}
+  tileSize: 1
 --- !u!4 &1326471922
 Transform:
   m_ObjectHideFlags: 0

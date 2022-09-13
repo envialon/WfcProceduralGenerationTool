@@ -13,31 +13,35 @@ MonoBehaviour:
   m_Name: TestTileSet
   m_EditorClassIdentifier: 
   tiles:
-  - prefab: {fileID: 9194564933334337555, guid: 9cf268e192ca1774abc7712c982b826a, type: 3}
-    xPos: 21L
-    yPos: 21J
-    zPos: 21J
-    xNeg: 3T
-    yNeg: 3T
-    zNeg: 3T
-  - prefab: {fileID: 7397643882240794881, guid: 998c0dc56f29466479a92aaf6477d66a, type: 3}
-    xPos: 3T
-    yPos: 4H
-    zPos: 521I
-    xNeg: 3T
-    yNeg: 3T
-    zNeg: 521I
-  - prefab: {fileID: 8035450394785920628, guid: da552da5f6d82374dbe42ad9f24cb6ed, type: 3}
-    xPos: 
-    yPos: 
-    zPos: 
-    xNeg: 
-    yNeg: 
-    zNeg: 
-  - prefab: {fileID: 9066706444137269408, guid: 6c6cf681b2504d44b968f1687b7a3626, type: 3}
-    xPos: 
-    yPos: 
-    zPos: 
-    xNeg: 
-    yNeg: 
-    zNeg: 
+  - mesh: {fileID: -7513297493162946847, guid: f70fb1b5a49792b4bb61fb79d6fbaab3, type: 3}
+    faces:
+    - -1
+    - -1
+    - -1
+    - -1
+    - -1
+    - -1
+    - -1
+    - -1
+    - -1
+    - -1
+    - -1
+    - -1
+    - -1
+    - -1
+    - -1
+    - -1
+    - -1
+    - -1
+    - -1
+    - -1
+    - -1
+    - -1
+    - -1
+    - -1
+  - mesh: {fileID: -1529682118313172751, guid: a47c5255c53162d47945f32a0776d0d6, type: 3}
+    faces: []
+  - mesh: {fileID: 5761739814090621300, guid: e1804005358bab84aa8ebbdea5885594, type: 3}
+    faces: []
+  - mesh: {fileID: -6281424698479989189, guid: 20c6c033ae038694ab63f343316d3eb8, type: 3}
+    faces: []
