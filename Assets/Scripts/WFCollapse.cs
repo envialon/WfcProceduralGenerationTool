@@ -19,7 +19,7 @@ namespace WFC_Procedural_Generator_Framework
         public void GenerateAdyacencyRules()
         {
             List<Tile> tiles = tileSet.tiles;
-            Dictionary<HashSet<Vector2>, string> uniqueFaces = new Dictionary<HashSet<Vector2>, string>();
+            Dictionary<HashSet<Vector2>, string> uniqueFaces = new Dictionary<HashSet<Vector2>, string>(HashSet<Vector2>.CreateSetComparer());
             int uniqueFaceCounter = 0;
 
             for (int i = 0; i < tiles.Count; i++)
@@ -51,6 +51,7 @@ namespace WFC_Procedural_Generator_Framework
                             // update counter
                             uniqueFaceCounter++;
                         }
+                        uniqueFaces.Add(faces[j], faceID);
                         uniqueFaceCounter++;
                     }
                     else
@@ -60,7 +61,6 @@ namespace WFC_Procedural_Generator_Framework
                     }
                     //update the code for the face 
                     tiles[i].faces[j] = faceID;
-                    uniqueFaces.Add(faces[j], faceID);
                 }
             }
         }
@@ -116,22 +116,22 @@ namespace WFC_Procedural_Generator_Framework
                     faceVertices[1].Add(new Vector2(vertices[i].z, vertices[i].y));
                 }
 
-                if (vertices[i].y == 0)
-                {
-                    //faceVertices[2].Add(vertices[i]);
-                }
-                else if (vertices[i].y == tileSize)
-                {
-                    //faceVertices[3].Add(vertices[i]);
-                }
-
                 if (vertices[i].z == 0)
                 {
-                    faceVertices[4].Add(new Vector2(vertices[i].x, vertices[i].y));
+                    faceVertices[2].Add(new Vector2(vertices[i].x, vertices[i].y));
                 }
                 else if (vertices[i].z == tileSize)
                 {
-                    faceVertices[5].Add(new Vector2(vertices[i].x, vertices[i].y));
+                    faceVertices[3].Add(new Vector2(vertices[i].x, vertices[i].y));
+                }
+
+                if (vertices[i].y == 0)
+                {
+                    faceVertices[4].Add(new Vector2(vertices[i].x, vertices[i].z));
+                }
+                else if (vertices[i].y == tileSize)
+                {
+                    faceVertices[5].Add(new Vector2(vertices[i].x, vertices[i].z));
                 }
             }
             return faceVertices;
