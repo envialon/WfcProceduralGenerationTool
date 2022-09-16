@@ -11,23 +11,21 @@ public class Comparer : IEqualityComparer<(HashSet<Vector2>, int)>
 
     public int GetHashCode((HashSet<Vector2>, int) obj)
     {
-        return obj.Item1.GetHashCode() + obj.Item2.GetHashCode();
+        return obj.Item1.GetHashCode();
     }
 }
+
 namespace WFC_Procedural_Generator_Framework
 {
-    public class WFCollapse : MonoBehaviour
+    public class AdyacencyRulesGenerator: MonoBehaviour
     {
         public TileSet tileSet;
         public float tileSize = 1;
 
-        void Start()
+        public void Start()
         {
             GenerateAdyacencyRules();
-            RandomGenerate();
         }
-
-
         public void GenerateAdyacencyRules()
         {
             List<Tile> tiles = tileSet.tiles;
@@ -61,7 +59,7 @@ namespace WFC_Procedural_Generator_Framework
                         {
                             // transform all of the vertices to be mirrored
                             // add the mirrored version of the face
-                            uniqueFaces.Add((MirrorFace(face.Item1),face.Item2),  faceID + "f");
+                            uniqueFaces.Add((MirrorFace(face.Item1), face.Item2), faceID + "f");
                             // update counter
                             uniqueFaceCounter++;
                         }
@@ -112,49 +110,89 @@ namespace WFC_Procedural_Generator_Framework
         {
             int faceCount = 6;
             Vector3[] vertices = mesh.vertices;
-            int[] triangles = mesh.triangles;
-            List<(HashSet<Vector2>, int)> faceVertices = new List<(HashSet<Vector2>, int)>();
-            for (int i = 0; i < faceCount; i++)
+            List<int> triangles = new List<int>(mesh.triangles);
+
+            List<List<int>> faceIndexes = new List<List<int>>();
+            List<int> triangleCount = new List<int>(new int[faceCount]);
+            List<(HashSet<Vector2>, int)> output = new List<(HashSet<Vector2>, int)>();
+
+            for(int i = 0; i < faceCount; i++)
             {
-                faceVertices.Add(new(new HashSet<Vector2>(), new int()));
+                faceIndexes.Add(new List<int>());
             }
 
+            // Finding all of the face indexes
             for (int i = 0; i < vertices.Length; i++)
             {
                 if (vertices[i].x == 0)
                 {
-                    faceVertices[0].Item1.Add(new Vector2(vertices[i].z, vertices[i].y));
+                    // faceVertices[0].Item1.Add(new Vector2(vertices[i].z, vertices[i].y));
+                    faceIndexes[0].Add(i);
                 }
                 else if (vertices[i].x == tileSize)
                 {
-                    faceVertices[1].Item1.Add(new Vector2(vertices[i].z, vertices[i].y));
+                    faceIndexes[1].Add(i);
                 }
 
                 if (vertices[i].z == 0)
                 {
-                    faceVertices[2].Item1.Add(new Vector2(vertices[i].x, vertices[i].y));
+                    faceIndexes[2].Add(i);
                 }
                 else if (vertices[i].z == tileSize)
                 {
-                    faceVertices[3].Item1.Add(new Vector2(vertices[i].x, vertices[i].y));
+                    faceIndexes[3].Add(i);
                 }
 
                 if (vertices[i].y == 0)
                 {
-                    faceVertices[4].Item1.Add(new Vector2(vertices[i].x, vertices[i].z));
+                    faceIndexes[4].Add(i);
                 }
                 else if (vertices[i].y == tileSize)
                 {
-                    faceVertices[5].Item1.Add(new Vector2(vertices[i].x, vertices[i].z));
+                    faceIndexes[5].Add(i);
+                }
+
+            }
+
+            // counting each face triangle
+            for (int t = 0; t < triangles.Count; t += 3)
+            {
+                int a = triangles[t], b = triangles[t + 1], c = triangles[t + 2];
+
+                for (int i = 0; i < faceIndexes.Count; i++)
+                {
+                    if (faceIndexes[i].Contains(a) || faceIndexes[i].Contains(b) || faceIndexes[i].Contains(c))
+                    {
+                        triangleCount[i]++;
+                    }
                 }
             }
-            return faceVertices;
-        }
 
+            //translating faceIndexes to Vector2
+            for (int i = 0; i < faceCount; i++)
+            {
+                HashSet<Vector2> face = new HashSet<Vector2>();
+                for (int j = 0; j < faceIndexes[i].Count; j++)
+                {
+                    if (i < 2)
+                    {
+                        face.Add(new Vector2(vertices[j].z, vertices[j].y));
+                    }
+                    else if (i < 4)
+                    {
 
-        public void RandomGenerate()
-        {
+                        face.Add(new Vector2(vertices[j].x, vertices[j].y));
+                    }
+                    else
+                    {
 
+                        face.Add(new Vector2(vertices[j].x, vertices[j].z));
+                    }
+                }
+
+                output.Add((face, triangleCount[i]));
+            }
+            return output;
         }
     }
 }
