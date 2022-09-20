@@ -176,22 +176,20 @@ namespace WFC_Procedural_Generator_Framework
                 {
                     if (i < 2)
                     {
-                        face.Add(new Vector2(vertices[j].z, vertices[j].y));
+                        face.Add(new Vector2(vertices[faceIndexes[i][j]].z, vertices[faceIndexes[i][j]].y));
                     }
                     else if (i < 4)
                     {
-
-                        face.Add(new Vector2(vertices[j].x, vertices[j].y));
+                        face.Add(new Vector2(vertices[faceIndexes[i][j]].x, vertices[faceIndexes[i][j]].y));
                     }
                     else
                     {
-
-                        face.Add(new Vector2(vertices[j].x, vertices[j].z));
+                        face.Add(new Vector2(vertices[faceIndexes[i][j]].x, vertices[faceIndexes[i][j]].z));
                     }
                 }
-
                 output.Add((face, triangleCount[i]));
             }
+
             return output;
         }
     }
