@@ -32,7 +32,7 @@ namespace WFC_Procedural_Generator_Framework
         {
             List<Tile> tiles = tileSet.tiles;
             Dictionary<(HashSet<Vector2>, int), string> uniqueFaces = new Dictionary<(HashSet<Vector2>, int), string>(new Comparer());
-            
+            //maybe use a new dictionary for vertical faces to avoid colisions
             int uniqueFaceCounter = 0;
 
             for (int i = 0; i < tiles.Count; i++)
