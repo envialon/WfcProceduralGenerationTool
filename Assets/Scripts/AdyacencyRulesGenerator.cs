@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Comparer : IEqualityComparer<(HashSet<Vector2>, int)>
 {
+    
     public bool Equals((HashSet<Vector2>, int) x, (HashSet<Vector2>, int) y)
     {
         return (x.Item1.SetEquals(y.Item1) && x.Item2 == y.Item2) ? true : false;
