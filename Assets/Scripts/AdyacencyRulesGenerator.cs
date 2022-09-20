@@ -87,7 +87,7 @@ namespace WFC_Procedural_Generator_Framework
             //MIRRORS OVER THE VERTICAL AXIS
             for (int i = 0; i < result.Count; i++)
             {
-                result[i] = new Vector2(tileSize, 0) - result[i];
+                result[i] = new Vector2(tileSize - result[i].x, result[i].y);
             }
 
             return new HashSet<Vector2>(result);
@@ -96,12 +96,11 @@ namespace WFC_Procedural_Generator_Framework
         private bool CheckFaceSymmetry(HashSet<Vector2> vertices)
         {
             List<Vector2> faceVertices = new List<Vector2>(vertices);
-            Vector2 threshold = new Vector2(tileSize, 0);
 
             // ONLY CHECKS FOR SYMMETRY OVER THE VERTICAL AXIS
             for (int i = 0; i < faceVertices.Count; i++)
             {
-                if (!faceVertices.Contains(threshold - faceVertices[i]))
+                if (!faceVertices.Contains(new Vector2(tileSize - faceVertices[i].x, faceVertices[i].y)))
                 {
                     return false;
                 }
