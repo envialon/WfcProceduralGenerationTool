@@ -11,7 +11,8 @@ public class Comparer : IEqualityComparer<(HashSet<Vector2>, int)>
 
     public int GetHashCode((HashSet<Vector2>, int) obj)
     {
-        return obj.Item1.GetHashCode();
+        var comparer = HashSet<Vector2>.CreateSetComparer();
+        return comparer.GetHashCode(obj.Item1) + obj.Item2;
     }
 }
 
@@ -30,6 +31,7 @@ namespace WFC_Procedural_Generator_Framework
         {
             List<Tile> tiles = tileSet.tiles;
             Dictionary<(HashSet<Vector2>, int), string> uniqueFaces = new Dictionary<(HashSet<Vector2>, int), string>(new Comparer());
+            
             int uniqueFaceCounter = 0;
 
             for (int i = 0; i < tiles.Count; i++)
