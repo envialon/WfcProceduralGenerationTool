@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Comparer : IEqualityComparer<(HashSet<Vector2>, int)>
 {
-    
+
     public bool Equals((HashSet<Vector2>, int) x, (HashSet<Vector2>, int) y)
     {
         return (x.Item1.SetEquals(y.Item1) && x.Item2 == y.Item2) ? true : false;
@@ -19,65 +19,83 @@ public class Comparer : IEqualityComparer<(HashSet<Vector2>, int)>
 
 namespace WFC_Procedural_Generator_Framework
 {
-    public class AdyacencyRulesGenerator: MonoBehaviour
+    public class AdyacencyRulesGenerator
     {
         public TileSet tileSet;
-        public float tileSize = 1;
+        public float tileSize;
 
-        public void Start()
+        public AdyacencyRulesGenerator(TileSet tileSet, float tileSize = 1)
         {
+            this.tileSet = tileSet;
+            this.tileSize = tileSize;
             GenerateAdyacencyRules();
         }
+
+
         public void GenerateAdyacencyRules()
         {
             List<Tile> tiles = tileSet.tiles;
-            Dictionary<(HashSet<Vector2>, int), string> uniqueFaces = new Dictionary<(HashSet<Vector2>, int), string>(new Comparer());
-            //maybe use a new dictionary for vertical faces to avoid colisions
-            int uniqueFaceCounter = 0;
+            Dictionary<(HashSet<Vector2>, int), string> uniqueHorizontalFaces = new Dictionary<(HashSet<Vector2>, int), string>(new Comparer());
+            Dictionary<(HashSet<Vector2>, int), string> uniqueVerticalFaces = new Dictionary<(HashSet<Vector2>, int), string>(new Comparer());
+            int uniqueHorizontalCounter = 0;
+            int uniqueVerticalCounter = 0;
 
             for (int i = 0; i < tiles.Count; i++)
             {
-                List<(HashSet<Vector2>, int)> facesAndTriangleCount = GetFaces(tiles[i].mesh);
+                List<(HashSet<Vector2>, int)> facesAndTriangles = GetFaces(tiles[i].mesh);
 
-
-                for (int j = 0; j < facesAndTriangleCount.Count; j++)
+                for (int j = 0; j < facesAndTriangles.Count; j++)
                 {
-                    (HashSet<Vector2>, int) face = facesAndTriangleCount[j];
-                    string faceID = j >= 4 ? "v" : "";
-
-                    if (face.Item1.Count == 0)
+                    string faceID;
+                    (HashSet<Vector2>, int) face = facesAndTriangles[j];
+                    if (j >= 4)
                     {
-                        faceID = "-1";
-                    }
-                    else if (!uniqueFaces.ContainsKey(face))
-                    {
-                        faceID = faceID + uniqueFaceCounter;
-
-                        if (CheckFaceSymmetry(face.Item1))
-                        {
-                            // if symmetric, add s 
-                            faceID = faceID + "s";
-                        }
-                        else
-                        {
-                            // transform all of the vertices to be mirrored
-                            // add the mirrored version of the face
-                            uniqueFaces.Add((MirrorFace(face.Item1), face.Item2), faceID + "f");
-                            // update counter
-                            uniqueFaceCounter++;
-                        }
-                        uniqueFaces.Add(face, faceID);
-                        uniqueFaceCounter++;
+                        faceID = "v";
+                        ManageFace(uniqueVerticalFaces, face, ref uniqueVerticalCounter,ref faceID);
                     }
                     else
                     {
-                        //figure what's the faceID and update it if it has been registered before
-                        faceID = uniqueFaces[face];
+                        faceID = "";
+                        ManageFace(uniqueHorizontalFaces, face, ref uniqueHorizontalCounter,ref  faceID);
                     }
-                    //update the code for the face 
                     tiles[i].faces[j] = faceID;
                 }
             }
+        }
+
+        private string ManageFace(Dictionary<(HashSet<Vector2>, int), string> uniqueFaces, (HashSet<Vector2>, int) face, ref int uniqueFaceCounter, ref string faceID)
+        {
+            if (face.Item1.Count == 0)
+            {
+                faceID = "-1";
+            }
+            else if (!uniqueFaces.ContainsKey(face))
+            {
+                faceID = faceID + uniqueFaceCounter;
+
+                if (CheckFaceSymmetry(face.Item1))
+                {
+                    // if symmetric, add s 
+                    faceID = faceID + "s";
+                }
+                else
+                {
+                    // transform all of the vertices to be mirrored
+                    // add the mirrored version of the face
+                    uniqueFaces.Add((MirrorFace(face.Item1), face.Item2), faceID + "f");
+                    // update counter
+                    uniqueFaceCounter++;
+                }
+                uniqueFaces.Add(face, faceID);
+                uniqueFaceCounter++;
+            }
+            else
+            {
+                //figure what's the faceID and update it if it has been registered before
+                faceID = uniqueFaces[face];
+            }
+
+            return faceID;
         }
 
         private HashSet<Vector2> MirrorFace(HashSet<Vector2> faceVertex)
@@ -118,7 +136,7 @@ namespace WFC_Procedural_Generator_Framework
             List<int> triangleCount = new List<int>(new int[faceCount]);
             List<(HashSet<Vector2>, int)> output = new List<(HashSet<Vector2>, int)>();
 
-            for(int i = 0; i < faceCount; i++)
+            for (int i = 0; i < faceCount; i++)
             {
                 faceIndexes.Add(new List<int>());
             }
