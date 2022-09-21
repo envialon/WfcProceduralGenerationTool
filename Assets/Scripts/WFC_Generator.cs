@@ -3,12 +3,43 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
+public struct FreeSpace
+{
+
+    public Vector3 coords;
+    public HashSet<int> possibleTiles;
+
+    public FreeSpace(Vector3 pos)
+    {
+        coords = pos;
+        possibleTiles = new HashSet<int>();
+    }
+}
+
+public struct PlacedTile
+{
+
+    public int id;
+    public Vector3 pos;
+    public Quaternion rot;
+
+    public PlacedTile(int id, Vector3 pos, Quaternion rot)
+    {
+        this.id = id;
+        this.pos = pos; 
+        this.rot = rot;
+    }
+}
+
 namespace WFC_Procedural_Generator_Framework
 {
     public class WFC_Generator : MonoBehaviour
     {
+        public int mapSize = 10;
+
+        public float tileSize = 1f;
+
         public TileSet tileSet;
-        public float tileSize;
         AdyacencyRulesGenerator adyacencyRulesGenerator;
 
 
@@ -16,11 +47,38 @@ namespace WFC_Procedural_Generator_Framework
         {
             //generate rules 
             adyacencyRulesGenerator = new AdyacencyRulesGenerator(tileSet, tileSize);
-            adyacencyRulesGenerator.GenerateAdjacencyMatrix();
+
 
             //wave collapsing
+            WaveFunctionCollapse(adyacencyRulesGenerator.GenerateAdjacencyMatrix(), tileSize, mapSize);
+
             //creating the new mesh 
 
         }
+
+        private List<PlacedTile> WaveFunctionCollapse(List<List<List<int>>> adjacencyMatrix, float tileSize, int mapSize)
+        {
+            List<FreeSpace> freeSpaces = new List<FreeSpace>();
+            List<PlacedTile> placedTiles = new List<PlacedTile>();
+
+            InitializeFreeSpaces(freeSpaces, tileSize, mapSize);
+
+            return placedTiles;
+        }
+
+        private void InitializeFreeSpaces(List<FreeSpace> freeSpaces, float tileSize, int mapSize)
+        {
+            float increment = mapSize / tileSize;
+
+            // ONLY INITIALIZING FOR Y = 0 
+            for (float i = 0; i <= mapSize; i += increment)
+            {
+                for (float j = 0; j <= mapSize; j += increment)
+                {
+                    freeSpaces.Add(new FreeSpace(new Vector3(i, 0, j)));
+                }
+            }
+        }
+
     }
 }
