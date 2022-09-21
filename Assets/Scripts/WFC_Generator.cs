@@ -26,7 +26,7 @@ public struct PlacedTile
     public PlacedTile(int id, Vector3 pos, Quaternion rot)
     {
         this.id = id;
-        this.pos = pos; 
+        this.pos = pos;
         this.rot = rot;
     }
 }
@@ -63,8 +63,54 @@ namespace WFC_Procedural_Generator_Framework
 
             InitializeFreeSpaces(freeSpaces, tileSize, mapSize);
 
+            while (freeSpaces.Count > 0)
+            {
+                // get the space with the least possible tiles
+                int candidateIndex = GetCandidateIndex(freeSpaces);
+                FreeSpace candidate = freeSpaces[candidateIndex];
+
+                // select a random tile from those
+                // might be replaceable by mesh
+                int tileIndexToPlace = GetTileToPLace(candidate);
+                Vector3 posToPlace = candidate.coords;
+
+                // delete it from freespaces 
+                freeSpaces.RemoveAt(candidateIndex);
+
+                // add it to placed tiles 
+                placedTiles.Add(new PlacedTile(tileIndexToPlace, posToPlace, Quaternion.identity));
+
+                // reorganize the freeSpaces
+            }
+
             return placedTiles;
         }
+
+        private int GetTileToPLace(FreeSpace candidate)
+        {
+            List<int> possibleTiles = new List<int>(candidate.possibleTiles);
+            int randomIndex = Random.Range(0, possibleTiles.Count);
+            return possibleTiles[randomIndex];
+        }
+
+        private int GetCandidateIndex(List<FreeSpace> freeSpaces)
+        {
+            int minPossibleTiles = int.MaxValue;
+            int freeSpaceIndex = 0;
+
+            for (int i = 0; i < freeSpaces.Count; i++)
+            {
+                if (freeSpaces[i].possibleTiles.Count < minPossibleTiles)
+                {
+                    freeSpaceIndex = i;
+                    minPossibleTiles = freeSpaces[i].possibleTiles.Count;
+                }
+            }
+
+            return freeSpaceIndex;
+        }
+
+
 
         private void InitializeFreeSpaces(List<FreeSpace> freeSpaces, float tileSize, int mapSize)
         {
