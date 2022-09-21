@@ -15,33 +15,33 @@ MonoBehaviour:
   tiles:
   - mesh: {fileID: -7513297493162946847, guid: f70fb1b5a49792b4bb61fb79d6fbaab3, type: 3}
     faces:
-    - 0
-    - 2
-    - 4s
-    - 5s
-    - v6
+    - 0s
+    - 0s
+    - 0s
+    - 0s
+    - v0s
     - -1
   - mesh: {fileID: 5761739814090621300, guid: e1804005358bab84aa8ebbdea5885594, type: 3}
     faces:
-    - 8s
-    - 9
-    - 11
-    - 13s
-    - v14
-    - v16
+    - 1
+    - 3s
+    - 3s
+    - 1f
+    - v1s
+    - v2
   - mesh: {fileID: -1529682118313172751, guid: a47c5255c53162d47945f32a0776d0d6, type: 3}
     faces:
-    - 18
-    - 20
-    - 22
-    - 24
-    - v26
-    - v28
+    - 4s
+    - 4s
+    - 3s
+    - 3s
+    - v1s
+    - v4s
   - mesh: {fileID: -6281424698479989189, guid: 20c6c033ae038694ab63f343316d3eb8, type: 3}
     faces:
-    - 30
-    - 32
-    - 34s
-    - 35s
-    - v36
-    - v38
+    - 0s
+    - 4s
+    - 1f
+    - 1f
+    - v4s
+    - v5

@@ -62,6 +62,7 @@ namespace WFC_Procedural_Generator_Framework
             List<PlacedTile> placedTiles = new List<PlacedTile>();
 
             InitializeFreeSpaces(freeSpaces, tileSize, mapSize);
+            UpdatePossibleTiles(freeSpaces, placedTiles);
 
             while (freeSpaces.Count > 0)
             {
@@ -86,6 +87,10 @@ namespace WFC_Procedural_Generator_Framework
             return placedTiles;
         }
 
+        private void UpdatePossibleTiles(List<FreeSpace> freeSpaces, List<PlacedTile> placedTiles)
+        {
+
+        }
         private int GetTileToPLace(FreeSpace candidate)
         {
             List<int> possibleTiles = new List<int>(candidate.possibleTiles);
