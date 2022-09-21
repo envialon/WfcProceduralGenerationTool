@@ -16,6 +16,7 @@ namespace WFC_Procedural_Generator_Framework
         {
             //generate rules 
             adyacencyRulesGenerator = new AdyacencyRulesGenerator(tileSet, tileSize);
+            adyacencyRulesGenerator.GenerateAdjacencyMatrix();
 
             //wave collapsing
             //creating the new mesh 

@@ -63,6 +63,44 @@ namespace WFC_Procedural_Generator_Framework
             }
         }
 
+        public List<List<List<int>>> GenerateAdjacencyMatrix()
+        {
+            List<Tile> tiles = tileSet.tiles;
+            List<List<List<int>>> neighbors = new List<List<List<int>>>();
+
+
+            for (int i = 0; i < tiles.Count; i++)
+            {
+                neighbors.Add(new List<List<int>>());
+                for (int j = 0; j < tiles.Count; j++)
+                {
+                    neighbors[i].Add(new List<int>());
+                }
+            }
+
+            for (int i = 0; i < tiles.Count; i++)
+            {
+                Tile origin = tiles[i];
+                for (int j = i + 1; j < tiles.Count; j++)
+                {
+                    Tile destination = tiles[j];
+                    for (int f = 0; i < origin.faces.Count; f++)
+                    {
+                        if (origin.faces[f] == destination.faces[f] + "f" ||
+                            destination.faces[f] == origin.faces[f] + "f" ||
+                            (origin.faces[f] == destination.faces[f] &&
+                            origin.faces[f][origin.faces[f].Length - 1] == 's'))
+                        {
+                            neighbors[i][j].Add(f);
+                            neighbors[j][i].Add(f);
+                        }
+                    }
+                }
+            }
+
+            return neighbors;
+        }
+
         private string ManageFace(Dictionary<(HashSet<Vector2>, int), string> uniqueFaces, (HashSet<Vector2>, int) face, ref int uniqueFaceCounter, ref string faceID)
         {
             if (face.Item1.Count == 0)
