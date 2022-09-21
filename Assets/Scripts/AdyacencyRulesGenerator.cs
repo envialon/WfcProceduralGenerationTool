@@ -91,8 +91,12 @@ namespace WFC_Procedural_Generator_Framework
                             (origin.faces[f] == destination.faces[f] &&
                             origin.faces[f][origin.faces[f].Length - 1] == 's'))
                         {
+
                             neighbors[i][j].Add(f);
-                            neighbors[j][i].Add(f);
+                            if (i != j)
+                            {
+                                neighbors[j][i].Add(f);
+                            }
                         }
                     }
                 }
