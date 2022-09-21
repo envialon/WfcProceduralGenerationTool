@@ -51,12 +51,12 @@ namespace WFC_Procedural_Generator_Framework
                     if (j >= 4)
                     {
                         faceID = "v";
-                        ManageFace(uniqueVerticalFaces, face, ref uniqueVerticalCounter,ref faceID);
+                        ManageFace(uniqueVerticalFaces, face, ref uniqueVerticalCounter, ref faceID);
                     }
                     else
                     {
                         faceID = "";
-                        ManageFace(uniqueHorizontalFaces, face, ref uniqueHorizontalCounter,ref  faceID);
+                        ManageFace(uniqueHorizontalFaces, face, ref uniqueHorizontalCounter, ref faceID);
                     }
                     tiles[i].faces[j] = faceID;
                 }
@@ -209,7 +209,6 @@ namespace WFC_Procedural_Generator_Framework
                 }
                 output.Add((face, triangleCount[i]));
             }
-
             return output;
         }
     }
