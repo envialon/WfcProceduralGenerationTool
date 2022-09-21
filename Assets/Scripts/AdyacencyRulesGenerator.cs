@@ -81,10 +81,10 @@ namespace WFC_Procedural_Generator_Framework
             for (int i = 0; i < tiles.Count; i++)
             {
                 Tile origin = tiles[i];
-                for (int j = i + 1; j < tiles.Count; j++)
+                for (int j = i; j < tiles.Count; j++)
                 {
                     Tile destination = tiles[j];
-                    for (int f = 0; i < origin.faces.Count; f++)
+                    for (int f = 0; f < origin.faces.Count; f++)
                     {
                         if (origin.faces[f] == destination.faces[f] + "f" ||
                             destination.faces[f] == origin.faces[f] + "f" ||
