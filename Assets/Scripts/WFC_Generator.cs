@@ -3,17 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public struct FreeSpace
+public struct FreeSpace 
 {
-
-    public Vector3 coords;
-    public HashSet<int> possibleTiles;
-
-    public FreeSpace(Vector3 pos)
-    {
-        coords = pos;
-        possibleTiles = new HashSet<int>();
-    }
+    public HashSet<int> possibleTiles;   
 }
 
 public struct PlacedTile
@@ -58,38 +50,41 @@ namespace WFC_Procedural_Generator_Framework
 
         private List<PlacedTile> WaveFunctionCollapse(List<List<List<int>>> adjacencyMatrix, float tileSize, int mapSize)
         {
-            List<FreeSpace> freeSpaces = new List<FreeSpace>();
-            List<PlacedTile> placedTiles = new List<PlacedTile>();
+            SortedDictionary<Vector3, FreeSpace> freeSpaces = new SortedDictionary<Vector3, FreeSpace>();
+            SortedDictionary<Vector3, PlacedTile> placedTiles = new SortedDictionary<Vector3, PlacedTile>();
 
             InitializeFreeSpaces(freeSpaces, tileSize, mapSize);
             UpdatePossibleTiles(freeSpaces, placedTiles);
 
             while (freeSpaces.Count > 0)
             {
-                // get the space with the least possible tiles
-                int candidateIndex = GetCandidateIndex(freeSpaces);
-                FreeSpace candidate = freeSpaces[candidateIndex];
+                // get the space with the least possible tiles                
+                Vector3 candidatePos = GetCandidate(freeSpaces);
+                FreeSpace candidate = freeSpaces[candidatePos];
 
                 // select a random tile from those
                 // might be replaceable by mesh
                 int tileIndexToPlace = GetTileToPLace(candidate);
-                Vector3 posToPlace = candidate.coords;
 
                 // delete it from freespaces 
-                freeSpaces.RemoveAt(candidateIndex);
+                freeSpaces.Remove(candidatePos);
 
                 // add it to placed tiles 
-                placedTiles.Add(new PlacedTile(tileIndexToPlace, posToPlace, Quaternion.identity));
+                placedTiles.Add(candidatePos, new PlacedTile(tileIndexToPlace, candidatePos, Quaternion.identity));
 
                 // reorganize the freeSpaces
             }
 
-            return placedTiles;
+            return new List<PlacedTile>(placedTiles.Values); ;
         }
 
-        private void UpdatePossibleTiles(List<FreeSpace> freeSpaces, List<PlacedTile> placedTiles)
+        private void UpdatePossibleTiles(SortedDictionary<Vector3, FreeSpace> freeSpacesDic, SortedDictionary<Vector3, PlacedTile> placedTiles)
         {
+            List<FreeSpace> freeSpaces = new List<FreeSpace>(freeSpacesDic.Values);
+            for(int i = 0; i < freeSpaces.Count; i++)
+            {
 
+            }
         }
         private int GetTileToPLace(FreeSpace candidate)
         {
@@ -98,26 +93,25 @@ namespace WFC_Procedural_Generator_Framework
             return possibleTiles[randomIndex];
         }
 
-        private int GetCandidateIndex(List<FreeSpace> freeSpaces)
+        private Vector3 GetCandidate(SortedDictionary<Vector3, FreeSpace> freeSpaces)
         {
             int minPossibleTiles = int.MaxValue;
-            int freeSpaceIndex = 0;
+            Vector3 candidate = new Vector3();
 
-            for (int i = 0; i < freeSpaces.Count; i++)
+            
+            foreach (KeyValuePair<Vector3, FreeSpace> p in freeSpaces)
             {
-                if (freeSpaces[i].possibleTiles.Count < minPossibleTiles)
+                
+                if (p.Value.possibleTiles.Count < minPossibleTiles)
                 {
-                    freeSpaceIndex = i;
-                    minPossibleTiles = freeSpaces[i].possibleTiles.Count;
+                    candidate = p.Key;
+                    minPossibleTiles = p.Value.possibleTiles.Count;
                 }
             }
-
-            return freeSpaceIndex;
+            return candidate;
         }
 
-
-
-        private void InitializeFreeSpaces(List<FreeSpace> freeSpaces, float tileSize, int mapSize)
+        private void InitializeFreeSpaces( SortedDictionary<Vector3, FreeSpace> freeSpaces, float tileSize, int mapSize)
         {
             float increment = mapSize / tileSize;
 
@@ -126,7 +120,8 @@ namespace WFC_Procedural_Generator_Framework
             {
                 for (float j = 0; j <= mapSize; j += increment)
                 {
-                    freeSpaces.Add(new FreeSpace(new Vector3(i, 0, j)));
+                    Vector3 currentPos = new Vector3(i, 0, j);
+                    freeSpaces.Add(currentPos, new FreeSpace());
                 }
             }
         }
