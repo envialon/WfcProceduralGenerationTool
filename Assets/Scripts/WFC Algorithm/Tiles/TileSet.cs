@@ -7,6 +7,6 @@ namespace WFC_Procedural_Generator_Framework
     public class TileSet : ScriptableObject
     {
         [SerializeField]
-        public List<Tile> tiles;
+        public List<TileAttributes> tiles;
     }
 }
