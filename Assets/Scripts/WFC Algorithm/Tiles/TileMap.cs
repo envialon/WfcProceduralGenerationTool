@@ -4,8 +4,10 @@ using UnityEngine;
 
 namespace WFC_Procedural_Generator_Framework
 {
-    public class TileMap 
+    public class TileMap
     {
-        Dictionary<int[], Tile> tileMap;
+        public Dictionary<int[], Tile> tileMap;
+        public int maxX;
+        public int maxY;
     }
 }
