@@ -7,7 +7,4 @@ public struct TileAttributes
 {
     public Mesh mesh;
     public Material material;
-    public ulong configuration;
-    //configuration
-
 }

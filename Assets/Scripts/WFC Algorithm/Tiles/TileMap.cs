@@ -6,6 +6,7 @@ namespace WFC_Procedural_Generator_Framework
 {
     public class TileMap 
     {
-        Dictionary<int[], Tile> tileMap;
+        public int mapSize = 10;
+        public Tile[][] map;
     }
 }

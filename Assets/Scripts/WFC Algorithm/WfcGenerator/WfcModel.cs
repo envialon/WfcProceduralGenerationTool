@@ -12,19 +12,28 @@ namespace WFC_Procedural_Generator_Framework
         int depth;
         bool trained = false;
 
+        Dictionary<int, long> tileConfiguration;
+
+
         public WfcModel(TileSet tileSet = null, TileMap tileMap = null, int width = 0, int height = 0, int depth = 0)
         {
             this.tileSet = tileSet;
             this.width = width;
             this.height = height;
             this.depth = depth;
-            if(tileMap is not null)
+            
+            if (tileMap is not null)
             {
-                TrainModel(tileMap);
+                Train(tileMap);
             }
         }
-        
-        public bool TrainModel(TileMap tileMap)
+        public bool Train(TileMap tileMap, TileSet tileSet)
+        {
+            this.tileSet = tileSet;
+            return Train(tileMap);
+        }
+
+        public bool Train(TileMap tileMap)
         {
             throw new System.NotImplementedException();
         }
@@ -37,6 +46,5 @@ namespace WFC_Procedural_Generator_Framework
             }
             throw new System.NotImplementedException();
         }
-
     }
 }
