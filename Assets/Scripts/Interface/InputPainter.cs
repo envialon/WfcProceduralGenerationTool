@@ -23,12 +23,20 @@ namespace WFC_Procedural_Generator_Framework
         public int selectedTile = 1;
         public TileSet tileSet;
 
-        private void OnValidate()
+        private void Start()
         {
             mapCollider = GetComponent<Collider>();
             mapCollider.transform.localScale = new Vector3(mapSize, 1, mapSize);
             tileMap = new TileMap(mapSize);
             gameObjects = new GameObject[mapSize, mapSize];
+            for (int i = 0; i < mapSize; i++)
+            {
+                for (int j = 0; j < mapSize; j++)
+                {                    
+                    gameObjects[i, j] = Instantiate(slotPrefab, new Vector3(i, 0, j), Quaternion.Euler(new Vector3(0, 90*defaultRotation, 0)));
+                    gameObjects[i, j].transform.parent = transform;
+                }
+            }
         }
 
 
@@ -81,6 +89,7 @@ namespace WFC_Procedural_Generator_Framework
                 {
                     Vector3 p = transform.InverseTransformPoint(hit.point) + new Vector3(mapSize * 0.5f, 0f, mapSize * 0.5f);
                     p = new Vector3((int)(p.x / mapSize), 0, (int)(p.z / mapSize));
+                    Debug.Log("Hitpoint: " + hit.point + "\n x: " + p.x + " z: " + p.z);
                     HandleClick((int)p.x, (int)p.z);
                 }
             }
