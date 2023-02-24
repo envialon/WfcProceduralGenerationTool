@@ -7,7 +7,6 @@ using UnityEngine;
 namespace WFC_Procedural_Generator_Framework
 {
 
-    [RequireComponent(typeof(BoxCollider))]
     public class InputPainter : MonoBehaviour
     {
         int tileSize = 1;
@@ -25,15 +24,14 @@ namespace WFC_Procedural_Generator_Framework
 
         private void Start()
         {
-            mapCollider = GetComponent<Collider>();
-            mapCollider.transform.localScale = new Vector3(mapSize, 1, mapSize);
+            transform.position = new Vector3((mapSize / 2) - 1, -.5f, (mapSize / 2) - 1);
             tileMap = new TileMap(mapSize);
             gameObjects = new GameObject[mapSize, mapSize];
             for (int i = 0; i < mapSize; i++)
             {
                 for (int j = 0; j < mapSize; j++)
-                {                    
-                    gameObjects[i, j] = Instantiate(slotPrefab, new Vector3(i, 0, j), Quaternion.Euler(new Vector3(0, 90*defaultRotation, 0)));
+                {
+                    gameObjects[i, j] = Instantiate(slotPrefab, new Vector3(i, 0, j), Quaternion.Euler(new Vector3(0, 90 * defaultRotation, 0)));
                     gameObjects[i, j].transform.parent = transform;
                 }
             }
@@ -81,19 +79,17 @@ namespace WFC_Procedural_Generator_Framework
 
         private void OnMouseDown()
         {
-            if (Input.GetMouseButtonDown(0))
-            {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                RaycastHit hit;
-                if (Physics.Raycast(ray, out hit))
-                {
-                    Vector3 p = transform.InverseTransformPoint(hit.point) + new Vector3(mapSize * 0.5f, 0f, mapSize * 0.5f);
-                    p = new Vector3((int)(p.x / mapSize), 0, (int)(p.z / mapSize));
-                    Debug.Log("Hitpoint: " + hit.point + "\n x: " + p.x + " z: " + p.z);
-                    HandleClick((int)p.x, (int)p.z);
-                }
-            }
 
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit))
+            {
+                Vector3 p = hit.transform.position;
+                Debug.Log("Vector: " + p);
+                HandleClick((int)p.x, (int)p.z);
+            }
         }
+
+
     }
 }
