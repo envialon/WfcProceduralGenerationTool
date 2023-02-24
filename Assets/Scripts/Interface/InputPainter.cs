@@ -7,61 +7,54 @@ using UnityEngine;
 namespace WFC_Procedural_Generator_Framework
 {
 
-    public class InterfaceManager : MonoBehaviour
+    [RequireComponent(typeof(BoxCollider))]
+    public class InputPainter : MonoBehaviour
     {
         int tileSize = 1;
         int mapSize = 10;
 
         private const int defaultRotation = 0;
 
-        TileMap tileMap = new TileMap();
-        Collider baseCollider;
-        MeshFilter[][] meshFilters;
-        GameObject meshContainer;
+        TileMap tileMap;
+        Collider mapCollider;
+        GameObject[,] gameObjects;
 
-        public int selectedTile = 0;
+        public GameObject slotPrefab;
+        public int selectedTile = 1;
         public TileSet tileSet;
 
-
-        void Start()
+        private void OnValidate()
         {
-            meshContainer = Instantiate(new GameObject(), this.transform);
-            baseCollider = GetComponent<Collider>();
-            baseCollider.transform.localScale = new Vector3(mapSize, 1, mapSize);
-
-
-            for (int i = 0; i < mapSize; i++)
-            {
-                for (int j = 0; j < mapSize; j++)
-                {
-                    tileMap.map[i][j] = new Tile();
-                    meshFilters[i][j] = meshContainer.AddComponent<MeshFilter>();
-                }
-            }
+            mapCollider = GetComponent<Collider>();
+            mapCollider.transform.localScale = new Vector3(mapSize, 1, mapSize);
+            tileMap = new TileMap(mapSize);
+            gameObjects = new GameObject[mapSize, mapSize];
         }
+
 
         public void PlaceTile(int x, int y)
         {
-            meshFilters[x][y].mesh = tileSet.tiles[selectedTile].mesh;
-            meshFilters[x][y].transform.rotation = Quaternion.Euler(0, defaultRotation * 90, 0);
-            tileMap.map[x][y].Set(selectedTile, defaultRotation);
+
+            gameObjects[x, y].GetComponent<MeshFilter>().mesh = tileSet.tiles[selectedTile].mesh;
+            gameObjects[x, y].transform.rotation = Quaternion.Euler(0, defaultRotation * 90, 0);
+            tileMap.map[x, y].Set(selectedTile, defaultRotation);
         }
 
         public void RotateTile(int x, int y)
         {
-            tileMap.map[x][y].RotateClockwise();
-            meshFilters[x][y].transform.rotation = Quaternion.Euler(0, tileMap.map[x][y].rotation * 90, 0);
+            tileMap.map[x, y].RotateClockwise();
+            gameObjects[x, y].transform.rotation = Quaternion.Euler(0, tileMap.map[x, y].rotation * 90, 0);
         }
 
         private void HandleClick(int x, int y)
         {
-            if (tileMap.map[x][y].id != 0)
-            {
-                RotateTile(x, y);
-            }
-            else
+            if (gameObjects[x, y] is not null)
             {
                 PlaceTile(x, y);
+            }
+            else if (tileMap.map[x, y].id == selectedTile)
+            {
+                RotateTile(x, y);
             }
         }
 
@@ -78,7 +71,7 @@ namespace WFC_Procedural_Generator_Framework
             return new Vector3(x, y, z);
         }
 
-        private void Update()
+        private void OnMouseDown()
         {
             if (Input.GetMouseButtonDown(0))
             {
@@ -86,10 +79,12 @@ namespace WFC_Procedural_Generator_Framework
                 RaycastHit hit;
                 if (Physics.Raycast(ray, out hit))
                 {
-                    Vector3 collisionSpot = RoundCoords(hit.point);
-                    HandleClick((int)collisionSpot.x, (int)collisionSpot.z);
+                    Vector3 p = transform.InverseTransformPoint(hit.point) + new Vector3(mapSize * 0.5f, 0f, mapSize * 0.5f);
+                    p = new Vector3((int)(p.x / mapSize), 0, (int)(p.z / mapSize));
+                    HandleClick((int)p.x, (int)p.z);
                 }
             }
+
         }
     }
 }
