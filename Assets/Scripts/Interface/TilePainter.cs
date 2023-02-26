@@ -8,7 +8,7 @@ using UnityEditor;
 public class TilePainter : MonoBehaviour
 {
     public List<Grid> layers = new List<Grid>();
-
+    
     [SerializeField]
     private Material tilemapRenderMaterial;
 
@@ -35,6 +35,19 @@ public class TilePainter : MonoBehaviour
         }
     }
 
+    public void HandleClick(Vector3 mousePosition)
+    {
+        if()
+        {
+            
+        }
+    }
+
+    public void SerializeTileMap()
+    {
+
+    }
+
 }
 
 
@@ -52,7 +65,25 @@ public class TilePainterEditor : Editor
         {
             tilePainter.ClearLayers();
         }
-        GUILayout.Space(10);     
+        GUILayout.Space(10);
+        if (GUILayout.Button("Serialize tileMap"))
+        {
+            tilePainter.SerializeTileMap();
+        }
         DrawDefaultInspector();
+    }
+
+    private void OnSceneGUI()
+    {
+        TilePainter tilePainter = (TilePainter)target;
+        Event e = Event.current;
+        if(e.type == EventType.MouseDown)
+        {
+            tilePainter.HandleClick(Input.mousePosition);
+        }
+        if(e.type == EventType.KeyDown)
+        {
+            
+        }
     }
 }
