@@ -7,20 +7,32 @@ using UnityEditor;
 
 public class TilePainter : MonoBehaviour
 {
-    public List<Tilemap> layers = new List<Tilemap>();
+    public List<Grid> layers = new List<Grid>();
 
     [SerializeField]
     private Material tilemapRenderMaterial;
 
     private Tilemap currentLayer;
-    
+
     public void AddLayer()
     {
         GameObject child = new GameObject();
         child.transform.parent = transform;
-        child.AddComponent<Tilemap>();
-        child.AddComponent<TilemapRenderer>().material = tilemapRenderMaterial;
+        child.transform.position = new Vector3(0f, layers.Count, 0f);
+
         child.name = "Layer " + layers.Count;
+
+        layers.Add(child.AddComponent<Grid>());
+        layers[layers.Count - 1].cellSwizzle = GridLayout.CellSwizzle.XZY;
+    }
+
+    public void ClearLayers()
+    {
+        layers = new List<Grid>();
+        foreach (Transform child in transform)
+        {
+            DestroyImmediate(child.gameObject);
+        }
     }
 
 }
@@ -35,8 +47,12 @@ public class TilePainterEditor : Editor
         if (GUILayout.Button("Add Layer"))
         {
             tilePainter.AddLayer();
-
+        }        
+        if (GUILayout.Button("Clear Layers"))
+        {
+            tilePainter.ClearLayers();
         }
+        GUILayout.Space(10);     
         DrawDefaultInspector();
     }
 }
