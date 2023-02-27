@@ -15,9 +15,9 @@ public class TilePainter : MonoBehaviour
 
     public int selectedLayer = 0;
     private BoxCollider selectedCollider;
-    
-    
-    private void OnEnable()
+
+
+    public void Initialize()
     {
         selectedCollider = gameObject.GetComponent<BoxCollider>();
         selectedCollider.size = new Vector3(mapSize, 0, mapSize);
@@ -53,8 +53,8 @@ public class TilePainter : MonoBehaviour
             Debug.Log("No layer selected");
             return;
         }
-
-        if (Physics.Raycast(Camera.main.transform.position, mousePosition, out RaycastHit hit, 1000f))
+        Ray ray = Camera.current.ScreenPointToRay(mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
         {
             Vector3Int cellPosition = layers[selectedLayer].WorldToCell(hit.point);
             Debug.Log(cellPosition);
@@ -102,6 +102,7 @@ public class TilePainterEditor : Editor
         {
             tilePainter.SerializeTileMap();
         }
+        tilePainter.Initialize();
         DrawDefaultInspector();
     }
 
@@ -113,7 +114,7 @@ public class TilePainterEditor : Editor
         if (e.type == EventType.MouseDown)
         {
             Debug.Log("Mouse down");
-            tilePainter.HandleClick(Input.mousePosition);
+            tilePainter.HandleClick(e.mousePosition);
         }
         if (e.type == EventType.KeyDown)
         {
