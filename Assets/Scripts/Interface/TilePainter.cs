@@ -2,44 +2,70 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using Unity.VisualScripting;
+using UnityEditor.SearchService;
 
-
-[RequireComponent(typeof(BoxCollider))]
 public class TilePainter : MonoBehaviour
 {
+
+    public int numberOfLayers = 1;
     public int mapSize = 10;
-    public List<Grid> layers = new List<Grid>();
+    public Grid grid;
 
     [SerializeField]
     private Material tilemapRenderMaterial;
 
     public int selectedLayer = 0;
     private BoxCollider selectedCollider;
+    private GameObject child;
+
 
 
     public void Initialize()
     {
-        selectedCollider = gameObject.GetComponent<BoxCollider>();
-        selectedCollider.size = new Vector3(mapSize, 0, mapSize);
+        if (child == null)
+        {
+            child = new GameObject("GridSelector");
+            child.transform.localPosition = new Vector3(0, 0, 0);
+            child.transform.parent = transform;
+        }
+        if (selectedCollider == null)
+        {
+            selectedCollider = child.AddComponent<BoxCollider>();
+            selectedCollider.size = new Vector3(mapSize, 0, mapSize);
+            selectedCollider.center = new Vector3(mapSize / 2, 0, mapSize / 2);
+        }
+        if (grid == null)
+        {
+            grid = child.AddComponent<Grid>();
+            grid.cellSwizzle = GridLayout.CellSwizzle.XZY;
+        }
+    }
+
+    private void MoveGridSelector()
+    {
+        grid.transform.position = new Vector3(0f, selectedLayer, 0f);
     }
 
     public void AddLayer()
     {
-        GameObject child = new GameObject();
-        child.transform.parent = transform;
-        child.transform.position = new Vector3(0f, layers.Count, 0f);
+        numberOfLayers++;
+        selectedLayer = numberOfLayers - 1;
+        MoveGridSelector();
+        //GameObject child = new GameObject();
+        //child.transform.parent = transform;
+        //child.transform.position = new Vector3(0f, layers.Count, 0f);
 
-        child.name = "Layer " + layers.Count;
+        //child.name = "Layer " + layers.Count;
 
-        layers.Add(child.AddComponent<Grid>());
-        layers[layers.Count - 1].cellSwizzle = GridLayout.CellSwizzle.XZY;
+        //layers.Add(child.AddComponent<Grid>());
+        //layers[layers.Count - 1].cellSwizzle = GridLayout.CellSwizzle.XZY;
 
-        layers[selectedLayer] = layers[layers.Count - 1];
+        //layers[selectedLayer] = layers[layers.Count - 1];
     }
 
     public void ClearLayers()
     {
-        layers = new List<Grid>();
         foreach (Transform child in transform)
         {
             DestroyImmediate(child.gameObject);
@@ -48,15 +74,10 @@ public class TilePainter : MonoBehaviour
 
     public void HandleClick(Vector3 mousePosition)
     {
-        if (layers[selectedLayer] == null)
-        {
-            Debug.Log("No layer selected");
-            return;
-        }
         Ray ray = Camera.current.ScreenPointToRay(mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
         {
-            Vector3Int cellPosition = layers[selectedLayer].WorldToCell(hit.point);
+            Vector3Int cellPosition = grid.WorldToCell(hit.point);
             Debug.Log(cellPosition);
         }
     }
@@ -66,12 +87,12 @@ public class TilePainter : MonoBehaviour
         switch (keycode)
         {
             case KeyCode.UpArrow:
-                selectedLayer = (selectedLayer + 1 >= layers.Count) ? layers.Count - 1 : selectedLayer++;
-                selectedCollider.transform.position = new Vector3(0, selectedLayer, 0);
+                selectedLayer = (selectedLayer + 1 >= numberOfLayers) ? numberOfLayers - 1 : selectedLayer++;
+                MoveGridSelector();
                 break;
             case KeyCode.DownArrow:
                 selectedLayer = (selectedLayer - 1 < 0) ? 0 : selectedLayer--;
-                selectedCollider.transform.position = new Vector3(0, selectedLayer, 0);
+                MoveGridSelector();
                 break;
         }
     }
@@ -79,6 +100,14 @@ public class TilePainter : MonoBehaviour
     public void SerializeTileMap()
     {
 
+    }
+    private void OnDrawGizmosSelected()
+    {
+        for (int i = 0; i <= mapSize; i++)
+        {
+            Gizmos.DrawLine(new Vector3(0, selectedLayer, i), new Vector3(mapSize, selectedLayer, i));
+            Gizmos.DrawLine(new Vector3(i, selectedLayer, 0), new Vector3(i, selectedLayer, mapSize));
+        }
     }
 }
 
@@ -88,6 +117,7 @@ public class TilePainterEditor : Editor
 {
     public override void OnInspectorGUI()
     {
+        DrawDefaultInspector();
         TilePainter tilePainter = (TilePainter)target;
         if (GUILayout.Button("Add Layer"))
         {
@@ -103,7 +133,6 @@ public class TilePainterEditor : Editor
             tilePainter.SerializeTileMap();
         }
         tilePainter.Initialize();
-        DrawDefaultInspector();
     }
 
 
@@ -122,4 +151,6 @@ public class TilePainterEditor : Editor
         }
         HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
     }
+
+
 }
