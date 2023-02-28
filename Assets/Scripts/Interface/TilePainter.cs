@@ -10,7 +10,7 @@ namespace WFC_Procedural_Generator_Framework
 {
     public class TilePainter : MonoBehaviour
     {
-        public int numberOfLayers = 1;
+        public int numberOfLayers = 0;
         public int selectedLayer = 0;
         public int selectedTile = 1;
         public int mapSize = 10;
@@ -20,10 +20,11 @@ namespace WFC_Procedural_Generator_Framework
 
         [SerializeField]
         private Material tilemapRenderMaterial;
-    
+
         private (MeshFilter, MeshRenderer)[,,] tileRenderers;
         private BoxCollider selectedCollider;
         private GameObject child;
+        private GameObject slots;
         private TileMap tileMap;
 
         private void OnDrawGizmosSelected()
@@ -37,6 +38,11 @@ namespace WFC_Procedural_Generator_Framework
 
         public void Initialize()
         {
+            if (slots == null)
+            {
+                slots = new GameObject("Slots");
+                slots.transform.parent = this.transform;
+            }
             if (child == null)
             {
                 child = new GameObject("GridSelector");
@@ -54,6 +60,7 @@ namespace WFC_Procedural_Generator_Framework
                 grid = child.AddComponent<Grid>();
                 grid.cellSwizzle = GridLayout.CellSwizzle.XZY;
             }
+            if (numberOfLayers == 0) AddLayer();
         }
 
         private void MoveGridSelector()
@@ -65,6 +72,16 @@ namespace WFC_Procedural_Generator_Framework
         {
             numberOfLayers++;
             selectedLayer = numberOfLayers - 1;
+            for (int i = 0; i < mapSize; i++)
+            {
+                for (int j = 0; j < mapSize; j++)
+                {
+                    GameObject slot = new GameObject("Slot");
+                    slot.transform.position = new Vector3(i, selectedLayer, j);
+                    slot.transform.parent = slots.transform;
+                    tileRenderers[i, selectedLayer, j] = (slot.AddComponent<MeshFilter>(), slot.AddComponent<MeshRenderer>());
+                }
+            }
             MoveGridSelector();
         }
 
@@ -91,7 +108,9 @@ namespace WFC_Procedural_Generator_Framework
 
         private void PlaceTile(Vector3Int coords)
         {
-            
+            (MeshFilter filter, MeshRenderer render) = tileRenderers[coords.x, coords.y, coords.z];
+            filter.mesh = tileSet.tiles[selectedTile].mesh;
+            render.material = tilemapRenderMaterial;
         }
 
         private void RotateTile(Vector3Int coords)
@@ -135,6 +154,7 @@ namespace WFC_Procedural_Generator_Framework
             {
                 tilePainter.AddLayer();
             }
+            //add a restart button
 
             GUILayout.Space(10);
             tilePainter.Initialize();
