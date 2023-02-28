@@ -73,12 +73,13 @@ public class TilePainter : MonoBehaviour
     }
 
     public void HandleClick(Vector3 mousePosition)
-    {
-        Ray ray = Camera.current.ScreenPointToRay(mousePosition);
+    {        
+        //Ray ray = SceneView.lastActiveSceneView.camera.ScreenPointToRay(mousePosition);
+        Ray ray = HandleUtility.GUIPointToWorldRay(mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
         {
             Vector3Int cellPosition = grid.WorldToCell(hit.point);
-            Debug.Log(cellPosition);
+            Debug.Log("Hit at: " + hit.point + " Corresponds to cell " + cellPosition);
         }
     }
 
