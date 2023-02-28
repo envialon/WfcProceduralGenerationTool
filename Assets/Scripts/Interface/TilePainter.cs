@@ -20,10 +20,20 @@ namespace WFC_Procedural_Generator_Framework
 
         [SerializeField]
         private Material tilemapRenderMaterial;
-
+    
+        private (MeshFilter, MeshRenderer)[,,] tileRenderers;
         private BoxCollider selectedCollider;
         private GameObject child;
-        private Tilemap tileMap;
+        private TileMap tileMap;
+
+        private void OnDrawGizmosSelected()
+        {
+            for (int i = 0; i <= mapSize; i++)
+            {
+                Gizmos.DrawLine(new Vector3(0, selectedLayer, i), new Vector3(mapSize, selectedLayer, i));
+                Gizmos.DrawLine(new Vector3(i, selectedLayer, 0), new Vector3(i, selectedLayer, mapSize));
+            }
+        }
 
         public void Initialize()
         {
@@ -44,8 +54,8 @@ namespace WFC_Procedural_Generator_Framework
                 grid = child.AddComponent<Grid>();
                 grid.cellSwizzle = GridLayout.CellSwizzle.XZY;
             }
-
         }
+
         private void MoveGridSelector()
         {
             grid.transform.position = new Vector3(0f, selectedLayer, 0f);
@@ -56,16 +66,6 @@ namespace WFC_Procedural_Generator_Framework
             numberOfLayers++;
             selectedLayer = numberOfLayers - 1;
             MoveGridSelector();
-        }
-
-        public void HandleClick(Vector3 mousePosition)
-        {
-            Ray ray = HandleUtility.GUIPointToWorldRay(mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
-            {
-                Vector3Int cellPosition = grid.WorldToCell(hit.point);
-                Debug.Log("Hit at: " + hit.point + " Corresponds to cell " + cellPosition);
-            }
         }
 
         public void HandleKeyPress(KeyCode keycode)
@@ -85,22 +85,38 @@ namespace WFC_Procedural_Generator_Framework
                     break;
                 case KeyCode.RightArrow:
                     selectedTile = (selectedTile + 1 >= tileSet.tiles.Count - 1) ? tileSet.tiles.Count - 1 : selectedTile + 1;
-
                     break;
             }
         }
 
-        public void SerializeTileMap()
+        private void PlaceTile(Vector3Int coords)
         {
-            Debug.Log("Not implemented");
+            
         }
 
-        private void OnDrawGizmosSelected()
+        private void RotateTile(Vector3Int coords)
         {
-            for (int i = 0; i <= mapSize; i++)
+
+        }
+
+        public void HandleClick(Vector3 mousePosition)
+        {
+            Ray ray = HandleUtility.GUIPointToWorldRay(mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
             {
-                Gizmos.DrawLine(new Vector3(0, selectedLayer, i), new Vector3(mapSize, selectedLayer, i));
-                Gizmos.DrawLine(new Vector3(i, selectedLayer, 0), new Vector3(i, selectedLayer, mapSize));
+                Vector3Int cellPosition = grid.WorldToCell(hit.point);
+                cellPosition = new Vector3Int(cellPosition.x, selectedLayer, cellPosition.y);
+
+                Debug.Log("Hit at: " + hit.point + " Corresponds to cell " + cellPosition);
+
+                if (selectedTile == tileMap.GetTile(cellPosition.x, cellPosition.y, cellPosition.y).id)
+                {
+                    RotateTile(cellPosition);
+                }
+                else
+                {
+                    PlaceTile(cellPosition);
+                }
             }
         }
     }
@@ -121,10 +137,6 @@ namespace WFC_Procedural_Generator_Framework
             }
 
             GUILayout.Space(10);
-            if (GUILayout.Button("Serialize tileMap"))
-            {
-                tilePainter.SerializeTileMap();
-            }
             tilePainter.Initialize();
         }
 
@@ -135,7 +147,6 @@ namespace WFC_Procedural_Generator_Framework
             Event e = Event.current;
             if (e.type == EventType.MouseDown)
             {
-                Debug.Log("Mouse down");
                 tilePainter.HandleClick(e.mousePosition);
             }
             if (e.type == EventType.KeyDown)

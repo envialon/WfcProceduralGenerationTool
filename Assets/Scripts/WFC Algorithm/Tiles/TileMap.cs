@@ -29,6 +29,11 @@ namespace WFC_Procedural_Generator_Framework
         public void RotateAt(int x, int y, int z)
         {
             map[x, y, z].RotateClockwise();
+        }  
+
+        public Tile GetTile(int x,int y, int z)
+        {
+            return map[x, y, z];            
         }
     }
 }
