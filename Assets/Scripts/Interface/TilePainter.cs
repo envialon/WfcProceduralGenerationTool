@@ -56,21 +56,10 @@ namespace WFC_Procedural_Generator_Framework
             numberOfLayers++;
             selectedLayer = numberOfLayers - 1;
             MoveGridSelector();
-            //GameObject child = new GameObject();
-            //child.transform.parent = transform;
-            //child.transform.position = new Vector3(0f, layers.Count, 0f);
-
-            //child.name = "Layer " + layers.Count;
-
-            //layers.Add(child.AddComponent<Grid>());
-            //layers[layers.Count - 1].cellSwizzle = GridLayout.CellSwizzle.XZY;
-
-            //layers[selectedLayer] = layers[layers.Count - 1];
         }
 
         public void HandleClick(Vector3 mousePosition)
         {
-            //Ray ray = SceneView.lastActiveSceneView.camera.ScreenPointToRay(mousePosition);
             Ray ray = HandleUtility.GUIPointToWorldRay(mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
             {
@@ -81,24 +70,6 @@ namespace WFC_Procedural_Generator_Framework
 
         public void HandleKeyPress(KeyCode keycode)
         {
-            //if (keycode == KeyCode.UpArrow)
-            //{
-            //    selectedLayer = (selectedLayer + 1 >= numberOfLayers) ? numberOfLayers - 1 : selectedLayer++;
-            //    MoveGridSelector();
-            //}
-            //else if (keycode == KeyCode.DownArrow)
-            //{
-            //    selectedLayer = (selectedLayer + 1 >= numberOfLayers) ? numberOfLayers - 1 : selectedLayer++;
-            //    MoveGridSelector();
-            //}
-            //else if (keycode == KeyCode.LeftArrow)
-            //{
-            //    selectedTile = (selectedTile - 1 < 0) ? 0 : selectedTile--;
-            //}
-            //else if (keycode == KeyCode.RightArrow)
-            //{
-            //    selectedTile = (selectedTile + 1 >= tileSet.tiles.Count - 1) ? tileSet.tiles.Count - 1 : selectedTile++;
-            //}
             switch (keycode)
             {
                 case KeyCode.UpArrow:
@@ -113,7 +84,7 @@ namespace WFC_Procedural_Generator_Framework
                     selectedTile = (selectedTile - 1 < 0) ? 0 : selectedTile - 1;
                     break;
                 case KeyCode.RightArrow:
-                    selectedTile = (selectedTile + 1 >= tileSet.tiles.Count - 1) ? tileSet.tiles.Count - 1 : selectedTile+1;
+                    selectedTile = (selectedTile + 1 >= tileSet.tiles.Count - 1) ? tileSet.tiles.Count - 1 : selectedTile + 1;
 
                     break;
             }
