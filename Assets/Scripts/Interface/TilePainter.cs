@@ -25,7 +25,6 @@ namespace WFC_Procedural_Generator_Framework
         private GameObject child;
         private Tilemap tileMap;
 
-
         public void Initialize()
         {
             if (child == null)
@@ -45,9 +44,8 @@ namespace WFC_Procedural_Generator_Framework
                 grid = child.AddComponent<Grid>();
                 grid.cellSwizzle = GridLayout.CellSwizzle.XZY;
             }
-            
-        }
 
+        }
         private void MoveGridSelector()
         {
             grid.transform.position = new Vector3(0f, selectedLayer, 0f);
@@ -83,21 +81,40 @@ namespace WFC_Procedural_Generator_Framework
 
         public void HandleKeyPress(KeyCode keycode)
         {
+            //if (keycode == KeyCode.UpArrow)
+            //{
+            //    selectedLayer = (selectedLayer + 1 >= numberOfLayers) ? numberOfLayers - 1 : selectedLayer++;
+            //    MoveGridSelector();
+            //}
+            //else if (keycode == KeyCode.DownArrow)
+            //{
+            //    selectedLayer = (selectedLayer + 1 >= numberOfLayers) ? numberOfLayers - 1 : selectedLayer++;
+            //    MoveGridSelector();
+            //}
+            //else if (keycode == KeyCode.LeftArrow)
+            //{
+            //    selectedTile = (selectedTile - 1 < 0) ? 0 : selectedTile--;
+            //}
+            //else if (keycode == KeyCode.RightArrow)
+            //{
+            //    selectedTile = (selectedTile + 1 >= tileSet.tiles.Count - 1) ? tileSet.tiles.Count - 1 : selectedTile++;
+            //}
             switch (keycode)
             {
                 case KeyCode.UpArrow:
-                    selectedLayer = (selectedLayer + 1 >= numberOfLayers) ? numberOfLayers - 1 : selectedLayer++;
+                    selectedLayer = (selectedLayer + 1 >= numberOfLayers) ? numberOfLayers - 1 : selectedLayer + 1;
                     MoveGridSelector();
                     break;
                 case KeyCode.DownArrow:
-                    selectedLayer = (selectedLayer - 1 < 0) ? 0 : selectedLayer--;
+                    selectedLayer = (selectedLayer - 1 < 0) ? 0 : selectedLayer - 1;
                     MoveGridSelector();
                     break;
                 case KeyCode.LeftArrow:
-                    selectedTile = (selectedTile - 1 < 0) ? 0 : selectedTile--;
+                    selectedTile = (selectedTile - 1 < 0) ? 0 : selectedTile - 1;
                     break;
                 case KeyCode.RightArrow:
-                    selectedTile = (selectedTile + 1 >= tileSet.tiles.Count - 1) ? tileSet.tiles.Count - 1 : selectedTile++;
+                    selectedTile = (selectedTile + 1 >= tileSet.tiles.Count - 1) ? tileSet.tiles.Count - 1 : selectedTile+1;
+
                     break;
             }
         }
