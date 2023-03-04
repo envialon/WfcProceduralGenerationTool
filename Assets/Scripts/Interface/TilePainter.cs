@@ -28,21 +28,33 @@ namespace WFC_Procedural_Generator_Framework
         public void Clear()
         {
             this.gridManager.Clear();
-            this.tileMap = new TileMapData();
+            this.tileMap = new TileMapData(mapSize, 2);
         }
 
         public void Initialize()
         {
+            if (tileMap == null)
+            {
+                tileMap = new TileMapData();
+            }
             if (gridManager == null)
             {
                 this.gridManager = GetComponent<GridManager>();
                 gridManager.Initialize(mapSize);
             }
+            tile = new UnityEngine.Tilemaps.Tile();
+            SetCurrentTile(selectedTile);
         }
 
         private void MoveGridSelector()
         {
             gridManager.SelectLayer(gridManager.selectedLayer);
+        }
+
+        public void SetCurrentTile(int selection)
+        {
+            selectedTile = Mathf.Max(0, Mathf.Min(tileSet.tiles.Count - 1, selection));
+            
         }
 
         public void AddLayer()
@@ -63,17 +75,19 @@ namespace WFC_Procedural_Generator_Framework
                     MoveGridSelector();
                     break;
                 case KeyCode.LeftArrow:
-                    selectedTile = (selectedTile - 1 < 0) ? 0 : selectedTile - 1;
+                    SetCurrentTile(selectedTile - 1);
                     break;
                 case KeyCode.RightArrow:
-                    selectedTile = (selectedTile + 1 >= tileSet.tiles.Count - 1) ? tileSet.tiles.Count - 1 : selectedTile + 1;
+                    SetCurrentTile(selectedTile + 1);
                     break;
             }
         }
 
         private void PlaceTile(Vector3Int coords)
         {
-            gridManager.SetTile(coords.x, coords.y, tile);
+            SetCurrentTile(selectedTile);
+            gridManager.SetTile(coords.x, coords.z, tile);
+            //update tileMap
         }
 
         private void RotateTile(Vector3Int coords)
@@ -91,7 +105,7 @@ namespace WFC_Procedural_Generator_Framework
 
                 Debug.Log("Hit at: " + hit.point + " Corresponds to cell " + cellPosition);
 
-                if (selectedTile == tileMap.GetTile(cellPosition.x, cellPosition.y, cellPosition.y).id)
+                if (selectedTile == tileMap.GetTile(cellPosition.x, cellPosition.y, cellPosition.z).id)
                 {
                     RotateTile(cellPosition);
                 }
@@ -107,6 +121,12 @@ namespace WFC_Procedural_Generator_Framework
     [CustomEditor(typeof(TilePainter))]
     public class TilePainterEditor : Editor
     {
+
+        private void Awake()
+        {
+            TilePainter tilePainter = (TilePainter)target;
+            tilePainter.Initialize();
+        }
         public override void OnInspectorGUI()
         {
             DrawDefaultInspector();
@@ -121,7 +141,6 @@ namespace WFC_Procedural_Generator_Framework
             {
                 tilePainter.Clear();
             }
-
             GUILayout.Space(10);
         }
 

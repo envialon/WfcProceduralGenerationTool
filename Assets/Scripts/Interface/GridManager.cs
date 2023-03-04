@@ -50,18 +50,15 @@ public class GridManager : MonoBehaviour
 
     public void SelectLayer(int selection)
     {
-        if (selection < 0)
-        {
-            selectedLayer = Mathf.Min(numberOfLayers, selection);
-            selectorCollider.center = new Vector3(selectorCollider.center.x, selectedLayer, selectorCollider.center.z);
-        }
+        selectedLayer = Mathf.Max(0, Mathf.Min(numberOfLayers - 1, selection));
+        selectorCollider.center = new Vector3(selectorCollider.center.x, selectedLayer, selectorCollider.center.z);
     }
 
     public void AddLayer()
     {
         numberOfLayers++;
         selectedLayer = numberOfLayers - 1;
-        GameObject layer = new GameObject("Layer " + numberOfLayers);
+        GameObject layer = new GameObject("Layer " + (numberOfLayers - 1));
         layer.transform.parent = transform;
         Tilemap tilemap = layer.AddComponent<Tilemap>();
         tilemap.tileAnchor = new Vector3(0.5f, 0.5f, 0.5f);
@@ -71,7 +68,7 @@ public class GridManager : MonoBehaviour
 
     public void SetTile(int x, int y, Tile tile)
     {
-        tilemaps[0].SetTile(new Vector3Int(x, selectedLayer, y), tile);
+        tilemaps[selectedLayer].SetTile(new Vector3Int(x, selectedLayer, y), tile);
     }
 
 }
