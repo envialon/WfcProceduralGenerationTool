@@ -4,13 +4,13 @@ using UnityEngine;
 
 namespace WFC_Procedural_Generator_Framework
 {
-    public class TileMap
+    public class TileMapData
     {
         public int mapSize = 10;
         public int height = 1;
         public Tile[,,] map;
 
-        public TileMap(int mapSize = 10, int height = 1)
+        public TileMapData(int mapSize = 10, int height = 1)
         {
             this.mapSize = mapSize;
             this.height = height;
