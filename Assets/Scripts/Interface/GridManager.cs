@@ -37,7 +37,7 @@ public class GridManager : MonoBehaviour
         numberOfLayers = 1;
         selectedLayer = 0;
         tilemap = GetComponent<Tilemap>();
-        tilemap.layoutGrid.cellSwizzle = GridLayout.CellSwizzle.XYZ;
+        tilemap.layoutGrid.cellSwizzle = GridLayout.CellSwizzle.XZY;
         selectorCollider = GetComponent<BoxCollider>();
     }
 

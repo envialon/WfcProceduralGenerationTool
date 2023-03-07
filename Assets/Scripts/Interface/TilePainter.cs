@@ -104,12 +104,13 @@ namespace WFC_Procedural_Generator_Framework
             tilePrefabs[selectedTile].SetActive(true);
             gridManager.SetTile(coords, tile);
             tilePrefabs[selectedTile].SetActive(false);
-            //update tileMap
+            tileMap.SetTile(new Tile(selectedTile), coords.x, coords.y, coords.z);
         }
 
         private void RotateTile(Vector3Int coords)
         {
-
+            tileMap.RotateAt(coords.x, coords.y, coords.z);
+            //rotar el gameObject
         }
 
 
@@ -120,7 +121,6 @@ namespace WFC_Procedural_Generator_Framework
             if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
             {
                 Vector3Int cellPosition = gridManager.grid.WorldToCell(hit.point);
-                //cellPosition = new Vector3Int(cellPosition.x, cellPosition.y, gridManager.selectedLayer);
 
                 Debug.Log("Hit at: " + hit.point + " Corresponds to cell " + cellPosition);
 
