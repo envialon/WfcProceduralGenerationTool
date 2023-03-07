@@ -1,14 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 [RequireComponent(typeof(Grid))]
 [RequireComponent(typeof(BoxCollider))]
+[RequireComponent(typeof(Tilemap))]
 public class GridManager : MonoBehaviour
 {
     public BoxCollider selectorCollider;
-    List<Tilemap> tilemaps;
+    Tilemap tilemap;
 
     public Grid grid;
 
@@ -21,29 +23,29 @@ public class GridManager : MonoBehaviour
         {
             DestroyImmediate(child.gameObject);
         }
-        tilemaps.Clear();
+        tilemap.ClearAllTiles();
         Initialize();
     }
 
-    public void Initialize(int mapsize)
+    public void Initialize(int mapsize, int height = 1)
     {
         Initialize();
-        SetGridSize(mapsize);
+        SetGridSize(mapsize, height);
     }
 
     public void Initialize()
     {
-        numberOfLayers = 0;
-        selectedLayer = -1;
-        tilemaps = new List<Tilemap>();
+        numberOfLayers = 1;
+        selectedLayer = 0;
+        tilemap = GetComponent<Tilemap>();
         grid = GetComponent<Grid>();
         selectorCollider = GetComponent<BoxCollider>();
         grid.cellSwizzle = GridLayout.CellSwizzle.XZY;
-        if (tilemaps.Count == 0) { AddLayer(); }
     }
 
-    public void SetGridSize(int size)
+    public void SetGridSize(int size, int height)
     {
+        numberOfLayers = height;
         selectorCollider.size = new Vector3(size, 0, size);
         selectorCollider.center = new Vector3(size / 2, 0, size / 2);
     }
@@ -54,21 +56,13 @@ public class GridManager : MonoBehaviour
         selectorCollider.center = new Vector3(selectorCollider.center.x, selectedLayer, selectorCollider.center.z);
     }
 
-    public void AddLayer()
+    public void SetTile(Vector3Int coords, Tile tile)
     {
-        numberOfLayers++;
-        selectedLayer = numberOfLayers - 1;
-        GameObject layer = new GameObject("Layer " + (numberOfLayers - 1));
-        layer.transform.parent = transform;
-        Tilemap tilemap = layer.AddComponent<Tilemap>();
-        tilemap.tileAnchor = new Vector3(0.5f, 0.5f, 0.5f);
-        tilemap.transform.localPosition = new Vector3(0, numberOfLayers - 1, 0);
-        SelectLayer(selectedLayer);
+        tilemap.SetTile(coords, tile);
     }
 
-    public void SetTile(int x, int y, Tile tile)
+    public GameObject GetTilePrefab(Vector3Int coords)
     {
-        tilemaps[selectedLayer].SetTile(new Vector3Int(x, selectedLayer, y), tile);
+        return tilemap.GetTile(coords).GameObject();
     }
-
 }

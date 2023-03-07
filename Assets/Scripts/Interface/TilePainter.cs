@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -8,10 +9,12 @@ namespace WFC_Procedural_Generator_Framework
     {
         public int selectedTile = 1;
         public int mapSize = 10;
+        public int height = 1;
 
         GridManager gridManager;
         public TileSet tileSet;
 
+        private List<GameObject> tilePrefabs = new List<GameObject>();
         private TileMapData tileMap;
         private UnityEngine.Tilemaps.Tile tile;
 
@@ -28,21 +31,38 @@ namespace WFC_Procedural_Generator_Framework
         public void Clear()
         {
             this.gridManager.Clear();
-            this.tileMap = new TileMapData(mapSize, 2);
+            this.tileMap = new TileMapData(mapSize, height);
+            this.tile = null;
+            CreatePrefabList();
+            Initialize();
+        }
+
+
+        private void CreatePrefabList()
+        {
+            foreach (GameObject tileobj in tilePrefabs)
+            {
+                DestroyImmediate(tileobj);
+            }
+            tilePrefabs.Clear();
+            int tileCount = tileSet.tiles.Count;
+            for (int i = 0; i < tileCount; i++)
+            {
+                GameObject go = new GameObject("Tile " + i);
+                go.AddComponent<MeshRenderer>().material = tileSet.tiles[i].material;
+                go.AddComponent<MeshFilter>().mesh = tileSet.tiles[i].mesh;
+                go.transform.parent = this.transform;
+                go.SetActive(false);
+                tilePrefabs.Add(go);
+            }
         }
 
         public void Initialize()
-        {
-            if (tileMap == null)
-            {
-                tileMap = new TileMapData();
-            }
-            if (gridManager == null)
-            {
-                this.gridManager = GetComponent<GridManager>();
-                gridManager.Initialize(mapSize);
-            }
-            tile = new UnityEngine.Tilemaps.Tile();
+        {            
+            tileMap = new TileMapData(mapSize, height);
+            gridManager = GetComponent<GridManager>();
+            tile = (UnityEngine.Tilemaps.Tile)ScriptableObject.CreateInstance(typeof(UnityEngine.Tilemaps.Tile));
+            gridManager.Initialize(mapSize, height);
             SetCurrentTile(selectedTile);
         }
 
@@ -54,12 +74,7 @@ namespace WFC_Procedural_Generator_Framework
         public void SetCurrentTile(int selection)
         {
             selectedTile = Mathf.Max(0, Mathf.Min(tileSet.tiles.Count - 1, selection));
-            
-        }
-
-        public void AddLayer()
-        {
-            gridManager.AddLayer();
+            tile.gameObject = tilePrefabs[selection];
         }
 
         public void HandleKeyPress(KeyCode keycode)
@@ -86,7 +101,8 @@ namespace WFC_Procedural_Generator_Framework
         private void PlaceTile(Vector3Int coords)
         {
             SetCurrentTile(selectedTile);
-            gridManager.SetTile(coords.x, coords.z, tile);
+            gridManager.SetTile(coords, tile);
+            gridManager.GetTilePrefab(coords).SetActive(true);
             //update tileMap
         }
 
@@ -94,6 +110,8 @@ namespace WFC_Procedural_Generator_Framework
         {
 
         }
+
+
 
         public void HandleClick(Vector3 mousePosition)
         {
@@ -125,7 +143,7 @@ namespace WFC_Procedural_Generator_Framework
         private void Awake()
         {
             TilePainter tilePainter = (TilePainter)target;
-            tilePainter.Initialize();
+            tilePainter.Clear();
         }
         public override void OnInspectorGUI()
         {
@@ -133,10 +151,7 @@ namespace WFC_Procedural_Generator_Framework
             GUILayout.Space(10);
 
             TilePainter tilePainter = (TilePainter)target;
-            if (GUILayout.Button("Add Layer"))
-            {
-                tilePainter.AddLayer();
-            }
+
             if (GUILayout.Button("Clear"))
             {
                 tilePainter.Clear();
