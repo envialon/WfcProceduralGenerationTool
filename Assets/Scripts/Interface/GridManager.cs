@@ -4,7 +4,6 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-[RequireComponent(typeof(Grid))]
 [RequireComponent(typeof(BoxCollider))]
 [RequireComponent(typeof(Tilemap))]
 public class GridManager : MonoBehaviour
@@ -38,9 +37,8 @@ public class GridManager : MonoBehaviour
         numberOfLayers = 1;
         selectedLayer = 0;
         tilemap = GetComponent<Tilemap>();
-        grid = GetComponent<Grid>();
+        tilemap.layoutGrid.cellSwizzle = GridLayout.CellSwizzle.XYZ;
         selectorCollider = GetComponent<BoxCollider>();
-        grid.cellSwizzle = GridLayout.CellSwizzle.XZY;
     }
 
     public void SetGridSize(int size, int height)

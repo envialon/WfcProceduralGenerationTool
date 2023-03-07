@@ -20,11 +20,11 @@ namespace WFC_Procedural_Generator_Framework
 
         private void OnDrawGizmosSelected()
         {
-
+            Vector3 pos = transform.position;
             for (int i = 0; i <= mapSize; i++)
             {
-                Gizmos.DrawLine(new Vector3(0, gridManager.selectedLayer, i), new Vector3(mapSize, gridManager.selectedLayer, i));
-                Gizmos.DrawLine(new Vector3(i, gridManager.selectedLayer, 0), new Vector3(i, gridManager.selectedLayer, mapSize));
+                Gizmos.DrawLine(new Vector3(0, gridManager.selectedLayer, i) + pos, new Vector3(mapSize, gridManager.selectedLayer, i) + pos);
+                Gizmos.DrawLine(new Vector3(i, gridManager.selectedLayer, 0) + pos, new Vector3(i, gridManager.selectedLayer, mapSize) + pos);
             }
         }
 
@@ -58,7 +58,7 @@ namespace WFC_Procedural_Generator_Framework
         }
 
         public void Initialize()
-        {            
+        {
             tileMap = new TileMapData(mapSize, height);
             gridManager = GetComponent<GridManager>();
             tile = (UnityEngine.Tilemaps.Tile)ScriptableObject.CreateInstance(typeof(UnityEngine.Tilemaps.Tile));
@@ -101,8 +101,9 @@ namespace WFC_Procedural_Generator_Framework
         private void PlaceTile(Vector3Int coords)
         {
             SetCurrentTile(selectedTile);
+            tilePrefabs[selectedTile].SetActive(true);
             gridManager.SetTile(coords, tile);
-            gridManager.GetTilePrefab(coords).SetActive(true);
+            tilePrefabs[selectedTile].SetActive(false);
             //update tileMap
         }
 
@@ -119,7 +120,7 @@ namespace WFC_Procedural_Generator_Framework
             if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
             {
                 Vector3Int cellPosition = gridManager.grid.WorldToCell(hit.point);
-                cellPosition = new Vector3Int(cellPosition.x, gridManager.selectedLayer, cellPosition.y);
+                //cellPosition = new Vector3Int(cellPosition.x, cellPosition.y, gridManager.selectedLayer);
 
                 Debug.Log("Hit at: " + hit.point + " Corresponds to cell " + cellPosition);
 
