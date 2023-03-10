@@ -15,7 +15,7 @@ namespace WFC_Procedural_Generator_Framework
         public TileSet tileSet;
 
         private List<GameObject> tilePrefabs = new List<GameObject>();
-        private TileMapData tileMap;
+        private InputTileMapData tileMap;
         private UnityEngine.Tilemaps.Tile tile;
 
         private void OnDrawGizmosSelected()
@@ -26,13 +26,15 @@ namespace WFC_Procedural_Generator_Framework
                 Gizmos.DrawLine(new Vector3(0, gridManager.selectedLayer, i) + pos, new Vector3(mapSize, gridManager.selectedLayer, i) + pos);
                 Gizmos.DrawLine(new Vector3(i, gridManager.selectedLayer, 0) + pos, new Vector3(i, gridManager.selectedLayer, mapSize) + pos);
             }
+            
         }
 
         public void Clear()
         {
-            this.gridManager.Clear();
-            this.tileMap = new TileMapData(mapSize, height);
-            this.tile = null;
+            if (gridManager != null)
+            {
+                this.gridManager.Clear();
+            }
             CreatePrefabList();
             Initialize();
         }
@@ -59,7 +61,7 @@ namespace WFC_Procedural_Generator_Framework
 
         public void Initialize()
         {
-            tileMap = new TileMapData(mapSize, height);
+            tileMap = new InputTileMapData(mapSize, height);
             gridManager = GetComponent<GridManager>();
             tile = (UnityEngine.Tilemaps.Tile)ScriptableObject.CreateInstance(typeof(UnityEngine.Tilemaps.Tile));
             gridManager.Initialize(mapSize, height);
@@ -109,7 +111,7 @@ namespace WFC_Procedural_Generator_Framework
 
         private void RotateTile(Vector3Int coords)
         {
-            tileMap.RotateAt(coords.x, coords.y, coords.z);
+            //tileMap.RotateAt(coords.x, coords.y, coords.z);
             //rotar el gameObject
         }
 
@@ -122,7 +124,7 @@ namespace WFC_Procedural_Generator_Framework
             {
                 Vector3Int cellPosition = gridManager.grid.WorldToCell(hit.point);
 
-                Debug.Log("Hit at: " + hit.point + " Corresponds to cell " + cellPosition);
+                //Debug.Log("Hit at: " + hit.point + " Corresponds to cell " + cellPosition);
 
                 if (selectedTile == tileMap.GetTile(cellPosition.x, cellPosition.y, cellPosition.z).id)
                 {

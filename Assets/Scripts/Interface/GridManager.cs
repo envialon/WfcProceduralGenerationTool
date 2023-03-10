@@ -13,8 +13,8 @@ public class GridManager : MonoBehaviour
 
     public Grid grid;
 
-    public int numberOfLayers = 0;
-    public int selectedLayer = -1;
+    public int numberOfLayers = 1;
+    public int selectedLayer = 0;
 
     public void Clear()
     {
@@ -37,7 +37,7 @@ public class GridManager : MonoBehaviour
         numberOfLayers = 1;
         selectedLayer = 0;
         tilemap = GetComponent<Tilemap>();
-        tilemap.layoutGrid.cellSwizzle = GridLayout.CellSwizzle.XZY;
+        tilemap.layoutGrid.cellSwizzle = GridLayout.CellSwizzle.XYZ;
         selectorCollider = GetComponent<BoxCollider>();
     }
 

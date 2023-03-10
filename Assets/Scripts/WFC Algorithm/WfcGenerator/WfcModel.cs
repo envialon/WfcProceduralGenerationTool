@@ -15,7 +15,7 @@ namespace WFC_Procedural_Generator_Framework
         Dictionary<int, long> tileConfiguration;
 
 
-        public WfcModel(TileSet tileSet = null, TileMapData tileMap = null, int width = 0, int height = 0, int depth = 0)
+        public WfcModel(TileSet tileSet = null, InputTileMapData tileMap = null, int width = 0, int height = 0, int depth = 0)
         {
             this.tileSet = tileSet;
             this.width = width;
@@ -27,18 +27,18 @@ namespace WFC_Procedural_Generator_Framework
                 Train(tileMap);
             }
         }
-        public bool Train(TileMapData tileMap, TileSet tileSet)
+        public bool Train(InputTileMapData tileMap, TileSet tileSet)
         {
             this.tileSet = tileSet;
             return Train(tileMap);
         }
 
-        public bool Train(TileMapData tileMap)
+        public bool Train(InputTileMapData tileMap)
         {
             throw new System.NotImplementedException();
         }
 
-        public TileMapData Generate()
+        public InputTileMapData Generate()
         {
             if (!trained)
             {
