@@ -1,12 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO.Compression;
-using System.IO.MemoryMappedFiles;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Xml.Schema;
-using Unity.VisualScripting;
 
 namespace WFC_Procedural_Generator_Framework
 {
@@ -16,13 +10,20 @@ namespace WFC_Procedural_Generator_Framework
         public float relativeFrecuency;
         public float relativeFrecuencyLog2;
         public int[,,] pattern;
+
+        public PatternInfo(int[,,] pattern)
+        {
+            this.pattern = pattern;
+            frecuency = 0;
+            relativeFrecuency = 0;
+            relativeFrecuencyLog2 = 0;
+        }
+
         public static PatternInfo operator ++(PatternInfo patternInfo)
         {
             patternInfo.frecuency++;
             return patternInfo;
         }
-
-
     }
 
     public class InputReader
@@ -72,8 +73,10 @@ namespace WFC_Procedural_Generator_Framework
             return output;
         }
 
+
         private void PopulatePatternFrequency2D()
         {
+            //usamos el diccionario para aprovechar el hasheo
             Dictionary<int[,,], PatternInfo> patternFrecuency = new Dictionary<int[,,], PatternInfo>();
             int totalPatterns = 0;
             for (int i = 0; i < mapSize - patternSize; i++)
@@ -83,19 +86,19 @@ namespace WFC_Procedural_Generator_Framework
                     int[,,] pattern = Extract2DPatternAt(i, j);
                     if (!patternFrecuency.ContainsKey(pattern))
                     {
-                        patternFrecuency.Add(pattern, new PatternInfo());
+                        patternFrecuency.Add(pattern, new PatternInfo(pattern));
                     }
                     totalPatterns++;
                     patternFrecuency[pattern]++;
                 }
             }
 
-            PatternInfo[] output = patternFrecuency.Values.ToArray();
-            int numberOfValues = output.Length;
+            patterns = patternFrecuency.Values.ToArray();
+            int numberOfValues = patterns.Length;
             for (int i = 0; i < numberOfValues; i++)
             {
-                output[i].relativeFrecuency = output[i].frecuency / totalPatterns;
-                output[i].relativeFrecuencyLog2 = MathF.Log(output[i].relativeFrecuencyLog2, 2);
+                patterns[i].relativeFrecuency = patterns[i].frecuency / totalPatterns;
+                patterns[i].relativeFrecuencyLog2 = MathF.Log(patterns[i].relativeFrecuencyLog2, 2);
             }
         }
 
