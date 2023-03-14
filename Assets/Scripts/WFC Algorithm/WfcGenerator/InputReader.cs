@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
-using Unity.VisualScripting.Antlr3.Runtime.Tree;
 
 namespace WFC_Procedural_Generator_Framework
 {
@@ -127,15 +125,16 @@ namespace WFC_Procedural_Generator_Framework
             bool eastNeighbour = true;
             bool westNeighbour = true;
 
+            int lastIndex = patternSize - 1;
             int[,,] currentGrid = current.pattern;
             int[,,] candidateGrid = candidate.pattern;
 
             for (int i = 0; i < patternSize; i++)
             {
-                northNeighbour &= currentGrid[i, 0, patternSize] == candidateGrid[i, 0, 0];
-                southNeighbour &= currentGrid[i, 0, 0] == candidateGrid[i, 0, patternSize];
-                eastNeighbour &= currentGrid[patternSize, 0, i] == candidateGrid[0, 0, i];
-                westNeighbour &= currentGrid[0, 0, i] == candidateGrid[patternSize, 0, i];
+                northNeighbour &= currentGrid[i, 0, lastIndex] == candidateGrid[i, 0, 0];
+                southNeighbour &= currentGrid[i, 0, 0] == candidateGrid[i, 0, lastIndex];
+                eastNeighbour &= currentGrid[lastIndex, 0, i] == candidateGrid[0, 0, i];
+                westNeighbour &= currentGrid[0, 0, i] == candidateGrid[lastIndex, 0, i];
             }
 
             if (northNeighbour)
@@ -172,11 +171,11 @@ namespace WFC_Procedural_Generator_Framework
                     CheckForNeighbourhood2D(i, current, j, candidate);
                 }
             }
-            throw new NotImplementedException();
         }
 
-        public InputReader(InputTileMapData inputTileMap)
+        public InputReader(InputTileMapData inputTileMap, int patternSize = 2)
         {
+            this.patternSize = patternSize;
             this.inputTileMap = inputTileMap;
             this.mapSize = inputTileMap.mapSize;
             this.height = inputTileMap.height;

@@ -7,6 +7,9 @@ namespace WFC_Procedural_Generator_Framework
     [RequireComponent(typeof(GridManager))]
     public class TilePainter : MonoBehaviour
     {
+        //Delete after
+        InputReader reader;
+        
         public int selectedTile = 1;
         public int mapSize = 10;
         public int height = 1;
@@ -115,8 +118,6 @@ namespace WFC_Procedural_Generator_Framework
             //rotar el gameObject
         }
 
-
-
         public void HandleClick(Vector3 mousePosition)
         {
             Ray ray = HandleUtility.GUIPointToWorldRay(mousePosition);
@@ -135,6 +136,11 @@ namespace WFC_Procedural_Generator_Framework
                     PlaceTile(cellPosition);
                 }
             }
+        }
+
+        public void StartReader()
+        {
+            reader = new InputReader(tileMap);
         }
     }
 
@@ -158,6 +164,10 @@ namespace WFC_Procedural_Generator_Framework
             if (GUILayout.Button("Clear"))
             {
                 tilePainter.Clear();
+            }
+            if (GUILayout.Button("Start Reader"))
+            {
+                tilePainter.StartReader();
             }
             GUILayout.Space(10);
         }
