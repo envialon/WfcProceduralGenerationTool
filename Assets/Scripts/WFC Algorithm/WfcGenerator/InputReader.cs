@@ -14,25 +14,27 @@ namespace WFC_Procedural_Generator_Framework
 
     public struct PatternInfo
     {
+        public int id;
         public int frecuency;
         public float relativeFrecuency;
         public float relativeFrecuencyLog2;
         public int[,,] pattern;
 
-        public Dictionary<Directions, List<int>> neigbourIndices;
+        public Dictionary<Directions, HashSet<int>> neigbourIndices;
 
-        public PatternInfo(int[,,] pattern)
+        public PatternInfo(int[,,] pattern, int patternId)
         {
             this.pattern = pattern;
+            this.id = patternId;
             frecuency = 0;
             relativeFrecuency = 0;
             relativeFrecuencyLog2 = 0;
-            neigbourIndices = new Dictionary<Directions, List<int>>
+            neigbourIndices = new Dictionary<Directions, HashSet<int>>
             {
-                { Directions.north, new List<int>() },
-                { Directions.south, new List<int>() },
-                { Directions.west, new List<int>() },
-                { Directions.east, new List<int>() }
+                { Directions.north, new HashSet<int>() },
+                { Directions.south, new HashSet<int>() },
+                { Directions.west, new HashSet<int>() },
+                { Directions.east, new HashSet<int>() }
             };
         }
 
@@ -51,31 +53,30 @@ namespace WFC_Procedural_Generator_Framework
 
         private int height;
         private int mapSize;
-        private int[,,] indexMap;
+        private int[,,] offsettedIndexGrid;
+        private int[,,] patternGrid;
         private PatternInfo[] patterns;
 
         /// <summary>
         /// Deberemos transformar la información de tile y rotación a enteros puramente, acabaremos con 
         /// 4N índices únicos donde N es el tamaño de tileset.
         /// </summary>
-        private void PopulateIndexMap()
+        private void PopulateIndexGrid()
         {
             Tile[,,] tilemap = inputTileMap.map;
-            indexMap = new int[inputTileMap.mapSize, inputTileMap.height, inputTileMap.mapSize];
+            offsettedIndexGrid = new int[inputTileMap.mapSize + patternSize, inputTileMap.height, inputTileMap.mapSize + patternSize];
 
             for (int k = 0; k < height; k++)
             {
-                for (int i = 0; i < mapSize; i++)
+                for (int i = 0; i < mapSize + patternSize; i++)
                 {
-                    for (int j = 0; j < mapSize; j++)
+                    for (int j = 0; j < mapSize + patternSize; j++)
                     {
-                        indexMap[i, k, j] = tilemap[i, k, j].id * 4 + tilemap[i, k, j].rotation;
+                        offsettedIndexGrid[i, k, j] = tilemap[i % mapSize, k, j % mapSize].id * 4 + tilemap[i % mapSize, k, j % mapSize].rotation;
                     }
                 }
             }
         }
-
-
         private int[,,] Extract2DPatternAt(int x, int y)
         {
             int[,,] output = new int[patternSize, 1, patternSize];
@@ -83,7 +84,7 @@ namespace WFC_Procedural_Generator_Framework
             {
                 for (int j = 0; j < patternSize; j++)
                 {
-                    output[i, 0, j] = indexMap[i, 0, j];
+                    output[i, 0, j] = offsettedIndexGrid[i, 0, j];
                 }
             }
             return output;
@@ -93,8 +94,10 @@ namespace WFC_Procedural_Generator_Framework
         private void PopulatePatternFrequency2D()
         {
             //usamos el diccionario para aprovechar el hasheo
+
             Dictionary<int[,,], PatternInfo> patternFrecuency = new Dictionary<int[,,], PatternInfo>();
             int totalPatterns = 0;
+
             for (int i = 0; i < mapSize - patternSize; i++)
             {
                 for (int j = 0; j < mapSize - patternSize; j++)
@@ -102,10 +105,11 @@ namespace WFC_Procedural_Generator_Framework
                     int[,,] pattern = Extract2DPatternAt(i, j);
                     if (!patternFrecuency.ContainsKey(pattern))
                     {
-                        patternFrecuency.Add(pattern, new PatternInfo(pattern));
+                        patternFrecuency.Add(pattern, new PatternInfo(pattern, totalPatterns));
                     }
                     totalPatterns++;
                     patternFrecuency[pattern]++;
+                    patternGrid[i, 0, j] = patternFrecuency[pattern].id;
                 }
             }
 
@@ -159,7 +163,26 @@ namespace WFC_Procedural_Generator_Framework
             }
         }
 
-        private void PopulatePatternNeighbours()
+        private void FindImmediateNeigbhours()
+        {
+            for (int i = 1; i < mapSize - 1; i++)
+            {
+                for (int j = 1; j < mapSize - 1; j++)
+                {
+                    patterns[patternGrid[i, 0, j]].neigbourIndices[Directions.north].Add(patternGrid[i, 0, j + 1]);
+                    patterns[patternGrid[i, 0, j]].neigbourIndices[Directions.south].Add(patternGrid[i, 0, j - 1]);
+                    patterns[patternGrid[i, 0, j]].neigbourIndices[Directions.east].Add(patternGrid[i + 1, 0, j]);
+                    patterns[patternGrid[i, 0, j]].neigbourIndices[Directions.west].Add(patternGrid[i - 1, 0, j]);
+
+                    patterns[patternGrid[i, 0, j - 1]].neigbourIndices[Directions.north].Add(patternGrid[i, 0, j]);
+                    patterns[patternGrid[i, 0, j + 1]].neigbourIndices[Directions.south].Add(patternGrid[i, 0, j]);
+                    patterns[patternGrid[i - 1, 0, j]].neigbourIndices[Directions.east].Add(patternGrid[i, 0, j]);
+                    patterns[patternGrid[i + 1, 0, j]].neigbourIndices[Directions.west].Add(patternGrid[i, 0, j]);
+                }
+            }
+        }
+
+        private void FindOverlappingNeighbours()
         {
             int numberOfPatterns = patterns.Length;
             for (int i = 0; i < numberOfPatterns; i++)
@@ -173,13 +196,19 @@ namespace WFC_Procedural_Generator_Framework
             }
         }
 
+        private void PopulatePatternNeighbours()
+        {
+            FindOverlappingNeighbours();
+        }
+
         public InputReader(InputTileMapData inputTileMap, int patternSize = 2)
         {
             this.patternSize = patternSize;
             this.inputTileMap = inputTileMap;
             this.mapSize = inputTileMap.mapSize;
             this.height = inputTileMap.height;
-            PopulateIndexMap();
+            this.patternGrid = new int[mapSize, 1, mapSize];
+            PopulateIndexGrid();
             PopulatePatternFrequency2D();
             PopulatePatternNeighbours();
         }
