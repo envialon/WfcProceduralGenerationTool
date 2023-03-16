@@ -12,6 +12,9 @@ namespace WFC_Procedural_Generator_Framework
         east
     }
 
+    /// <summary>
+    /// Contains all of the pattern information extracted from the input.
+    /// </summary>
     public struct PatternInfo
     {
         public int id;
@@ -135,12 +138,15 @@ namespace WFC_Procedural_Generator_Framework
 
             for (int i = 0; i < patternSize; i++)
             {
-                northNeighbour &= currentGrid[i, 0, lastIndex] == candidateGrid[i, 0, 0];
-                southNeighbour &= currentGrid[i, 0, 0] == candidateGrid[i, 0, lastIndex];
-                eastNeighbour &= currentGrid[lastIndex, 0, i] == candidateGrid[0, 0, i];
-                westNeighbour &= currentGrid[0, 0, i] == candidateGrid[lastIndex, 0, i];
+                for (int j = 1; j < patternSize; j++)
+                {
+                    int mirrorJ = lastIndex - j;
+                    northNeighbour &= currentGrid[i, 0, j] == candidateGrid[i, 0, mirrorJ];
+                    southNeighbour &= currentGrid[i, 0, mirrorJ] == candidateGrid[i, 0, j];
+                    eastNeighbour &= currentGrid[j, 0, i] == candidateGrid[mirrorJ, 0, i];
+                    westNeighbour &= currentGrid[mirrorJ, 0, i] == candidateGrid[j, 0, i];
+                }
             }
-
             if (northNeighbour)
             {
                 candidate.neigbourIndices[Directions.north].Add(currentIndex);
@@ -163,24 +169,24 @@ namespace WFC_Procedural_Generator_Framework
             }
         }
 
-        private void FindImmediateNeigbhours()
-        {
-            for (int i = 1; i < mapSize - 1; i++)
-            {
-                for (int j = 1; j < mapSize - 1; j++)
-                {
-                    patterns[patternGrid[i, 0, j]].neigbourIndices[Directions.north].Add(patternGrid[i, 0, j + 1]);
-                    patterns[patternGrid[i, 0, j]].neigbourIndices[Directions.south].Add(patternGrid[i, 0, j - 1]);
-                    patterns[patternGrid[i, 0, j]].neigbourIndices[Directions.east].Add(patternGrid[i + 1, 0, j]);
-                    patterns[patternGrid[i, 0, j]].neigbourIndices[Directions.west].Add(patternGrid[i - 1, 0, j]);
+        //private void FindImmediateNeigbhours()
+        //{
+        //    for (int i = 1; i < mapSize - 1; i++)
+        //    {
+        //        for (int j = 1; j < mapSize - 1; j++)
+        //        {
+        //            patterns[patternGrid[i, 0, j]].neigbourIndices[Directions.north].Add(patternGrid[i, 0, j + 1]);
+        //            patterns[patternGrid[i, 0, j]].neigbourIndices[Directions.south].Add(patternGrid[i, 0, j - 1]);
+        //            patterns[patternGrid[i, 0, j]].neigbourIndices[Directions.east].Add(patternGrid[i + 1, 0, j]);
+        //            patterns[patternGrid[i, 0, j]].neigbourIndices[Directions.west].Add(patternGrid[i - 1, 0, j]);
 
-                    patterns[patternGrid[i, 0, j - 1]].neigbourIndices[Directions.north].Add(patternGrid[i, 0, j]);
-                    patterns[patternGrid[i, 0, j + 1]].neigbourIndices[Directions.south].Add(patternGrid[i, 0, j]);
-                    patterns[patternGrid[i - 1, 0, j]].neigbourIndices[Directions.east].Add(patternGrid[i, 0, j]);
-                    patterns[patternGrid[i + 1, 0, j]].neigbourIndices[Directions.west].Add(patternGrid[i, 0, j]);
-                }
-            }
-        }
+        //            patterns[patternGrid[i, 0, j - 1]].neigbourIndices[Directions.north].Add(patternGrid[i, 0, j]);
+        //            patterns[patternGrid[i, 0, j + 1]].neigbourIndices[Directions.south].Add(patternGrid[i, 0, j]);
+        //            patterns[patternGrid[i - 1, 0, j]].neigbourIndices[Directions.east].Add(patternGrid[i, 0, j]);
+        //            patterns[patternGrid[i + 1, 0, j]].neigbourIndices[Directions.west].Add(patternGrid[i, 0, j]);
+        //        }
+        //    }
+        //}
 
         private void FindOverlappingNeighbours()
         {
