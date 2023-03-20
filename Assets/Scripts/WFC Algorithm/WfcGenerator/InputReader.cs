@@ -169,25 +169,6 @@ namespace WFC_Procedural_Generator_Framework
             }
         }
 
-        //private void FindImmediateNeigbhours()
-        //{
-        //    for (int i = 1; i < mapSize - 1; i++)
-        //    {
-        //        for (int j = 1; j < mapSize - 1; j++)
-        //        {
-        //            patterns[patternGrid[i, 0, j]].neigbourIndices[Directions.north].Add(patternGrid[i, 0, j + 1]);
-        //            patterns[patternGrid[i, 0, j]].neigbourIndices[Directions.south].Add(patternGrid[i, 0, j - 1]);
-        //            patterns[patternGrid[i, 0, j]].neigbourIndices[Directions.east].Add(patternGrid[i + 1, 0, j]);
-        //            patterns[patternGrid[i, 0, j]].neigbourIndices[Directions.west].Add(patternGrid[i - 1, 0, j]);
-
-        //            patterns[patternGrid[i, 0, j - 1]].neigbourIndices[Directions.north].Add(patternGrid[i, 0, j]);
-        //            patterns[patternGrid[i, 0, j + 1]].neigbourIndices[Directions.south].Add(patternGrid[i, 0, j]);
-        //            patterns[patternGrid[i - 1, 0, j]].neigbourIndices[Directions.east].Add(patternGrid[i, 0, j]);
-        //            patterns[patternGrid[i + 1, 0, j]].neigbourIndices[Directions.west].Add(patternGrid[i, 0, j]);
-        //        }
-        //    }
-        //}
-
         private void FindOverlappingNeighbours()
         {
             int numberOfPatterns = patterns.Length;
@@ -207,6 +188,11 @@ namespace WFC_Procedural_Generator_Framework
             FindOverlappingNeighbours();
         }
 
+        public PatternInfo[] GetPatternInfo()
+        {
+            return patterns;
+        }
+
         public InputReader(InputTileMapData inputTileMap, int patternSize = 2)
         {
             this.patternSize = patternSize;
@@ -218,6 +204,5 @@ namespace WFC_Procedural_Generator_Framework
             PopulatePatternFrequency2D();
             PopulatePatternNeighbours();
         }
-
     }
 }
