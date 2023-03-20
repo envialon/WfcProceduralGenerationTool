@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 namespace WFC_Procedural_Generator_Framework
 {
     [RequireComponent(typeof(GridManager))]
@@ -9,7 +8,7 @@ namespace WFC_Procedural_Generator_Framework
     {
         //Delete after
         InputReader reader;
-        
+
         public int selectedTile = 1;
         public int mapSize = 10;
         public int height = 1;
@@ -29,7 +28,6 @@ namespace WFC_Procedural_Generator_Framework
                 Gizmos.DrawLine(new Vector3(0, gridManager.selectedLayer, i) + pos, new Vector3(mapSize, gridManager.selectedLayer, i) + pos);
                 Gizmos.DrawLine(new Vector3(i, gridManager.selectedLayer, 0) + pos, new Vector3(i, gridManager.selectedLayer, mapSize) + pos);
             }
-            
         }
 
         public void Clear()

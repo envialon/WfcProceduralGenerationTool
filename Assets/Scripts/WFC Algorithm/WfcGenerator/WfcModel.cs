@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using Unity.VisualScripting;
 
 namespace WFC_Procedural_Generator_Framework
 {
@@ -15,32 +13,92 @@ namespace WFC_Procedural_Generator_Framework
         }
     }
 
+    public struct RemovalUpdate
+    {
+        int patternIndex;
+        Position position;
+
+        public RemovalUpdate(Position position, int patternIndex)
+        {
+            this.patternIndex = patternIndex;
+            this.position = position;
+        }
+    }
+
+    public struct Cell
+    {
+        public HashSet<int> possiblePatterns;
+        public float entrophy;
+        public bool collapsed;
+
+        float sumOfPatternWeights;
+        float sumOfPatternLogWeights;
+
+
+
+        public Cell(int[] possiblePatterns, PatternInfo[] patternInfo)
+        {
+            this.possiblePatterns = new HashSet<int>(possiblePatterns);
+            sumOfPatternWeights = 0;
+            sumOfPatternLogWeights = 0;
+            entrophy = 0;
+            collapsed = false;
+            for (int i = 0; i < possiblePatterns.Length; i++)
+            {
+                sumOfPatternWeights += patternInfo[possiblePatterns[i]].relativeFrecuency;
+                //im doing it different from the rust resource, might be an error:
+                sumOfPatternLogWeights += patternInfo[possiblePatterns[i]].relativeFrecuencyLog2;
+            }
+            CalculateEntrophy();
+        }
+        
+        public void CollapseOn(int patternToCollapse)
+        {
+            possiblePatterns.RemoveWhere(x => x != patternToCollapse);
+            entrophy = 0;
+            collapsed = true;
+        }
+
+        private void CalculateEntrophy()
+        {
+            entrophy = (float)(Math.Log(sumOfPatternWeights, 2) - (sumOfPatternLogWeights / sumOfPatternWeights));
+        }
+
+        public void RemovePattern(int patternIndex, PatternInfo[] patternInfo)
+        {
+            possiblePatterns.Remove(patternIndex);
+            sumOfPatternLogWeights -= patternInfo[patternIndex].relativeFrecuencyLog2;
+            sumOfPatternWeights -= patternInfo[patternIndex].relativeFrecuency;
+            CalculateEntrophy();
+        }
+    }
+
     public class WfcModel
     {
         int width;
         int height;
         int depth;
-        bool trained = false;
+
         private Random random = new Random();
 
         //eventually change to bitwise operations
-        HashSet<int>[,,] outputGrid;
+        Cell[,,] outputGrid;
 
         public PatternInfo[] patterns;
-        public float[,,] entropyGrid;
-        public bool[,,] collapsed;
+
+
+
 
         private void InitializeOutputGrid()
         {
-            outputGrid = new HashSet<int>[width, height, depth];
+            outputGrid = new Cell[width, height, depth];
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < depth; j++)
                 {
                     for (int k = 0; k < height; k++)
                     {
-                        outputGrid[i, k, j] = new HashSet<int>();
-                        outputGrid[i, k, j].UnionWith(Enumerable.Range(0, patterns.Length));
+                        outputGrid[i, k, j] = new Cell(Enumerable.Range(0, patterns.Length).ToArray(), patterns);
                     }
                 }
             }
@@ -52,7 +110,6 @@ namespace WFC_Procedural_Generator_Framework
             this.height = height;
             this.depth = depth;
             this.patterns = inputReader.GetPatternInfo();
-            collapsed = new bool[width, height, depth];
             InitializeOutputGrid();
         }
 
@@ -68,9 +125,10 @@ namespace WFC_Procedural_Generator_Framework
                 {
                     for (int k = 0; k <= height; k++)
                     {
-                        if (minEntropy > entropyGrid[i, k, j] && !collapsed[i, k, j])
+                        Cell current = outputGrid[i, k, j];
+                        if (!current.collapsed && minEntropy > current.entrophy)
                         {
-                            minEntropy = entropyGrid[i, k, j];
+                            minEntropy = current.entrophy;
                             position = new int[] { i, k, j };
                         }
                     }
@@ -78,6 +136,7 @@ namespace WFC_Procedural_Generator_Framework
             }
             return new Position(position[0], position[1], position[2]);
         }
+
 
         private Position Observe()
         {
@@ -87,9 +146,10 @@ namespace WFC_Procedural_Generator_Framework
             return candidatePosition;
         }
 
+        //we can optimize this:
         private void CollapseBasedOnPatternFrecuency(int x, int y, int z)
         {
-            int[] candidateIndices = outputGrid[x, y, z].ToArray();
+            int[] candidateIndices = outputGrid[x, y, z].possiblePatterns.ToArray();
             int numberOfCandidates = candidateIndices.Length;
             if (numberOfCandidates <= 1)
             {
@@ -118,24 +178,18 @@ namespace WFC_Procedural_Generator_Framework
                 }
             }
 
-            outputGrid[x, y, z].RemoveWhere(x => x != collapsedPattern);
-            entropyGrid[x, y, z] = 0;
-            collapsed[x, y, z] = true;
+            outputGrid[x, y, z].CollapseOn(collapsedPattern);
         }
 
-   
         private void Propagation(Position origin)
         {
-            List<Position> propagationList = new List<Position> { origin };
-            HashSet<Position> propagated = new HashSet<Position>();
-            int remaining = 1; 
-            while (remaining >0)
-            {
-                Position current = propagationList[0];
-                propagationList.RemoveAt(0);
-                propagated.Add(current);   
-                
+            Queue<Position> queue = new Queue<Position>();
 
+            int remaining = 1;
+            while (remaining > 0)
+            {
+                Position current = queue.Peek();
+                queue.Dequeue();
             }
         }
 
