@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace WFC_Procedural_Generator_Framework
 {
@@ -13,12 +15,25 @@ namespace WFC_Procedural_Generator_Framework
         west,
     }
 
+
     public struct Position
     {
         public int x; public int y; public int z;
+
+
+        public static Position[] directions = new Position[]{
+                                            new Position(0, 0, 1),
+                                            new Position(1, 0, 0),
+                                            new Position(0, 0, -1),
+                                            new Position(-1, 0, 0),
+                                            };
         public Position(int x = 0, int y = 0, int z = 0)
         {
             this.x = x; this.y = y; this.z = z;
+        }
+        public static Position operator +(Position left, Position right)
+        {
+            return new Position(left.x + right.x, left.y + right.y, left.z + right.z);
         }
     }
 
@@ -124,6 +139,6 @@ namespace WFC_Procedural_Generator_Framework
         {
             return neigbourIndices[direction];
         }
-        
+
     }
 }
