@@ -4,50 +4,6 @@ using System.Linq;
 
 namespace WFC_Procedural_Generator_Framework
 {
-    public enum Directions
-    {
-        north,
-        south,
-        west,
-        east
-    }
-
-    /// <summary>
-    /// Contains all of the pattern information extracted from the input.
-    /// </summary>
-    public struct PatternInfo
-    {
-        public int id;
-        public int frecuency;
-        public float relativeFrecuency;
-        public float relativeFrecuencyLog2;
-        public int[,,] pattern;
-
-        public Dictionary<Directions, HashSet<int>> neigbourIndices;
-
-        public PatternInfo(int[,,] pattern, int patternId)
-        {
-            this.pattern = pattern;
-            this.id = patternId;
-            frecuency = 0;
-            relativeFrecuency = 0;
-            relativeFrecuencyLog2 = 0;
-            neigbourIndices = new Dictionary<Directions, HashSet<int>>
-            {
-                { Directions.north, new HashSet<int>() },
-                { Directions.south, new HashSet<int>() },
-                { Directions.west, new HashSet<int>() },
-                { Directions.east, new HashSet<int>() }
-            };
-        }
-
-        public static PatternInfo operator ++(PatternInfo patternInfo)
-        {
-            patternInfo.frecuency++;
-            return patternInfo;
-        }
-    }
-
     public class InputReader
     {
         public int patternSize = 2; // 2x2x2
@@ -149,23 +105,23 @@ namespace WFC_Procedural_Generator_Framework
             }
             if (northNeighbour)
             {
-                candidate.neigbourIndices[Directions.north].Add(currentIndex);
-                current.neigbourIndices[Directions.north].Add(candidateIndex);
+                candidate.neigbourIndices[Direction.north].Add(currentIndex);
+                current.neigbourIndices[Direction.north].Add(candidateIndex);
             }
             if (southNeighbour)
             {
-                candidate.neigbourIndices[Directions.south].Add(currentIndex);
-                current.neigbourIndices[Directions.south].Add(candidateIndex);
+                candidate.neigbourIndices[Direction.south].Add(currentIndex);
+                current.neigbourIndices[Direction.south].Add(candidateIndex);
             }
             if (eastNeighbour)
             {
-                candidate.neigbourIndices[Directions.east].Add(currentIndex);
-                current.neigbourIndices[Directions.east].Add(candidateIndex);
+                candidate.neigbourIndices[Direction.east].Add(currentIndex);
+                current.neigbourIndices[Direction.east].Add(candidateIndex);
             }
             if (westNeighbour)
             {
-                candidate.neigbourIndices[Directions.west].Add(currentIndex);
-                current.neigbourIndices[Directions.west].Add(candidateIndex);
+                candidate.neigbourIndices[Direction.west].Add(currentIndex);
+                current.neigbourIndices[Direction.west].Add(candidateIndex);
             }
         }
 

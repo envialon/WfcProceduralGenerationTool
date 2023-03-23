@@ -4,74 +4,7 @@ using System.Linq;
 
 namespace WFC_Procedural_Generator_Framework
 {
-    public struct Position
-    {
-        public int x; public int y; public int z;
-        public Position(int x = 0, int y = 0, int z = 0)
-        {
-            this.x = x; this.y = y; this.z = z;
-        }
-    }
 
-    public struct RemovalUpdate
-    {
-        int patternIndex;
-        Position position;
-
-        public RemovalUpdate(Position position, int patternIndex)
-        {
-            this.patternIndex = patternIndex;
-            this.position = position;
-        }
-    }
-
-    public struct Cell
-    {
-        public HashSet<int> possiblePatterns;
-        public float entrophy;
-        public bool collapsed;
-
-        float sumOfPatternWeights;
-        float sumOfPatternLogWeights;
-
-
-
-        public Cell(int[] possiblePatterns, PatternInfo[] patternInfo)
-        {
-            this.possiblePatterns = new HashSet<int>(possiblePatterns);
-            sumOfPatternWeights = 0;
-            sumOfPatternLogWeights = 0;
-            entrophy = 0;
-            collapsed = false;
-            for (int i = 0; i < possiblePatterns.Length; i++)
-            {
-                sumOfPatternWeights += patternInfo[possiblePatterns[i]].relativeFrecuency;
-                //im doing it different from the rust resource, might be an error:
-                sumOfPatternLogWeights += patternInfo[possiblePatterns[i]].relativeFrecuencyLog2;
-            }
-            CalculateEntrophy();
-        }
-        
-        public void CollapseOn(int patternToCollapse)
-        {
-            possiblePatterns.RemoveWhere(x => x != patternToCollapse);
-            entrophy = 0;
-            collapsed = true;
-        }
-
-        private void CalculateEntrophy()
-        {
-            entrophy = (float)(Math.Log(sumOfPatternWeights, 2) - (sumOfPatternLogWeights / sumOfPatternWeights));
-        }
-
-        public void RemovePattern(int patternIndex, PatternInfo[] patternInfo)
-        {
-            possiblePatterns.Remove(patternIndex);
-            sumOfPatternLogWeights -= patternInfo[patternIndex].relativeFrecuencyLog2;
-            sumOfPatternWeights -= patternInfo[patternIndex].relativeFrecuency;
-            CalculateEntrophy();
-        }
-    }
 
     public class WfcModel
     {
@@ -80,17 +13,32 @@ namespace WFC_Procedural_Generator_Framework
         int depth;
 
         private Random random = new Random();
+        private Cell[,,] outputGrid;
+        private PatternInfo[] patterns;
+        private int numberOfPatterns;
+        private int[,] InitialEnablerCount()
+        {
+            int numberOfDirections = Enum.GetValues(typeof(Direction)).Length;
+            int[,] result = new int[numberOfPatterns, numberOfDirections];
 
-        //eventually change to bitwise operations
-        Cell[,,] outputGrid;
-
-        public PatternInfo[] patterns;
-
-
-
+            for (int patternIndex = 0; patternIndex < numberOfPatterns; patternIndex++)
+            {
+                for (int direction = 0; direction < numberOfDirections; direction++)
+                {
+                    HashSet<int> compatibles = patterns[patternIndex].GetCompatiblesInDirection((Direction)direction);
+                    foreach (int compatible in compatibles)
+                    {
+                        result[compatible, direction] += 1;
+                    }
+                }
+            }
+            return result;
+        }
 
         private void InitializeOutputGrid()
         {
+            int[,] enablerCountTemplate = InitialEnablerCount();
+
             outputGrid = new Cell[width, height, depth];
             for (int i = 0; i < width; i++)
             {
@@ -98,7 +46,7 @@ namespace WFC_Procedural_Generator_Framework
                 {
                     for (int k = 0; k < height; k++)
                     {
-                        outputGrid[i, k, j] = new Cell(Enumerable.Range(0, patterns.Length).ToArray(), patterns);
+                        outputGrid[i, k, j] = new Cell(Enumerable.Range(0, patterns.Length).ToArray(), patterns, enablerCountTemplate);
                     }
                 }
             }
@@ -110,9 +58,9 @@ namespace WFC_Procedural_Generator_Framework
             this.height = height;
             this.depth = depth;
             this.patterns = inputReader.GetPatternInfo();
+            this.numberOfPatterns = patterns.Length;
             InitializeOutputGrid();
         }
-
 
         private Position FindLowestEntropyCell()
         {
@@ -177,29 +125,18 @@ namespace WFC_Procedural_Generator_Framework
                     break;
                 }
             }
-
             outputGrid[x, y, z].CollapseOn(collapsedPattern);
         }
 
-        private void Propagation(Position origin)
+        private void Propagate(Position origin)
         {
-            Queue<Position> queue = new Queue<Position>();
 
-            int remaining = 1;
-            while (remaining > 0)
-            {
-                Position current = queue.Peek();
-                queue.Dequeue();
-            }
         }
-
 
         public void Generate()
         {
             Position candidatePosition = Observe();
-            Propagation(candidatePosition);
+            Propagate(candidatePosition);
         }
-
-
     }
 }
