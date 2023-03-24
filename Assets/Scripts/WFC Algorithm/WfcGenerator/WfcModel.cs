@@ -14,7 +14,7 @@ namespace WFC_Procedural_Generator_Framework
 
         private Random random = new Random();
         private Cell[,,] outputGrid;
-        private PatternInfo[] patterns;
+        private PatternInfo[] patternInfo;
         private int numberOfPatterns;
         private int[,] InitialEnablerCount()
         {
@@ -25,7 +25,7 @@ namespace WFC_Procedural_Generator_Framework
             {
                 for (int direction = 0; direction < numberOfDirections; direction++)
                 {
-                    HashSet<int> compatibles = patterns[patternIndex].GetCompatiblesInDirection((Direction)direction);
+                    HashSet<int> compatibles = patternInfo[patternIndex].GetCompatiblesInDirection((Direction)direction);
                     foreach (int compatible in compatibles)
                     {
                         result[compatible, direction] += 1;
@@ -46,7 +46,7 @@ namespace WFC_Procedural_Generator_Framework
                 {
                     for (int k = 0; k < height; k++)
                     {
-                        outputGrid[i, k, j] = new Cell(Enumerable.Range(0, patterns.Length).ToArray(), patterns, enablerCountTemplate);
+                        outputGrid[i, k, j] = new Cell(Enumerable.Range(0, patternInfo.Length).ToArray(), patternInfo, enablerCountTemplate);
                     }
                 }
             }
@@ -57,8 +57,8 @@ namespace WFC_Procedural_Generator_Framework
             this.width = width;
             this.height = height;
             this.depth = depth;
-            this.patterns = inputReader.GetPatternInfo();
-            this.numberOfPatterns = patterns.Length;
+            this.patternInfo = inputReader.GetPatternInfo();
+            this.numberOfPatterns = patternInfo.Length;
             InitializeOutputGrid();
         }
 
@@ -108,7 +108,7 @@ namespace WFC_Procedural_Generator_Framework
             float sumOfFrecuencies = 0;
             for (int i = 0; i < numberOfCandidates; i++)
             {
-                candidateFrecuencies[i] = patterns[candidateIndices[i]].relativeFrecuency;
+                candidateFrecuencies[i] = patternInfo[candidateIndices[i]].relativeFrecuency;
                 sumOfFrecuencies += candidateFrecuencies[i];
             }
 
@@ -143,7 +143,7 @@ namespace WFC_Procedural_Generator_Framework
                     Position neigbourCoord = currentPosition + Position.directions[direction];
                     Cell neighbourCell = outputGrid[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z];
                     int[,] neighbourEnablers = neighbourCell.tileEnablerCountsByDirection;
-                    HashSet<int> compatiblePatterns = patterns[currentPatternIndex].GetCompatiblesInDirection((Direction)direction);
+                    HashSet<int> compatiblePatterns = patternInfo[currentPatternIndex].GetCompatiblesInDirection((Direction)direction);
                    
                     foreach(int compatiblePattern in compatiblePatterns)
                     {
@@ -155,12 +155,18 @@ namespace WFC_Procedural_Generator_Framework
                             {
                                 if (neighbourEnablers[currentPatternIndex, i] == 0)
                                 {
+                                    neighbourCell.RemovePattern(currentPatternIndex, patternInfo);
+
+                                    //CHECK FOR NO MORE POSSIBLE TILES NOW
+
+                                    removalQueue.Enqueue((neigbourCoord, currentPatternIndex));
 
                                     break;
                                 }
                             }
-                        }
+                        }                        
                     }
+                    neighbourEnablers[currentPatternIndex, direction]--;
                 }
             }
 
