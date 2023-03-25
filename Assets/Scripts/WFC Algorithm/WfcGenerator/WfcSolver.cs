@@ -79,7 +79,7 @@ namespace WFC_Procedural_Generator_Framework
                         if (!current.collapsed && minEntropy > current.entrophy)
                         {
                             minEntropy = current.entrophy;
-                            pos  = new Position(i,k,j);
+                            pos = new Position(i,k,j);
                         }
                     }
                 }
