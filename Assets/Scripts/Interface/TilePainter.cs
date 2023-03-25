@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -10,8 +11,10 @@ namespace WFC_Procedural_Generator_Framework
         InputReader reader;
 
         public int selectedTile = 1;
-        public int mapSize = 10;
-        public int height = 1;
+        public int inputMapSize = 10;
+        public int inputHeight = 1;
+
+        public Vector3Int OutputSize = new Vector3Int(10, 1, 10);
 
         GridManager gridManager;
         public TileSet tileSet;
@@ -20,13 +23,16 @@ namespace WFC_Procedural_Generator_Framework
         private InputTileMapData tileMap;
         private UnityEngine.Tilemaps.Tile tile;
 
+        private InputReader inputReader;
+        private WfcSolver model;
+
         private void OnDrawGizmosSelected()
         {
             Vector3 pos = transform.position;
-            for (int i = 0; i <= mapSize; i++)
+            for (int i = 0; i <= inputMapSize; i++)
             {
-                Gizmos.DrawLine(new Vector3(0, gridManager.selectedLayer, i) + pos, new Vector3(mapSize, gridManager.selectedLayer, i) + pos);
-                Gizmos.DrawLine(new Vector3(i, gridManager.selectedLayer, 0) + pos, new Vector3(i, gridManager.selectedLayer, mapSize) + pos);
+                Gizmos.DrawLine(new Vector3(0, gridManager.selectedLayer, i) + pos, new Vector3(inputMapSize, gridManager.selectedLayer, i) + pos);
+                Gizmos.DrawLine(new Vector3(i, gridManager.selectedLayer, 0) + pos, new Vector3(i, gridManager.selectedLayer, inputMapSize) + pos);
             }
         }
 
@@ -62,10 +68,10 @@ namespace WFC_Procedural_Generator_Framework
 
         public void Initialize()
         {
-            tileMap = new InputTileMapData(mapSize, height);
+            tileMap = new InputTileMapData(inputMapSize, inputHeight);
             gridManager = GetComponent<GridManager>();
             tile = (UnityEngine.Tilemaps.Tile)ScriptableObject.CreateInstance(typeof(UnityEngine.Tilemaps.Tile));
-            gridManager.Initialize(mapSize, height);
+            gridManager.Initialize(inputMapSize, inputHeight);
             SetCurrentTile(selectedTile);
         }
 
@@ -138,7 +144,13 @@ namespace WFC_Procedural_Generator_Framework
 
         public void StartReader()
         {
-            reader = new InputReader(tileMap);
+            inputReader = new InputReader(tileMap);
+        }
+
+        internal void Generate()
+        {
+            model = new WfcSolver(inputReader, OutputSize.x, OutputSize.y, OutputSize.z);
+            int[,,] patternIndexMap = model.Generate();
         }
     }
 
@@ -163,10 +175,15 @@ namespace WFC_Procedural_Generator_Framework
             {
                 tilePainter.Clear();
             }
-            if (GUILayout.Button("Start Reader"))
+            if (GUILayout.Button("Train Model"))
             {
                 tilePainter.StartReader();
             }
+            if (GUILayout.Button("Generate"))
+            {
+                tilePainter.Generate();
+            }
+
             GUILayout.Space(10);
         }
 

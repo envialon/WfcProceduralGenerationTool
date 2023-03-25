@@ -59,14 +59,15 @@ namespace WFC_Procedural_Generator_Framework
 
         float sumOfPatternWeights;
         float sumOfPatternLogWeights;
+        int collapsedIndex;
 
-
-        public Cell(int[] possiblePatterns, PatternInfo[] patternInfo, int[,] tileEnablerTemplate)
+        public Cell(int[] possiblePatterns, PatternInfo[] patternInfo, int[,] tileEnablerTemplate, int collapsedValue = -1)
         {
             this.possiblePatterns = new HashSet<int>(possiblePatterns);
             sumOfPatternWeights = 0;
             sumOfPatternLogWeights = 0;
             entrophy = 0;
+            this.collapsedIndex = collapsedValue;
             collapsed = false;
             for (int i = 0; i < possiblePatterns.Length; i++)
             {
@@ -79,11 +80,17 @@ namespace WFC_Procedural_Generator_Framework
             CalculateEntrophy();
         }
 
+        public int GetCollapsedIndex()
+        {
+            return collapsedIndex;
+        }
+
         public void CollapseOn(int patternToCollapse)
         {
             possiblePatterns.RemoveWhere(x => x != patternToCollapse);
             entrophy = 0;
             collapsed = true;
+            collapsedIndex = patternToCollapse;
         }
 
         private void CalculateEntrophy()

@@ -6,7 +6,7 @@ namespace WFC_Procedural_Generator_Framework
 {
 
 
-    public class WfcModel
+    public class WfcSolver
     {
         int width;
         int height;
@@ -16,6 +16,8 @@ namespace WFC_Procedural_Generator_Framework
         private Cell[,,] outputGrid;
         private PatternInfo[] patternInfo;
         private int numberOfPatterns;
+        private int collapsedCount = 0;
+
         private int[,] InitialEnablerCount()
         {
             int numberOfDirections = Enum.GetValues(typeof(Direction)).Length;
@@ -52,7 +54,7 @@ namespace WFC_Procedural_Generator_Framework
             }
         }
 
-        public WfcModel(InputReader inputReader, int width = 0, int height = 0, int depth = 0)
+        public WfcSolver(InputReader inputReader, int width = 0, int height = 0, int depth = 0)
         {
             this.width = width;
             this.height = height;
@@ -65,24 +67,24 @@ namespace WFC_Procedural_Generator_Framework
         private Position FindLowestEntropyCell()
         {
             float minEntropy = float.MaxValue;
-            int[] position = new int[3];
+            Position pos = new Position();
             //for now, lineal search, must optimize later
-            for (int i = 0; i <= width; i++)
+            for (int i = 0; i < width; i++)
             {
-                for (int j = 0; j <= depth; j++)
+                for (int j = 0; j < depth; j++)
                 {
-                    for (int k = 0; k <= height; k++)
+                    for (int k = 0; k < height; k++)
                     {
                         Cell current = outputGrid[i, k, j];
                         if (!current.collapsed && minEntropy > current.entrophy)
                         {
                             minEntropy = current.entrophy;
-                            position = new int[] { i, k, j };
+                            pos  = new Position(i,k,j);
                         }
                     }
                 }
             }
-            return new Position(position[0], position[1], position[2]);
+            return pos;
         }
 
 
@@ -101,7 +103,10 @@ namespace WFC_Procedural_Generator_Framework
             int numberOfCandidates = candidateIndices.Length;
             if (numberOfCandidates <= 1)
             {
-                return;
+                collapsedCount++;
+                outputGrid[x, y, z].CollapseOn(candidateIndices[0]);
+            
+            return;
             }
 
             float[] candidateFrecuencies = new float[numberOfCandidates];
@@ -125,10 +130,13 @@ namespace WFC_Procedural_Generator_Framework
                     break;
                 }
             }
+
+            collapsedCount++;
+
             outputGrid[x, y, z].CollapseOn(collapsedPattern);
         }
 
-        
+
 
         private void Propagate(Position origin)
         {
@@ -136,22 +144,22 @@ namespace WFC_Procedural_Generator_Framework
             int numberOfDirections = Enum.GetValues(typeof(Direction)).Length;
             while (removalQueue.Count > 0)
             {
-                (Position currentPosition, int currentPatternIndex) = removalQueue.Dequeue();               
+                (Position currentPosition, int currentPatternIndex) = removalQueue.Dequeue();
 
-                for(int direction = 0; direction < numberOfDirections; direction++)
+                for (int direction = 0; direction < numberOfDirections; direction++)
                 {
                     Position neigbourCoord = currentPosition + Position.directions[direction];
                     Cell neighbourCell = outputGrid[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z];
                     int[,] neighbourEnablers = neighbourCell.tileEnablerCountsByDirection;
                     HashSet<int> compatiblePatterns = patternInfo[currentPatternIndex].GetCompatiblesInDirection((Direction)direction);
-                   
-                    foreach(int compatiblePattern in compatiblePatterns)
+
+                    foreach (int compatiblePattern in compatiblePatterns)
                     {
                         int oppositeDirection = (direction + 2) % 4;
                         if (neighbourEnablers[currentPatternIndex, direction] == 1)
                         {
                             //check the other directions to see if we have a 0
-                            for(int i = 0; i < numberOfDirections; i++)
+                            for (int i = 0; i < numberOfDirections; i++)
                             {
                                 if (neighbourEnablers[currentPatternIndex, i] == 0)
                                 {
@@ -164,7 +172,7 @@ namespace WFC_Procedural_Generator_Framework
                                     break;
                                 }
                             }
-                        }                        
+                        }
                     }
                     neighbourEnablers[currentPatternIndex, direction]--;
                 }
@@ -172,10 +180,34 @@ namespace WFC_Procedural_Generator_Framework
 
         }
 
-        public void Generate()
+        public int[,,] GetPatternGridOutOfOutputGrid()
         {
-            Position candidatePosition = Observe();
-            Propagate(candidatePosition);
+
+            int[,,] patternGrid = new int[width, height, depth]; 
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < depth; j++)
+                {
+                    for (int k = 0; k < height; k++)
+                    {
+                        patternGrid[i, k, j] = outputGrid[i, k, j].GetCollapsedIndex();
+                    }
+                }
+            }
+            return patternGrid;
+        }
+
+        public int[,,] Generate()
+        {
+            int cellsToBeCollapsed = width * height * depth;
+            collapsedCount = 0;
+            while (collapsedCount < cellsToBeCollapsed)
+            {
+                Position candidatePosition = Observe();
+                Propagate(candidatePosition);
+            }
+            return GetPatternGridOutOfOutputGrid();
         }
     }
+
 }
