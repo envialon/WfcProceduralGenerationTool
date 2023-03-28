@@ -147,5 +147,16 @@ namespace WFC_Procedural_Generator_Framework
             return neigbourIndices[direction];
         }
 
+        public override int GetHashCode()
+        {
+            string digits = "";
+            foreach (int i in pattern)
+            {
+                digits += i; 
+            }
+            int output = int.Parse(digits);
+            return int.Parse(digits);
+        }
+
     }
 }

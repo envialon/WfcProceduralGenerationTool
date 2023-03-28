@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Debug = UnityEngine.Debug;
 
 namespace WFC_Procedural_Generator_Framework
 {
@@ -43,18 +44,30 @@ namespace WFC_Procedural_Generator_Framework
             {
                 for (int j = 0; j < patternSize; j++)
                 {
-                    output[i, 0, j] = offsettedIndexGrid[i, 0, j];
+                    output[i, 0, j] = offsettedIndexGrid[i+x, 0, j+y];
                 }
             }
             return output;
         }
 
 
+        private int hashPattern(int[,,] pattern)
+        {
+            string digits = "";
+            foreach (int i in pattern)
+            {
+                digits += i;
+            }
+            int output = int.Parse(digits);
+            return output;
+        }
+
         private void PopulatePatternFrequency2D()
         {
             //usamos el diccionario para aprovechar el hasheo
 
-            Dictionary<int[,,], PatternInfo> patternFrecuency = new Dictionary<int[,,], PatternInfo>();
+            Dictionary<int, PatternInfo> patternFrecuency = new Dictionary<int, PatternInfo>();
+            HashSet<PatternInfo> uniquePatterns = new HashSet<PatternInfo>();
             int totalPatterns = 0;
 
             for (int i = 0; i < mapSize - patternSize; i++)
@@ -62,15 +75,24 @@ namespace WFC_Procedural_Generator_Framework
                 for (int j = 0; j < mapSize - patternSize; j++)
                 {
                     int[,,] pattern = Extract2DPatternAt(i, j);
-                    if (!patternFrecuency.ContainsKey(pattern))
+                    int patternHash = hashPattern(pattern);
+                    // PatternInfo candidate = new PatternInfo(pattern, uniquePatterns.Count);
+                    if (!patternFrecuency.ContainsKey(hashPattern(pattern)))
                     {
-                        patternFrecuency.Add(pattern, new PatternInfo(pattern, totalPatterns));
+                        //uniquePatterns.Add(candidate);
+                        patternFrecuency.Add(patternHash, new PatternInfo(pattern, patternFrecuency.Count));
+                        totalPatterns++;
                     }
-                    totalPatterns++;
-                    patternFrecuency[pattern]++;
-                    patternGrid[i, 0, j] = patternFrecuency[pattern].id;
+                    patternFrecuency[patternHash]++;
+                    patternGrid[i, 0, j] = patternFrecuency[patternHash].id;
+                    //PatternInfo actualValue = new PatternInfo();
+                    //uniquePatterns.TryGetValue(candidate, out actualValue);
+                    //actualValue.frecuency++;
+                    //patternGrid[i, 0, j] = actualValue.id;
                 }
             }
+
+            Debug.Log(totalPatterns);
 
             patterns = patternFrecuency.Values.ToArray();
             int numberOfValues = patterns.Length;
