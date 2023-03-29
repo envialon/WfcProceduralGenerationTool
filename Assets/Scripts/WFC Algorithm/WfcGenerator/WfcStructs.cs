@@ -152,11 +152,16 @@ namespace WFC_Procedural_Generator_Framework
             string digits = "";
             foreach (int i in pattern)
             {
-                digits += i; 
+                digits += i;
             }
             int output = int.Parse(digits);
             return int.Parse(digits);
         }
 
+        internal void UpdateFrecuencies(float totalPatterns)
+        {
+            relativeFrecuency = frecuency / totalPatterns;
+            relativeFrecuencyLog2 = (float)(Math.Log(relativeFrecuency, 2));
+        }
     }
 }

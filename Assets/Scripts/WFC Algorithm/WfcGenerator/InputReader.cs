@@ -16,6 +16,7 @@ namespace WFC_Procedural_Generator_Framework
         private int[,,] offsettedIndexGrid;
         private int[,,] patternGrid;
         private PatternInfo[] patterns;
+        private int totalPatterns = 0;
 
         /// <summary>
         /// Deberemos transformar la información de tile y rotación a enteros puramente, acabaremos con 
@@ -37,6 +38,7 @@ namespace WFC_Procedural_Generator_Framework
                 }
             }
         }
+
         private int[,,] Extract2DPatternAt(int x, int y)
         {
             int[,,] output = new int[patternSize, 1, patternSize];
@@ -44,7 +46,7 @@ namespace WFC_Procedural_Generator_Framework
             {
                 for (int j = 0; j < patternSize; j++)
                 {
-                    output[i, 0, j] = offsettedIndexGrid[i+x, 0, j+y];
+                    output[i, 0, j] = offsettedIndexGrid[i + x, 0, j + y];
                 }
             }
             return output;
@@ -62,13 +64,13 @@ namespace WFC_Procedural_Generator_Framework
             return output;
         }
 
-        private void PopulatePatternFrequency2D()
+        private void ExtractUniquePatterns()
         {
             //usamos el diccionario para aprovechar el hasheo
 
             Dictionary<int, PatternInfo> patternFrecuency = new Dictionary<int, PatternInfo>();
             HashSet<PatternInfo> uniquePatterns = new HashSet<PatternInfo>();
-            int totalPatterns = 0;
+            totalPatterns = 0;
 
             for (int i = 0; i < mapSize - patternSize; i++)
             {
@@ -81,8 +83,8 @@ namespace WFC_Procedural_Generator_Framework
                     {
                         //uniquePatterns.Add(candidate);
                         patternFrecuency.Add(patternHash, new PatternInfo(pattern, patternFrecuency.Count));
-                        totalPatterns++;
                     }
+                    totalPatterns++;
                     patternFrecuency[patternHash]++;
                     patternGrid[i, 0, j] = patternFrecuency[patternHash].id;
                     //PatternInfo actualValue = new PatternInfo();
@@ -92,14 +94,21 @@ namespace WFC_Procedural_Generator_Framework
                 }
             }
 
-            Debug.Log(totalPatterns);
-
             patterns = patternFrecuency.Values.ToArray();
             int numberOfValues = patterns.Length;
             for (int i = 0; i < numberOfValues; i++)
             {
                 patterns[i].relativeFrecuency = patterns[i].frecuency / totalPatterns;
                 patterns[i].relativeFrecuencyLog2 = MathF.Log(patterns[i].relativeFrecuencyLog2, 2);
+            }
+        }
+
+        private void UpdateFrecuencies()
+        {
+
+            for (int i = 0; i < patterns.Length; i++)
+            {
+                patterns[i].UpdateFrecuencies(totalPatterns);
             }
         }
 
@@ -179,8 +188,10 @@ namespace WFC_Procedural_Generator_Framework
             this.height = inputTileMap.height;
             this.patternGrid = new int[mapSize, 1, mapSize];
             PopulateIndexGrid();
-            PopulatePatternFrequency2D();
+            ExtractUniquePatterns();
+            UpdateFrecuencies();
             PopulatePatternNeighbours();
         }
+
     }
 }
