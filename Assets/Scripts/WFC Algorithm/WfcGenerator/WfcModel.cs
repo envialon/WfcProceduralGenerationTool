@@ -20,6 +20,5 @@ namespace WFC_Procedural_Generator_Framework
             inputReader = new InputReader(data, patternSize);
             solver = new WfcSolver(inputReader, outputX, outputY, outputZ);
         }
-
     }
 }

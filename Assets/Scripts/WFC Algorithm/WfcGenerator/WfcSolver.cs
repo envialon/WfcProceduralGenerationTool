@@ -79,7 +79,7 @@ namespace WFC_Procedural_Generator_Framework
                         if (!current.collapsed && minEntropy > current.entrophy)
                         {
                             minEntropy = current.entrophy;
-                            pos = new Position(i,k,j);
+                            pos = new Position(i, k, j);
                         }
                     }
                 }
@@ -87,56 +87,62 @@ namespace WFC_Procedural_Generator_Framework
             return pos;
         }
 
-        private Position Observe()
+        private (Position, int) Observe()
         {
             // find cell with minimal entropy;
             Position candidatePosition = FindLowestEntropyCell();
-            CollapseBasedOnPatternFrecuency(candidatePosition.x, candidatePosition.y, candidatePosition.z);
-            return candidatePosition;
+            int removedPattern = CollapseBasedOnPatternFrecuency(candidatePosition.x, candidatePosition.y, candidatePosition.z);
+            return (candidatePosition, removedPattern);
         }
 
         //we can optimize this:
-        private void CollapseBasedOnPatternFrecuency(int x, int y, int z)
+        private int CollapseBasedOnPatternFrecuency(int x, int y, int z)
         {
-            int[] candidateIndices = outputGrid[x, y, z].possiblePatterns.ToArray();
-            int numberOfCandidates = candidateIndices.Length;
+            int[] candidatePatternIndices = outputGrid[x, y, z].possiblePatterns.ToArray();
+            int numberOfCandidates = candidatePatternIndices.Length;
             if (numberOfCandidates <= 1)
             {
                 collapsedCount++;
-                outputGrid[x, y, z].CollapseOn(candidateIndices[0]);
-            
-            return;
+                outputGrid[x, y, z].CollapseOn(candidatePatternIndices[0]);
+                return candidatePatternIndices[0];
             }
 
             float[] candidateFrecuencies = new float[numberOfCandidates];
             float sumOfFrecuencies = 0;
             for (int i = 0; i < numberOfCandidates; i++)
             {
-                candidateFrecuencies[i] = patternInfo[candidateIndices[i]].relativeFrecuency;
+                candidateFrecuencies[i] = patternInfo[candidatePatternIndices[i]].relativeFrecuency;
                 sumOfFrecuencies += candidateFrecuencies[i];
             }
 
-            int collapsedPattern = -1;
+            int collapsedIndex = -1;
 
-            double acc = 0;
             double randomValue = random.NextDouble();
+            randomValue = randomValue * (sumOfFrecuencies);
             for (int i = 0; i < numberOfCandidates; i++)
             {
-                acc += candidateFrecuencies[i];
-                if (randomValue <= acc)
+                if (randomValue > candidateFrecuencies[i])
                 {
-                    collapsedPattern = i;
-                    break;
+                    randomValue -= candidateFrecuencies[i];
                 }
+                else { collapsedIndex = i; break; }
             }
 
             collapsedCount++;
 
-            outputGrid[x, y, z].CollapseOn(collapsedPattern);
+            outputGrid[x, y, z].CollapseOn(candidatePatternIndices[collapsedIndex]);
+            return candidatePatternIndices[collapsedIndex];
         }
-        private void Propagate(Position origin)
+
+        private bool PositionIsValid(Position pos)
+        {
+            return (pos.x < width && pos.x >= 0) && (pos.y < height && pos.y >= 0) && (pos.z < depth && pos.z >= 0);
+        }
+
+        private void Propagate(Position origin, int collapsedPattern)
         {
             Queue<(Position, int)> removalQueue = new Queue<(Position, int)>();
+            removalQueue.Enqueue((origin, collapsedPattern));
             int numberOfDirections = Enum.GetValues(typeof(Direction)).Length;
             while (removalQueue.Count > 0)
             {
@@ -145,6 +151,7 @@ namespace WFC_Procedural_Generator_Framework
                 for (int direction = 0; direction < numberOfDirections; direction++)
                 {
                     Position neigbourCoord = currentPosition + Position.directions[direction];
+                    if (!PositionIsValid(neigbourCoord)) continue;
                     Cell neighbourCell = outputGrid[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z];
                     int[,] neighbourEnablers = neighbourCell.tileEnablerCountsByDirection;
                     HashSet<int> compatiblePatterns = patternInfo[currentPatternIndex].GetCompatiblesInDirection((Direction)direction);
@@ -178,7 +185,7 @@ namespace WFC_Procedural_Generator_Framework
 
         public int[,,] GetPatternGridOutOfOutputGrid()
         {
-            int[,,] patternGrid = new int[width, height, depth]; 
+            int[,,] patternGrid = new int[width, height, depth];
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < depth; j++)
@@ -199,8 +206,8 @@ namespace WFC_Procedural_Generator_Framework
             collapsedCount = 0;
             while (collapsedCount < cellsToBeCollapsed)
             {
-                Position candidatePosition = Observe();
-                Propagate(candidatePosition);
+                (Position candidatePosition, int collapsedPattern) = Observe();
+                Propagate(candidatePosition, collapsedPattern);
             }
             return GetPatternGridOutOfOutputGrid();
         }
