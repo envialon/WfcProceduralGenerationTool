@@ -33,7 +33,6 @@ namespace WFC_Procedural_Generator_Framework
             }
         }
 
-
         private void OnEnable()
         {
             Initialize();
@@ -81,6 +80,11 @@ namespace WFC_Procedural_Generator_Framework
                     Graphics.DrawMesh(tileSet.GetMesh(currentTile.id), currentTRS, tileSet.GetMaterial(currentTile.id), 0, cam);
                 }
             }
+        }
+
+        private void DrawGeneratedMap(Camera cam)
+        {
+
         }
 
         public void HandleKeyPress(KeyCode keycode)
