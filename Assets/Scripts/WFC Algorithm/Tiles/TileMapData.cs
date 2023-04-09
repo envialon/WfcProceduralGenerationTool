@@ -53,5 +53,11 @@ namespace WFC_Procedural_Generator_Framework
             return output;
         }
 
+        public void Clear()
+        {
+            map = new Tile[mapSize, height, mapSize];
+        }
+
+
     }
 }

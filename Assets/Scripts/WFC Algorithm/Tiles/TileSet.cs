@@ -25,5 +25,15 @@ namespace WFC_Procedural_Generator_Framework
             }
         }
 
+        public Mesh GetMesh(int id)
+        {
+            return tiles[id].mesh;
+        }
+
+        public Material GetMaterial(int id)
+        {
+            return tiles[id].material;
+        }
+
     }
 }

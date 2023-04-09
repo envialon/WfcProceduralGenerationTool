@@ -14,7 +14,7 @@ namespace WFC_Procedural_Generator_Framework
         public WfcModel(InputTileMapData data)
         {
             inputReader = new InputReader(data, patternSize);
-            solver = new WfcSolver(inputReader, outputX, outputY, outputZ);
+           // solver = new WfcSolver(inputReader, outputX, outputY, outputZ);
         }
 
         public void Train(InputTileMapData inputTileMap, int patternSize = 2)
