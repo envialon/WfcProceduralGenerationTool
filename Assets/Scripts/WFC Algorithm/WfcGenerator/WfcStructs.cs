@@ -15,7 +15,6 @@ namespace WFC_Procedural_Generator_Framework
         west,
     }
 
-
     public struct Position
     {
         public int x; public int y; public int z;
@@ -95,7 +94,8 @@ namespace WFC_Procedural_Generator_Framework
 
         private void CalculateEntrophy()
         {
-            entrophy = (float)(Math.Log(sumOfPatternWeights, 2) - (sumOfPatternLogWeights / sumOfPatternWeights));
+            System.Random rand = new System.Random();
+            entrophy = (float)(Math.Log(sumOfPatternWeights, 2) - (sumOfPatternLogWeights / sumOfPatternWeights) + rand.NextDouble() * (double)0.0001f);
         }
 
         public void RemovePattern(int patternIndex, PatternInfo[] patternInfo)

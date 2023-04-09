@@ -16,7 +16,8 @@ namespace WFC_Procedural_Generator_Framework
 
         public Vector3Int OutputSize = new Vector3Int(10, 1, 10);
 
-        GridManager gridManager;
+        GridManager inputGridManager;
+        public GridManager outputGridManager;
         public TileSet tileSet;
 
         private List<GameObject> tilePrefabs = new List<GameObject>();
@@ -31,16 +32,16 @@ namespace WFC_Procedural_Generator_Framework
             Vector3 pos = transform.position;
             for (int i = 0; i <= inputMapSize; i++)
             {
-                Gizmos.DrawLine(new Vector3(0, gridManager.selectedLayer, i) + pos, new Vector3(inputMapSize, gridManager.selectedLayer, i) + pos);
-                Gizmos.DrawLine(new Vector3(i, gridManager.selectedLayer, 0) + pos, new Vector3(i, gridManager.selectedLayer, inputMapSize) + pos);
+                Gizmos.DrawLine(new Vector3(0, inputGridManager.selectedLayer, i) + pos, new Vector3(inputMapSize, inputGridManager.selectedLayer, i) + pos);
+                Gizmos.DrawLine(new Vector3(i, inputGridManager.selectedLayer, 0) + pos, new Vector3(i, inputGridManager.selectedLayer, inputMapSize) + pos);
             }
         }
 
         public void Clear()
         {
-            if (gridManager != null)
+            if (inputGridManager != null)
             {
-                this.gridManager.Clear();
+                this.inputGridManager.Clear();
             }
             CreatePrefabList();
             Initialize();
@@ -69,15 +70,16 @@ namespace WFC_Procedural_Generator_Framework
         public void Initialize()
         {
             tileMap = new InputTileMapData(inputMapSize, inputHeight);
-            gridManager = GetComponent<GridManager>();
+            inputGridManager = GetComponent<GridManager>();
             tile = (UnityEngine.Tilemaps.Tile)ScriptableObject.CreateInstance(typeof(UnityEngine.Tilemaps.Tile));
-            gridManager.Initialize(inputMapSize, inputHeight);
+            inputGridManager.Initialize(inputMapSize, inputHeight);
+            outputGridManager.Initialize(OutputSize.x, OutputSize.y);
             SetCurrentTile(selectedTile);
         }
 
         private void MoveGridSelector()
         {
-            gridManager.SelectLayer(gridManager.selectedLayer);
+            inputGridManager.SelectLayer(inputGridManager.selectedLayer);
         }
 
         public void SetCurrentTile(int selection)
@@ -91,11 +93,11 @@ namespace WFC_Procedural_Generator_Framework
             switch (keycode)
             {
                 case KeyCode.UpArrow:
-                    gridManager.SelectLayer(gridManager.selectedLayer + 1);
+                    inputGridManager.SelectLayer(inputGridManager.selectedLayer + 1);
                     MoveGridSelector();
                     break;
                 case KeyCode.DownArrow:
-                    gridManager.SelectLayer(gridManager.selectedLayer - 1);
+                    inputGridManager.SelectLayer(inputGridManager.selectedLayer - 1);
                     MoveGridSelector();
                     break;
                 case KeyCode.LeftArrow:
@@ -111,7 +113,7 @@ namespace WFC_Procedural_Generator_Framework
         {
             SetCurrentTile(selectedTile);
             tilePrefabs[selectedTile].SetActive(true);
-            gridManager.SetTile(coords, tile);
+            inputGridManager.SetTile(coords, tile);
             tilePrefabs[selectedTile].SetActive(false);
             tileMap.SetTile(new Tile(selectedTile), coords.x, coords.y, coords.z);
         }
@@ -127,7 +129,7 @@ namespace WFC_Procedural_Generator_Framework
             Ray ray = HandleUtility.GUIPointToWorldRay(mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
             {
-                Vector3Int cellPosition = gridManager.grid.WorldToCell(hit.point);
+                Vector3Int cellPosition = inputGridManager.grid.WorldToCell(hit.point);
 
                 //Debug.Log("Hit at: " + hit.point + " Corresponds to cell " + cellPosition);
 
@@ -142,11 +144,14 @@ namespace WFC_Procedural_Generator_Framework
             }
         }
 
+        
         public void StartReader()
         {
             inputReader = new InputReader(tileMap);
             inputReader.Train(2, tileMap);
+
             int[,,] patternIndexMap = inputReader.patternGrid;
+
             string msg = "Input patterngrid: \n";
             for (int i = 0; i < patternIndexMap.GetLength(0); i++)
             {
@@ -161,17 +166,24 @@ namespace WFC_Procedural_Generator_Framework
 
         }
 
+        
         internal void Generate()
         {
             model = new WfcSolver(inputReader, OutputSize.x, OutputSize.y, OutputSize.z);
-            int[,,] patternIndexMap = model.Generate();
+            int[,,] tileIndexMap = model.Generate();
 
             string msg = "Output patterngrid: \n";
-            for(int i = 0; i < patternIndexMap.GetLength(0); i++)
+            for (int i = 0; i < tileIndexMap.GetLength(0); i++)
             {
-                for(int j = 0; j < patternIndexMap.GetLength(2); j++)
+                for (int j = 0; j < tileIndexMap.GetLength(2); j++)
                 {
-                    msg += patternIndexMap[i,0,j] + " ";
+                    Vector3Int coords = new Vector3Int(i, 0, j);
+                    int tileIndex = tileIndexMap[i, 0, j] / 4;
+                    SetCurrentTile(tileIndex);
+                    tilePrefabs[tileIndex].SetActive(true);
+                    outputGridManager.SetTile(coords, tile);
+                    tilePrefabs[tileIndex].SetActive(false);
+                    msg += tileIndexMap[i, 0, j] + " ";
                 }
                 msg += "\n";
             }
@@ -179,6 +191,9 @@ namespace WFC_Procedural_Generator_Framework
             Debug.Log(msg);
         }
     }
+
+
+
 
 #if UNITY_EDITOR
     [CustomEditor(typeof(TilePainter))]

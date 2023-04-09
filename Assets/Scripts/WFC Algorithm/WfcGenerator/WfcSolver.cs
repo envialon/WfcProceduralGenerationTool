@@ -12,8 +12,16 @@ namespace WFC_Procedural_Generator_Framework
         int height;
         int depth;
 
+        int finalWidth;
+        int finalHeight;
+        int finalDepth;
+
+        int patternSize;
+
+
+
         private Random random = new Random();
-        private Cell[,,] outputGrid;
+        private Cell[,,] cellMap;
         private PatternInfo[] patternInfo;
         private int numberOfPatterns;
         private int collapsedCount = 0;
@@ -41,14 +49,14 @@ namespace WFC_Procedural_Generator_Framework
         {
             int[,] enablerCountTemplate = InitialEnablerCount();
 
-            outputGrid = new Cell[width, height, depth];
+            cellMap = new Cell[width, height, depth];
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < depth; j++)
                 {
                     for (int k = 0; k < height; k++)
                     {
-                        outputGrid[i, k, j] = new Cell(Enumerable.Range(0, patternInfo.Length).ToArray(), patternInfo, enablerCountTemplate);
+                        cellMap[i, k, j] = new Cell(Enumerable.Range(0, patternInfo.Length).ToArray(), patternInfo, enablerCountTemplate);
                     }
                 }
             }
@@ -56,9 +64,15 @@ namespace WFC_Procedural_Generator_Framework
 
         public WfcSolver(InputReader inputReader, int width = 0, int height = 0, int depth = 0)
         {
-            this.width = width;
-            this.height = height;
-            this.depth = depth;
+            this.patternSize = inputReader.patternSize;
+            this.finalWidth = width;
+            this.finalHeight = height;
+            this.finalDepth = depth;
+
+            this.width = width - (patternSize);
+            this.height = height;// - (patternSize - 1);
+            this.depth = depth - (patternSize);
+
             this.patternInfo = inputReader.GetPatternInfo();
             this.numberOfPatterns = patternInfo.Length;
             InitializeOutputGrid();
@@ -75,7 +89,7 @@ namespace WFC_Procedural_Generator_Framework
                 {
                     for (int k = 0; k < height; k++)
                     {
-                        Cell current = outputGrid[i, k, j];
+                        Cell current = cellMap[i, k, j];
                         if (!current.collapsed && minEntropy > current.entrophy)
                         {
                             minEntropy = current.entrophy;
@@ -98,12 +112,12 @@ namespace WFC_Procedural_Generator_Framework
         //we can optimize this:
         private int CollapseBasedOnPatternFrecuency(int x, int y, int z)
         {
-            int[] candidatePatternIndices = outputGrid[x, y, z].possiblePatterns.ToArray();
+            int[] candidatePatternIndices = cellMap[x, y, z].possiblePatterns.ToArray();
             int numberOfCandidates = candidatePatternIndices.Length;
             if (numberOfCandidates <= 1)
             {
                 collapsedCount++;
-                outputGrid[x, y, z].CollapseOn(candidatePatternIndices[0]);
+                cellMap[x, y, z].CollapseOn(candidatePatternIndices[0]);
                 return candidatePatternIndices[0];
             }
 
@@ -130,7 +144,7 @@ namespace WFC_Procedural_Generator_Framework
 
             collapsedCount++;
 
-            outputGrid[x, y, z].CollapseOn(candidatePatternIndices[collapsedIndex]);
+            cellMap[x, y, z].CollapseOn(candidatePatternIndices[collapsedIndex]);
             return candidatePatternIndices[collapsedIndex];
         }
 
@@ -152,7 +166,7 @@ namespace WFC_Procedural_Generator_Framework
                 {
                     Position neigbourCoord = currentPosition + Position.directions[direction];
                     if (!PositionIsValid(neigbourCoord)) continue;
-                    Cell neighbourCell = outputGrid[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z];
+                    Cell neighbourCell = cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z];
                     int[,] neighbourEnablers = neighbourCell.tileEnablerCountsByDirection;
                     HashSet<int> compatiblePatterns = patternInfo[currentPatternIndex].GetCompatiblesInDirection((Direction)direction);
 
@@ -192,11 +206,33 @@ namespace WFC_Procedural_Generator_Framework
                 {
                     for (int k = 0; k < height; k++)
                     {
-                        patternGrid[i, k, j] = outputGrid[i, k, j].GetCollapsedIndex();
+                        patternGrid[i, k, j] = cellMap[i, k, j].GetCollapsedIndex();
                     }
                 }
             }
             return patternGrid;
+        }
+
+        public int[,,] GetOutputTileIndexGrid()
+        {
+            int[,,] output = new int[finalWidth, finalHeight, finalDepth];
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int z = 0; z < depth; z++)
+                {
+                    int patternIndex = cellMap[x, 0, z].GetCollapsedIndex();
+                    int[,,] pattern = patternInfo[patternIndex].pattern;
+                    for (int i = 0; i < patternSize; i++)
+                    {
+                        for (int j = 0; j < patternSize; j++)
+                        {
+                            output[x + i, 0, z + j] = pattern[i, 0, j];
+                        }
+                    }
+                }
+            }
+            return output;
         }
 
 
@@ -209,7 +245,7 @@ namespace WFC_Procedural_Generator_Framework
                 (Position candidatePosition, int collapsedPattern) = Observe();
                 Propagate(candidatePosition, collapsedPattern);
             }
-            return GetPatternGridOutOfOutputGrid();
+            return GetOutputTileIndexGrid();
         }
     }
 }
