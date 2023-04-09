@@ -87,7 +87,6 @@ namespace WFC_Procedural_Generator_Framework
             return pos;
         }
 
-
         private Position Observe()
         {
             // find cell with minimal entropy;
@@ -135,9 +134,6 @@ namespace WFC_Procedural_Generator_Framework
 
             outputGrid[x, y, z].CollapseOn(collapsedPattern);
         }
-
-
-
         private void Propagate(Position origin)
         {
             Queue<(Position, int)> removalQueue = new Queue<(Position, int)>();
@@ -182,7 +178,6 @@ namespace WFC_Procedural_Generator_Framework
 
         public int[,,] GetPatternGridOutOfOutputGrid()
         {
-
             int[,,] patternGrid = new int[width, height, depth]; 
             for (int i = 0; i < width; i++)
             {
@@ -197,6 +192,7 @@ namespace WFC_Procedural_Generator_Framework
             return patternGrid;
         }
 
+
         public int[,,] Generate()
         {
             int cellsToBeCollapsed = width * height * depth;
@@ -209,5 +205,4 @@ namespace WFC_Procedural_Generator_Framework
             return GetPatternGridOutOfOutputGrid();
         }
     }
-
 }

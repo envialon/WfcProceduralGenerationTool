@@ -145,12 +145,38 @@ namespace WFC_Procedural_Generator_Framework
         public void StartReader()
         {
             inputReader = new InputReader(tileMap);
+            inputReader.Train(2, tileMap);
+            int[,,] patternIndexMap = inputReader.patternGrid;
+            string msg = "Input patterngrid: \n";
+            for (int i = 0; i < patternIndexMap.GetLength(0); i++)
+            {
+                for (int j = 0; j < patternIndexMap.GetLength(2); j++)
+                {
+                    msg += patternIndexMap[i, 0, j] + " ";
+                }
+                msg += "\n";
+            }
+
+            Debug.Log(msg);
+
         }
 
         internal void Generate()
         {
             model = new WfcSolver(inputReader, OutputSize.x, OutputSize.y, OutputSize.z);
             int[,,] patternIndexMap = model.Generate();
+
+            string msg = "Output patterngrid: \n";
+            for(int i = 0; i < patternIndexMap.GetLength(0); i++)
+            {
+                for(int j = 0; j < patternIndexMap.GetLength(2); j++)
+                {
+                    msg += patternIndexMap[i,0,j] + " ";
+                }
+                msg += "\n";
+            }
+
+            Debug.Log(msg);
         }
     }
 

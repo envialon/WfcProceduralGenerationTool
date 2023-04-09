@@ -8,13 +8,15 @@ namespace WFC_Procedural_Generator_Framework
     public class InputReader
     {
         public int patternSize = 2; // 2x2x2
+        public int patternHeight = 2;
         public TileSet tileSet;
         public InputTileMapData inputTileMap;
 
         private int height;
         private int mapSize;
         private int[,,] offsettedIndexGrid;
-        private int[,,] patternGrid;
+       //must change
+        public int[,,] patternGrid;
         private PatternInfo[] patterns;
         private int totalPatterns = 0;
 
@@ -175,22 +177,79 @@ namespace WFC_Procedural_Generator_Framework
             FindOverlappingNeighbours();
         }
 
+        private void PlacePattern(ref int[,,] indexGrid, int patternId, int x, int y, int z)
+        {
+            for (int i = 0; i < patternSize; i++)
+            {
+                for (int j = 0; j < patternSize; j++)
+                {
+                    indexGrid[i + x, y, j + z] = patterns[patternId].pattern[i, 0, j];
+                }
+            }
+        }
+
+        public int[,,] GetIndexGridFromPatternIndexGrid(int[,,] patternIndexGrid)
+        {
+            int maxX = patternIndexGrid.GetLength(0);
+            int maxY = patternIndexGrid.GetLength(1);
+            int maxZ = patternIndexGrid.GetLength(2);
+
+            int[,,] indexGrid = new int[maxX * patternSize, maxY * patternHeight, maxZ * patternSize];
+
+            for (int i = 0; i < maxX; i++)
+            {
+                for (int j = 0; j < maxZ; j++)
+                {
+                    for (int k = 0; k < maxY; k++)
+                    {
+                        PlacePattern(ref indexGrid, patterns[patternIndexGrid[i, k, j]].id, i, k, j);
+                    }
+                }
+            }
+
+
+            return indexGrid;
+        }
+
         public PatternInfo[] GetPatternInfo()
         {
             return patterns;
         }
 
-        public InputReader(InputTileMapData inputTileMap, int patternSize = 2)
+        public void Train(int patternSize = 2, InputTileMapData inputTileMap = null)
+        {
+            if (inputTileMap is not null)
+            {
+                Initialize(inputTileMap, patternSize);
+            }
+            if (this.inputTileMap is null)
+            {
+                throw new Exception("The InputReader doesn't have any data to read.");
+            }
+            PopulateIndexGrid();
+            ExtractUniquePatterns();
+            UpdateFrecuencies();
+            PopulatePatternNeighbours();
+        }
+
+
+        private void Initialize(InputTileMapData inputTileMap, int patternSize = 2)
         {
             this.patternSize = patternSize;
             this.inputTileMap = inputTileMap;
             this.mapSize = inputTileMap.mapSize;
             this.height = inputTileMap.height;
             this.patternGrid = new int[mapSize, 1, mapSize];
-            PopulateIndexGrid();
-            ExtractUniquePatterns();
-            UpdateFrecuencies();
-            PopulatePatternNeighbours();
+        }
+
+        public InputReader()
+        {
+        }
+
+
+        public InputReader(InputTileMapData inputTileMap, int patternSize = 2)
+        {
+            Initialize(inputTileMap, patternSize);
         }
 
     }
