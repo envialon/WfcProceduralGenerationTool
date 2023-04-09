@@ -98,6 +98,11 @@ namespace WFC_Procedural_Generator_Framework
             }
         }
 
+        private void DeleteTile(Vector3Int pos)
+        {
+            inputMap.SetTile(new Tile(0, 0), pos.x, pos.y, pos.z);
+        }
+
         private void PlaceTile(Vector3Int pos)
         {
             inputMap.SetTile(new Tile(selectedTile, 0), pos.x, pos.y, pos.z);
@@ -108,7 +113,7 @@ namespace WFC_Procedural_Generator_Framework
             inputMap.RotateAt(pos.x, pos.y, pos.z);
         }
 
-        public void HandleClick(Vector3 mousePosition, KeyCode code)
+        public void HandleClick(Vector3 mousePosition, int mouseButton)
         {
             Ray ray = HandleUtility.GUIPointToWorldRay(mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
@@ -116,8 +121,11 @@ namespace WFC_Procedural_Generator_Framework
                 Vector3Int cellPosition = grid.WorldToCell(hit.point);
 
                 //Debug.Log("Hit at: " + hit.point + " Corresponds to cell " + cellPosition);
-
-                if (selectedTile == inputMap.GetTile(cellPosition.x, cellPosition.y, cellPosition.z).id)
+                if (mouseButton == 1)
+                {
+                    DeleteTile(cellPosition);
+                }
+                else if (selectedTile == inputMap.GetTile(cellPosition.x, cellPosition.y, cellPosition.z).id)
                 {
                     RotateTile(cellPosition);
                 }
@@ -179,7 +187,7 @@ namespace WFC_Procedural_Generator_Framework
             Event e = Event.current;
             if (e.type == EventType.MouseDown)
             {
-                t.HandleClick(e.mousePosition, e.keyCode);
+                t.HandleClick(e.mousePosition, e.button);
             }
             if (e.type == EventType.KeyDown)
             {
