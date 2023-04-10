@@ -19,9 +19,10 @@ namespace WFC_Procedural_Generator_Framework
 
         private Grid grid;
         private BoxCollider boxCollider;
-        private InputTileMapData inputMap;
+
         private WfcModel model;
-        private int[,,] lastMapGenerated;
+        private Tilemap inputMap;
+        private Tilemap lastMapGenerated;
 
         private void OnDrawGizmosSelected()
         {
@@ -47,7 +48,7 @@ namespace WFC_Procedural_Generator_Framework
 
         private void Initialize()
         {
-            inputMap = new InputTileMapData(inputMapSize, inputMapHeight);
+            inputMap = new Tilemap(inputMapSize, inputMapHeight);
             model = new WfcModel(inputMap);
 
             grid = GetComponent<Grid>();
@@ -65,8 +66,21 @@ namespace WFC_Procedural_Generator_Framework
                 if (tileSet)
                 {
                     DrawInputMap(cam);
+                    if (lastMapGenerated != null)
+                    {
+                        DrawGeneratedMap(cam);
+                    }
                 }
             }
+        }
+
+        private void DrawTile(Tile currentTile, Vector3 tilePos, Camera cam)
+        {
+            Quaternion rotation = Quaternion.Euler(new Vector3(0, 90 * currentTile.rotation, 0));
+
+            Matrix4x4 currentTRS = Matrix4x4.TRS(transform.position + tilePos, Quaternion.identity, Vector3.one);
+
+            Graphics.DrawMesh(tileSet.GetMesh(currentTile.id), currentTRS, tileSet.GetMaterial(currentTile.id), 0, cam);
         }
 
         private void DrawInputMap(Camera cam)
@@ -75,15 +89,31 @@ namespace WFC_Procedural_Generator_Framework
             {
                 for (int j = 0; j < inputMapSize; j++)
                 {
-                    Tile currentTile = inputMap.GetTile(i, 0, j);
-                    Matrix4x4 currentTRS = Matrix4x4.TRS(transform.position + new Vector3(i, 0, j), Quaternion.identity, Vector3.one);
-                    Graphics.DrawMesh(tileSet.GetMesh(currentTile.id), currentTRS, tileSet.GetMaterial(currentTile.id), 0, cam);
+                    Vector3 tilePos = new Vector3(i, 0, j);
+                    DrawTile(inputMap.GetTile(i, 0, j), tilePos, cam);
                 }
             }
         }
 
         private void DrawGeneratedMap(Camera cam)
         {
+            int outputX = lastMapGenerated.width;
+            int outputY = lastMapGenerated.height;
+            int outputZ = lastMapGenerated.depth;
+
+            Vector3Int startingPoint = new Vector3Int(inputMapSize + 1, 0, -outputZ / 2);
+
+            for (int i = 0; i < outputX; i++)
+            {
+                for (int j = 0; j < outputY; j++)
+                {
+
+                    Vector3Int tilePos = startingPoint + new Vector3Int(i, 0, j);
+                    Tile tile = lastMapGenerated.GetTile(tilePos.x, tilePos.y, tilePos.z);
+
+                    DrawTile(tile, tilePos, cam);
+                }
+            }
 
         }
 
@@ -91,12 +121,12 @@ namespace WFC_Procedural_Generator_Framework
         {
             switch (keycode)
             {
-                case KeyCode.S:
+                case KeyCode.N:
 
                     selectedTile = (selectedTile + 1) % tileSet.tiles.Count;
                     break;
 
-                case KeyCode.A:
+                case KeyCode.M:
                     selectedTile = Mathf.Abs((selectedTile - 1)) % tileSet.tiles.Count;
                     break;
             }
@@ -152,7 +182,7 @@ namespace WFC_Procedural_Generator_Framework
 
         public void Generate()
         {
-            lastMapGenerated = model.Generate();
+            lastMapGenerated = new Tilemap(model.Generate(), tileSet);
         }
     }
 

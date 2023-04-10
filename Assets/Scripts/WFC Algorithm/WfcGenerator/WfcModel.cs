@@ -11,13 +11,13 @@ namespace WFC_Procedural_Generator_Framework
         private InputReader inputReader;
         private WfcSolver solver;
 
-        public WfcModel(InputTileMapData data)
+        public WfcModel(Tilemap data)
         {
             inputReader = new InputReader(data, patternSize);
            // solver = new WfcSolver(inputReader, outputX, outputY, outputZ);
         }
 
-        public void Train(InputTileMapData inputTileMap, int patternSize = 2)
+        public void Train(Tilemap inputTileMap, int patternSize = 2)
         {
             inputReader.Train(patternSize, inputTileMap);
         }

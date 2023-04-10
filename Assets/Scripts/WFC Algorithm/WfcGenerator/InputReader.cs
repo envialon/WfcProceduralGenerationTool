@@ -10,7 +10,7 @@ namespace WFC_Procedural_Generator_Framework
         public int patternSize = 2; // 2x2x2
         public int patternHeight = 2;
         public TileSet tileSet;
-        public InputTileMapData inputTileMap;
+        public Tilemap inputTileMap;
 
         private int height;
         private int mapSize;
@@ -27,7 +27,7 @@ namespace WFC_Procedural_Generator_Framework
         private void PopulateIndexGrid()
         {
             Tile[,,] tilemap = inputTileMap.map;
-            offsettedIndexGrid = new int[inputTileMap.mapSize + patternSize, inputTileMap.height, inputTileMap.mapSize + patternSize];
+            offsettedIndexGrid = new int[inputTileMap.width+ patternSize, inputTileMap.height, inputTileMap.depth + patternSize];
 
             for (int k = 0; k < height; k++)
             {
@@ -216,7 +216,7 @@ namespace WFC_Procedural_Generator_Framework
             return patterns;
         }
 
-        public void Train(int patternSize = 2, InputTileMapData inputTileMap = null)
+        public void Train(int patternSize = 2, Tilemap inputTileMap = null)
         {
             if (inputTileMap is not null)
             {
@@ -233,11 +233,11 @@ namespace WFC_Procedural_Generator_Framework
         }
 
 
-        private void Initialize(InputTileMapData inputTileMap, int patternSize = 2)
+        private void Initialize(Tilemap inputTileMap, int patternSize = 2)
         {
             this.patternSize = patternSize;
             this.inputTileMap = inputTileMap;
-            this.mapSize = inputTileMap.mapSize;
+            this.mapSize = inputTileMap.width;
             this.height = inputTileMap.height;
             this.patternGrid = new int[mapSize, 1, mapSize];
         }
@@ -264,7 +264,7 @@ namespace WFC_Procedural_Generator_Framework
             return output;
         }
         
-        public InputReader(InputTileMapData inputTileMap, int patternSize = 2)
+        public InputReader(Tilemap inputTileMap, int patternSize = 2)
         {
             Initialize(inputTileMap, patternSize);
         }

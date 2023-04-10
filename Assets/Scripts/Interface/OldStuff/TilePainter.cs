@@ -21,7 +21,7 @@ namespace WFC_Procedural_Generator_Framework
         public TileSet tileSet;
 
         private List<GameObject> tilePrefabs = new List<GameObject>();
-        private InputTileMapData tileMap;
+        private Tilemap tileMap;
         private UnityEngine.Tilemaps.Tile tile;
 
         private InputReader inputReader;
@@ -69,7 +69,7 @@ namespace WFC_Procedural_Generator_Framework
 
         public void Initialize()
         {
-            tileMap = new InputTileMapData(inputMapSize, inputHeight);
+            tileMap = new Tilemap(inputMapSize, inputHeight);
             inputGridManager = GetComponent<GridManager>();
             tile = (UnityEngine.Tilemaps.Tile)ScriptableObject.CreateInstance(typeof(UnityEngine.Tilemaps.Tile));
             inputGridManager.Initialize(inputMapSize, inputHeight);
