@@ -40,7 +40,7 @@ namespace WFC_Procedural_Generator_Framework
                     for (int k = 0; k < height; k++)
                     {
                         int index = indexMap[i, k, j];
-                        int tileId = (int)Mathf.Floor(index / 4f);
+                        int tileId = index / 4;
                         int rotation = index - tileId * 4;
                         map[i, k, j] = new Tile(tileId, rotation);
                     }
