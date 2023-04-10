@@ -9,7 +9,6 @@ namespace WFC_Procedural_Generator_Framework
     {
         public int patternSize = 2; // 2x2x2
         public int patternHeight = 2;
-        public TileSet tileSet;
         public Tilemap inputTileMap;
 
         private int height;

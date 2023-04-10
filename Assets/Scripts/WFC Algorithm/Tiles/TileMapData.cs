@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace WFC_Procedural_Generator_Framework
 {
     public class Tilemap
@@ -23,12 +25,27 @@ namespace WFC_Procedural_Generator_Framework
             map = new Tile[width, height, width];
         }
 
-        public Tilemap(int[,,] indexMap, TileSet tileSet)
-        {
+        //Constructor from the output of the WFC algorithm
+        public Tilemap(int[,,] indexMap)
+        {            
             this.width = indexMap.GetLength(0);
             this.height = indexMap.GetLength(1);
             this.depth = indexMap.GetLength(2);
-            throw new System.Exception();
+
+            map = new Tile[width, height, width];
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < depth; j++)
+                {
+                    for (int k = 0; k < height; k++)
+                    {
+                        int index = indexMap[i, k, j];
+                        int tileId = (int)Mathf.Floor(index / 4f);
+                        int rotation = index - tileId * 4;
+                        map[i, k, j] = new Tile(tileId, rotation);
+                    }
+                }
+            }
         }
 
         public void SetTile(Tile tile, int x, int y, int z)

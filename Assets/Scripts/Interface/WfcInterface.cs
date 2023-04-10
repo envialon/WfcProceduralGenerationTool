@@ -109,7 +109,7 @@ namespace WFC_Procedural_Generator_Framework
                 {
 
                     Vector3Int tilePos = startingPoint + new Vector3Int(i, 0, j);
-                    Tile tile = lastMapGenerated.GetTile(tilePos.x, tilePos.y, tilePos.z);
+                    Tile tile = lastMapGenerated.GetTile(i, 0, j);
 
                     DrawTile(tile, tilePos, cam);
                 }
@@ -182,7 +182,8 @@ namespace WFC_Procedural_Generator_Framework
 
         public void Generate()
         {
-            lastMapGenerated = new Tilemap(model.Generate(), tileSet);
+            int[,,] generatedIndexMap = model.Generate();
+            lastMapGenerated = new Tilemap(generatedIndexMap);
         }
     }
 
