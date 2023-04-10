@@ -27,7 +27,7 @@ namespace WFC_Procedural_Generator_Framework
 
         //Constructor from the output of the WFC algorithm
         public Tilemap(int[,,] indexMap)
-        {            
+        {
             this.width = indexMap.GetLength(0);
             this.height = indexMap.GetLength(1);
             this.depth = indexMap.GetLength(2);
@@ -39,9 +39,8 @@ namespace WFC_Procedural_Generator_Framework
                 {
                     for (int k = 0; k < height; k++)
                     {
-                        int index = indexMap[i, k, j];
-                        int tileId = index / 4;
-                        int rotation = index - tileId * 4;
+                        int tileId = indexMap[i, k, j] / 4;
+                        int rotation = indexMap[i, k, j] - tileId * 4;
                         map[i, k, j] = new Tile(tileId, rotation);
                     }
                 }
