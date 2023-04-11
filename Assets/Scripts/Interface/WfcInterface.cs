@@ -34,6 +34,18 @@ namespace WFC_Procedural_Generator_Framework
             }
         }
 
+        private void OnValidate()
+        {
+            Resize();
+        }
+
+        private void Resize()
+        {
+            inputMap = new Tilemap(inputMapSize, inputMapHeight);
+            boxCollider.size = new Vector3(inputMapSize, 0, inputMapSize);
+            boxCollider.center = new Vector3(inputMapSize / 2 + 0.5f, 0, inputMapSize / 2 + 0.5f);
+        }
+
         private void OnEnable()
         {
             Initialize();
@@ -55,8 +67,7 @@ namespace WFC_Procedural_Generator_Framework
             grid.cellSwizzle = GridLayout.CellSwizzle.XYZ;
 
             boxCollider = GetComponent<BoxCollider>();
-            boxCollider.size = new Vector3(inputMapSize, 0, inputMapSize);
-            boxCollider.center = new Vector3(inputMapSize / 2, 0, inputMapSize / 2);
+            Resize();
         }
 
         private void DrawWithCamera(Camera cam)
@@ -114,7 +125,6 @@ namespace WFC_Procedural_Generator_Framework
                     DrawTile(tile, tilePos, cam);
                 }
             }
-
         }
 
         public void HandleKeyPress(KeyCode keycode)
@@ -183,6 +193,18 @@ namespace WFC_Procedural_Generator_Framework
         public void Generate()
         {
             int[,,] generatedIndexMap = model.Generate();
+
+            string msg = "";
+            for (int i = 0; i < generatedIndexMap.GetLength(0); i++)
+            {
+                for (int j = 0; j < generatedIndexMap.GetLength(2); j++)
+                {
+                    msg += generatedIndexMap[i, 0, j] + " ";
+                }
+                msg += "\n";
+            }
+            Debug.Log(msg);
+
             lastMapGenerated = new Tilemap(generatedIndexMap);
         }
     }

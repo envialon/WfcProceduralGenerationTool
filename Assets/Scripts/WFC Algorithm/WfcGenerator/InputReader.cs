@@ -54,31 +54,30 @@ namespace WFC_Procedural_Generator_Framework
         }
 
 
-        private int hashPattern(int[,,] pattern)
+        private string hashPattern(int[,,] pattern)
         {
             string digits = "";
             foreach (int i in pattern)
             {
-                digits += i;
+                digits += i+".";
             }
-            int output = int.Parse(digits);
-            return output;
+            return digits;
         }
 
         private void ExtractUniquePatterns()
         {
             //usamos el diccionario para aprovechar el hasheo
 
-            Dictionary<int, PatternInfo> patternFrecuency = new Dictionary<int, PatternInfo>();
+            Dictionary<string, PatternInfo> patternFrecuency = new Dictionary<string, PatternInfo>();
             HashSet<PatternInfo> uniquePatterns = new HashSet<PatternInfo>();
             totalPatterns = 0;
 
-            for (int i = 0; i < mapSize - patternSize; i++)
+            for (int i = 0; i <= mapSize - patternSize; i++)
             {
-                for (int j = 0; j < mapSize - patternSize; j++)
+                for (int j = 0; j <= mapSize - patternSize; j++)
                 {
                     int[,,] pattern = Extract2DPatternAt(i, j);
-                    int patternHash = hashPattern(pattern);
+                    string patternHash = hashPattern(pattern);
                     // PatternInfo candidate = new PatternInfo(pattern, uniquePatterns.Count);
                     if (!patternFrecuency.ContainsKey(hashPattern(pattern)))
                     {
@@ -97,11 +96,11 @@ namespace WFC_Procedural_Generator_Framework
 
             patterns = patternFrecuency.Values.ToArray();
             int numberOfValues = patterns.Length;
-            for (int i = 0; i < numberOfValues; i++)
-            {
-                patterns[i].relativeFrecuency = patterns[i].frecuency / totalPatterns;
-                patterns[i].relativeFrecuencyLog2 = MathF.Log(patterns[i].relativeFrecuencyLog2, 2);
-            }
+            //for (int i = 0; i < numberOfValues; i++)
+            //{
+            //    patterns[i].relativeFrecuency = patterns[i].frecuency / totalPatterns;
+            //    patterns[i].relativeFrecuencyLog2 = MathF.Log(patterns[i].relativeFrecuencyLog2, 2);
+            //}
         }
 
         private void UpdateFrecuencies()
@@ -225,6 +224,9 @@ namespace WFC_Procedural_Generator_Framework
             {
                 throw new Exception("The InputReader doesn't have any data to read.");
             }
+
+            patterns = new PatternInfo[0];
+
             PopulateIndexGrid();
             ExtractUniquePatterns();
             UpdateFrecuencies();

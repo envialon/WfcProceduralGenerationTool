@@ -87,7 +87,5 @@ namespace WFC_Procedural_Generator_Framework
         {
             map = new Tile[width, height, depth];
         }
-
-
     }
 }
