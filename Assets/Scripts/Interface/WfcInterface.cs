@@ -42,6 +42,7 @@ namespace WFC_Procedural_Generator_Framework
         private void Resize()
         {
             inputMap = new Tilemap(inputMapSize, inputMapHeight);
+            model = new WfcModel(inputMap);
             boxCollider.size = new Vector3(inputMapSize, 0, inputMapSize);
             boxCollider.center = new Vector3(inputMapSize / 2 + 0.5f, 0, inputMapSize / 2 + 0.5f);
         }
@@ -192,7 +193,7 @@ namespace WFC_Procedural_Generator_Framework
 
         public void Generate()
         {
-            int[,,] generatedIndexMap = model.Generate();
+            int[,,] generatedIndexMap = model.Generate(outputSize.x, outputSize.y, outputSize.z);
 
             string msg = "";
             for (int i = 0; i < generatedIndexMap.GetLength(0); i++)

@@ -4,10 +4,6 @@ namespace WFC_Procedural_Generator_Framework
     {
         int patternSize = 2;
 
-        int outputX = 20;
-        int outputY = 20;
-        int outputZ = 20;
-
         private InputReader inputReader;
         private WfcSolver solver;
 
@@ -15,14 +11,14 @@ namespace WFC_Procedural_Generator_Framework
         {
             inputReader = new InputReader(data, patternSize);
            // solver = new WfcSolver(inputReader, outputX, outputY, outputZ);
-        }
+        }   
 
         public void Train(Tilemap inputTileMap, int patternSize = 2)
         {
             inputReader.Train(patternSize, inputTileMap);
         }
 
-        public int[,,] Generate()
+        public int[,,] Generate(int outputX, int outputY, int outputZ)
         {
             solver = new WfcSolver(inputReader, outputX, outputY, outputZ);
             return solver.Generate();

@@ -69,9 +69,9 @@ namespace WFC_Procedural_Generator_Framework
             this.finalHeight = height;
             this.finalDepth = depth;
 
-            this.width = width - (patternSize);
-            this.height = height;// - (patternSize - 1);
-            this.depth = depth - (patternSize);
+            this.width = width+1 - (patternSize);
+            this.height = height;// - (patternHeight - 1);
+            this.depth = depth+1 - (patternSize);
 
             this.patternInfo = inputReader.GetPatternInfo();
             this.numberOfPatterns = patternInfo.Length;
@@ -114,7 +114,15 @@ namespace WFC_Procedural_Generator_Framework
         {
             int[] candidatePatternIndices = cellMap[x, y, z].possiblePatterns.ToArray();
             int numberOfCandidates = candidatePatternIndices.Length;
-            if (numberOfCandidates <= 1)
+
+            if (numberOfCandidates == 0)
+            {
+                collapsedCount++;
+                cellMap[x, y, z].CollapseOn(0);
+                return 0;
+            }
+
+            if (numberOfCandidates == 1)
             {
                 collapsedCount++;
                 cellMap[x, y, z].CollapseOn(candidatePatternIndices[0]);
@@ -183,6 +191,7 @@ namespace WFC_Procedural_Generator_Framework
                                     neighbourCell.RemovePattern(currentPatternIndex, patternInfo);
 
                                     //CHECK FOR NO MORE POSSIBLE TILES NOW
+
 
                                     removalQueue.Enqueue((neigbourCoord, currentPatternIndex));
 

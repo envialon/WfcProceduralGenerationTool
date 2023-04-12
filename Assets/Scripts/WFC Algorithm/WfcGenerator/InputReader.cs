@@ -164,7 +164,7 @@ namespace WFC_Procedural_Generator_Framework
                 PatternInfo current = patterns[i];
                 for (int j = i; j < numberOfPatterns; j++)
                 {
-                    PatternInfo candidate = patterns[i];
+                    PatternInfo candidate = patterns[j];
                     CheckForNeighbourhood2D(i, current, j, candidate);
                 }
             }
