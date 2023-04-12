@@ -117,7 +117,7 @@ namespace WFC_Procedural_Generator_Framework
 
             for (int i = 0; i < outputX; i++)
             {
-                for (int j = 0; j < outputY; j++)
+                for (int j = 0; j < outputZ; j++)
                 {
 
                     Vector3Int tilePos = startingPoint + new Vector3Int(i, 0, j);
@@ -184,6 +184,7 @@ namespace WFC_Procedural_Generator_Framework
         public void Clear()
         {
             inputMap.Clear();
+            if (lastMapGenerated is not null) lastMapGenerated.Clear();
         }
 
         public void Train()
