@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEditor;
-
+using System;
 
 namespace WFC_Procedural_Generator_Framework
 {
@@ -209,6 +209,26 @@ namespace WFC_Procedural_Generator_Framework
 
             lastMapGenerated = new Tilemap(generatedIndexMap);
         }
+
+        internal void ResizeOutput()
+        {
+            model.SetOutputSize(outputSize.x, outputSize.y, outputSize.z);
+        }
+
+        internal void Iterate()
+        {
+            int[,,] generatedIndexMap = model.Iterate();
+            string msg = "";
+            for (int i = 0; i < generatedIndexMap.GetLength(0); i++)
+            {
+                for (int j = 0; j < generatedIndexMap.GetLength(2); j++)
+                {
+                    msg += generatedIndexMap[i, 0, j] + " ";
+                }
+                msg += "\n";
+            }
+            Debug.Log(msg);
+        }
     }
 
     [CustomEditor(typeof(WfcInterface))]
@@ -230,9 +250,22 @@ namespace WFC_Procedural_Generator_Framework
                 t.Clear();
             }
 
+            GUILayout.Space(10);
+
             if (GUILayout.Button("Train"))
             {
                 t.Train();
+            }
+
+            if(GUILayout.Button("Resize output")) {
+                t.ResizeOutput();
+            }
+
+            GUILayout.Space(10);
+
+            if(GUILayout.Button("Iterate"))
+            {
+                t.Iterate();
             }
 
             if (GUILayout.Button("Generate"))

@@ -21,11 +21,11 @@ namespace WFC_Procedural_Generator_Framework
 
 
         private Random random = new Random();
-        private Cell[,,] cellMap;
+        public Cell[,,] cellMap;
         private PatternInfo[] patternInfo;
         private int numberOfPatterns;
         private int collapsedCount = 0;
-
+        int cellsToBeCollapsed;
         private int[,] InitialEnablerCount()
         {
             int numberOfDirections = Enum.GetValues(typeof(Direction)).Length;
@@ -62,20 +62,41 @@ namespace WFC_Procedural_Generator_Framework
             }
         }
 
-        public WfcSolver(InputReader inputReader, int width = 0, int height = 0, int depth = 0)
+        public WfcSolver(InputReader inputReader, int width = 1, int height = 1, int depth = 1)
         {
             this.patternSize = inputReader.patternSize;
             this.finalWidth = width;
             this.finalHeight = height;
             this.finalDepth = depth;
 
-            this.width = width+1 - (patternSize);
+            this.width = width + 1 - (patternSize);
             this.height = height;// - (patternHeight - 1);
-            this.depth = depth+1 - (patternSize);
+            this.depth = depth + 1 - (patternSize);
+
+            cellsToBeCollapsed = width * height * depth;
 
             this.patternInfo = inputReader.GetPatternInfo();
             this.numberOfPatterns = patternInfo.Length;
             InitializeOutputGrid();
+        }
+
+        public void SetOutputSize(int width, int height, int depth)
+        {
+            this.finalWidth = width;
+            this.finalHeight = height;
+            this.finalDepth = depth;
+
+            this.width = width + 1 - (patternSize);
+            this.height = height;// - (patternHeight - 1);
+            this.depth = depth + 1 - (patternSize);
+
+            cellsToBeCollapsed = width * height * depth;
+            InitializeOutputGrid();
+        }
+
+        private bool PositionIsValid(Position pos)
+        {
+            return (pos.x < width && pos.x >= 0) && (pos.y < height && pos.y >= 0) && (pos.z < depth && pos.z >= 0);
         }
 
         private Position FindLowestEntropyCell()
@@ -156,10 +177,6 @@ namespace WFC_Procedural_Generator_Framework
             return candidatePatternIndices[collapsedIndex];
         }
 
-        private bool PositionIsValid(Position pos)
-        {
-            return (pos.x < width && pos.x >= 0) && (pos.y < height && pos.y >= 0) && (pos.z < depth && pos.z >= 0);
-        }
 
         private void Propagate(Position origin, int collapsedPattern)
         {
@@ -206,6 +223,26 @@ namespace WFC_Procedural_Generator_Framework
 
         }
 
+
+        public int[,,] Generate()
+        {
+            int cellsToBeCollapsed = width * height * depth;
+            collapsedCount = 0;
+            while (collapsedCount < cellsToBeCollapsed)
+            {
+                (Position candidatePosition, int collapsedPattern) = Observe();
+                Propagate(candidatePosition, collapsedPattern);
+            }
+            return GetOutputTileIndexGrid();
+        }
+
+        public int[,,] Iterate()
+        {
+            (Position candidatePosition, int collapsedPattern) = Observe();
+            Propagate(candidatePosition, collapsedPattern);
+            return GetOutputTileIndexGrid();
+        }
+
         public int[,,] GetPatternGridOutOfOutputGrid()
         {
             int[,,] patternGrid = new int[width, height, depth];
@@ -231,7 +268,22 @@ namespace WFC_Procedural_Generator_Framework
                 for (int z = 0; z < depth; z++)
                 {
                     int patternIndex = cellMap[x, 0, z].GetCollapsedIndex();
-                    int[,,] pattern = patternInfo[patternIndex].pattern;
+                    int[,,] pattern;
+                    if (patternIndex < 0)
+                    {
+                        pattern = new int[patternSize, 1, patternSize];
+                        for (int i = 0; i < patternSize; i++)
+                        {
+                            for (int j = 0; j < patternSize; j++)
+                            {
+                                pattern[i, 0, j] = -1;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        pattern = patternInfo[patternIndex].pattern;
+                    }
                     for (int i = 0; i < patternSize; i++)
                     {
                         for (int j = 0; j < patternSize; j++)
@@ -245,16 +297,5 @@ namespace WFC_Procedural_Generator_Framework
         }
 
 
-        public int[,,] Generate()
-        {
-            int cellsToBeCollapsed = width * height * depth;
-            collapsedCount = 0;
-            while (collapsedCount < cellsToBeCollapsed)
-            {
-                (Position candidatePosition, int collapsedPattern) = Observe();
-                Propagate(candidatePosition, collapsedPattern);
-            }
-            return GetOutputTileIndexGrid();
-        }
     }
 }

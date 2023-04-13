@@ -101,8 +101,10 @@ namespace WFC_Procedural_Generator_Framework
         public void RemovePattern(int patternIndex, PatternInfo[] patternInfo)
         {
             possiblePatterns.Remove(patternIndex);
-            sumOfPatternLogWeights -= patternInfo[patternIndex].relativeFrecuencyLog2;
-            sumOfPatternWeights -= patternInfo[patternIndex].relativeFrecuency;
+            float freq = patternInfo[patternIndex].relativeFrecuency;
+            sumOfPatternWeights -= freq;
+            sumOfPatternLogWeights -= freq * (float)Math.Log(freq,2); // might be worth to cach freq * log(freq,2) somewhere
+
             CalculateEntrophy();
         }
     }
