@@ -21,7 +21,6 @@ namespace WFC_Procedural_Generator_Framework
 
         public int[,,] Generate(int outputX, int outputY, int outputZ)
         {
-
             solver = new WfcSolver(inputReader, outputX, outputY, outputZ);
             return solver.Generate();
         }

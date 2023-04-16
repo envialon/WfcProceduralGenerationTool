@@ -180,9 +180,15 @@ namespace WFC_Procedural_Generator_Framework
 
         private void Propagate(Position origin, int collapsedPattern)
         {
+
             Queue<(Position, int)> removalQueue = new Queue<(Position, int)>();
             removalQueue.Enqueue((origin, collapsedPattern));
             int numberOfDirections = Enum.GetValues(typeof(Direction)).Length;
+
+            string msg = "Collapsed on: " + origin.ToString() + " Removed pattern: " + collapsedPattern + "\n";
+
+
+
             while (removalQueue.Count > 0)
             {
                 (Position currentPosition, int currentPatternIndex) = removalQueue.Dequeue();
@@ -191,8 +197,7 @@ namespace WFC_Procedural_Generator_Framework
                 {
                     Position neigbourCoord = currentPosition + Position.directions[direction];
                     if (!PositionIsValid(neigbourCoord)) continue;
-                    Cell neighbourCell = cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z];
-                    int[,] neighbourEnablers = neighbourCell.tileEnablerCountsByDirection;
+                    int[,] neighbourEnablers = cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].tileEnablerCountsByDirection;
                     HashSet<int> compatiblePatterns = patternInfo[currentPatternIndex].GetCompatiblesInDirection((Direction)direction);
 
                     foreach (int compatiblePattern in compatiblePatterns)
@@ -205,11 +210,10 @@ namespace WFC_Procedural_Generator_Framework
                             {
                                 if (neighbourEnablers[currentPatternIndex, i] == 0)
                                 {
-                                    neighbourCell.RemovePattern(currentPatternIndex, patternInfo);
+                                    cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].RemovePattern(currentPatternIndex, patternInfo);
 
                                     //CHECK FOR NO MORE POSSIBLE TILES NOW
-
-
+                                    msg += "\tRemoved at: " + neigbourCoord.ToString() + "\n";
                                     removalQueue.Enqueue((neigbourCoord, currentPatternIndex));
 
                                     break;
@@ -220,6 +224,7 @@ namespace WFC_Procedural_Generator_Framework
                     neighbourEnablers[currentPatternIndex, direction]--;
                 }
             }
+            UnityEngine.Debug.Log(msg);
 
         }
 

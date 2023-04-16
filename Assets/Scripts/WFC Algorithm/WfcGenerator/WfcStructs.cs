@@ -34,6 +34,11 @@ namespace WFC_Procedural_Generator_Framework
         {
             return new Position(left.x + right.x, left.y + right.y, left.z + right.z);
         }
+
+        public override string ToString()
+        {
+            return "{" + x + ", " + y + ", " + z + "}";
+        }
     }
 
     public struct RemovalUpdate
