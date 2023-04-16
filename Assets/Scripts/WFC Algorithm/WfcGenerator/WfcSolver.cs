@@ -203,25 +203,25 @@ namespace WFC_Procedural_Generator_Framework
                     foreach (int compatiblePattern in compatiblePatterns)
                     {
                         int oppositeDirection = (direction + 2) % 4;
-                        if (neighbourEnablers[currentPatternIndex, direction] == 1)
+                        if (neighbourEnablers[compatiblePattern, direction] == 1)
                         {
                             //check the other directions to see if we have a 0
                             for (int i = 0; i < numberOfDirections; i++)
                             {
-                                if (neighbourEnablers[currentPatternIndex, i] == 0)
+                                if (neighbourEnablers[compatiblePattern, i] == 0)
                                 {
-                                    cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].RemovePattern(currentPatternIndex, patternInfo);
+                                    cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].RemovePattern(compatiblePattern, patternInfo);
 
                                     //CHECK FOR NO MORE POSSIBLE TILES NOW
                                     msg += "\tRemoved at: " + neigbourCoord.ToString() + "\n";
-                                    removalQueue.Enqueue((neigbourCoord, currentPatternIndex));
+                                    removalQueue.Enqueue((neigbourCoord, compatiblePattern));
 
                                     break;
                                 }
                             }
                         }
+                        neighbourEnablers[compatiblePattern, direction]--;
                     }
-                    neighbourEnablers[currentPatternIndex, direction]--;
                 }
             }
             UnityEngine.Debug.Log(msg);
