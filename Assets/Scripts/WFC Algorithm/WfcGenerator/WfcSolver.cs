@@ -196,26 +196,20 @@ namespace WFC_Procedural_Generator_Framework
         }
 
 
-        private void Propagate(Position origin, int collapsedPattern)
+        private void Propagate()
         {
-
-            removalQueue.Enqueue((origin, collapsedPattern));
             int numberOfDirections = Enum.GetValues(typeof(Direction)).Length;
-
-            string msg = "Collapsed on: " + origin.ToString() + " Removed pattern: " + collapsedPattern + "\n";
-
-
 
             while (removalQueue.Count > 0)
             {
-                (Position currentPosition, int currentPatternIndex) = removalQueue.Dequeue();
+                (Position currentPosition, int removedPatternIndex) = removalQueue.Dequeue();
 
                 for (int direction = 0; direction < numberOfDirections; direction++)
                 {
                     Position neigbourCoord = currentPosition + Position.directions[direction];
                     if (!PositionIsValid(neigbourCoord)) continue;
                     int[,] neighbourEnablers = cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].tileEnablerCountsByDirection;
-                    HashSet<int> compatiblePatterns = patternInfo[currentPatternIndex].GetCompatiblesInDirection((Direction)direction);
+                    HashSet<int> compatiblePatterns = patternInfo[removedPatternIndex].GetCompatiblesInDirection((Direction)direction);
 
                     foreach (int compatiblePattern in compatiblePatterns)
                     {
@@ -230,7 +224,6 @@ namespace WFC_Procedural_Generator_Framework
                                     cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].RemovePattern(compatiblePattern, patternInfo);
 
                                     //CHECK FOR NO MORE POSSIBLE TILES NOW
-                                    msg += "\tRemoved at: " + neigbourCoord.ToString() + "\n";
                                     removalQueue.Enqueue((neigbourCoord, compatiblePattern));
 
                                     break;
@@ -241,7 +234,6 @@ namespace WFC_Procedural_Generator_Framework
                     }
                 }
             }
-            UnityEngine.Debug.Log(msg);
 
         }
 
@@ -253,7 +245,7 @@ namespace WFC_Procedural_Generator_Framework
             while (collapsedCount < cellsToBeCollapsed)
             {
                 (Position candidatePosition, int collapsedPattern) = Observe();
-                Propagate(candidatePosition, collapsedPattern);
+                Propagate();
             }
             return GetOutputTileIndexGrid();
         }
@@ -261,7 +253,7 @@ namespace WFC_Procedural_Generator_Framework
         public int[,,] Iterate()
         {
             (Position candidatePosition, int collapsedPattern) = Observe();
-            Propagate(candidatePosition, collapsedPattern);
+            Propagate();
             return GetOutputTileIndexGrid();
         }
 

@@ -194,7 +194,9 @@ namespace WFC_Procedural_Generator_Framework
 
         public void Generate()
         {
-            int[,,] generatedIndexMap = model.Generate(outputSize.x, outputSize.y, outputSize.z);
+            
+
+            int[,,] generatedIndexMap = model.Generate(outputSize.x, outputSize.y, outputSize.z); ;
 
             string msg = "";
             for (int i = 0; i < generatedIndexMap.GetLength(0); i++)

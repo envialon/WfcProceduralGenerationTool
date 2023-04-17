@@ -4,8 +4,8 @@ namespace WFC_Procedural_Generator_Framework
     {
         int patternSize = 2;
 
-        private InputReader inputReader;
-        private WfcSolver solver;
+        public InputReader inputReader;
+        public WfcSolver solver;
 
         public WfcModel(Tilemap data)
         {
