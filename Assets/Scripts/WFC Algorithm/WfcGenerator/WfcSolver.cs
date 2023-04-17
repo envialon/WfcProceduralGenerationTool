@@ -25,7 +25,11 @@ namespace WFC_Procedural_Generator_Framework
         private PatternInfo[] patternInfo;
         private int numberOfPatterns;
         private int collapsedCount = 0;
-        int cellsToBeCollapsed;
+        int cellsToBeCollapsed = 0;
+
+        private Queue<(Position, int)> removalQueue;
+
+
         private int[,] InitialEnablerCount()
         {
             int numberOfDirections = Enum.GetValues(typeof(Direction)).Length;
@@ -77,6 +81,9 @@ namespace WFC_Procedural_Generator_Framework
 
             this.patternInfo = inputReader.GetPatternInfo();
             this.numberOfPatterns = patternInfo.Length;
+
+            removalQueue = new Queue<(Position, int)>();
+
             InitializeOutputGrid();
         }
 
@@ -126,27 +133,27 @@ namespace WFC_Procedural_Generator_Framework
         {
             // find cell with minimal entropy;
             Position candidatePosition = FindLowestEntropyCell();
-            int removedPattern = CollapseBasedOnPatternFrecuency(candidatePosition.x, candidatePosition.y, candidatePosition.z);
+            int removedPattern = CollapseBasedOnPatternFrecuency(candidatePosition);
             return (candidatePosition, removedPattern);
         }
 
         //we can optimize this:
-        private int CollapseBasedOnPatternFrecuency(int x, int y, int z)
+        private int CollapseBasedOnPatternFrecuency(Position pos)
         {
-            int[] candidatePatternIndices = cellMap[x, y, z].possiblePatterns.ToArray();
+            int[] candidatePatternIndices = cellMap[pos.x, pos.y, pos.z].possiblePatterns.ToArray();
             int numberOfCandidates = candidatePatternIndices.Length;
 
             if (numberOfCandidates == 0)
             {
                 collapsedCount++;
-                cellMap[x, y, z].CollapseOn(0);
+                cellMap[pos.x, pos.y, pos.z].CollapseOn(0);
                 return 0;
             }
 
             if (numberOfCandidates == 1)
             {
                 collapsedCount++;
-                cellMap[x, y, z].CollapseOn(candidatePatternIndices[0]);
+                cellMap[pos.x, pos.y, pos.z].CollapseOn(candidatePatternIndices[0]);
                 return candidatePatternIndices[0];
             }
 
@@ -159,21 +166,32 @@ namespace WFC_Procedural_Generator_Framework
             }
 
             int collapsedIndex = -1;
-
+            
             double randomValue = random.NextDouble();
             randomValue = randomValue * (sumOfFrecuencies);
             for (int i = 0; i < numberOfCandidates; i++)
             {
-                if (randomValue > candidateFrecuencies[i])
+                if (collapsedIndex < 0)
                 {
-                    randomValue -= candidateFrecuencies[i];
+                    if (randomValue > candidateFrecuencies[i])
+                    {
+
+                        randomValue -= candidateFrecuencies[i];
+                        //Add removal updates to the queue
+                        removalQueue.Enqueue((pos, candidatePatternIndices[i]));
+
+                    }
+                    else { collapsedIndex = i;}
                 }
-                else { collapsedIndex = i; break; }
+                else
+                {
+                    removalQueue.Enqueue((pos, candidatePatternIndices[i]));
+                }
             }
 
             collapsedCount++;
-
-            cellMap[x, y, z].CollapseOn(candidatePatternIndices[collapsedIndex]);
+         
+            cellMap[pos.x, pos.y, pos.z].CollapseOn(candidatePatternIndices[collapsedIndex]);
             return candidatePatternIndices[collapsedIndex];
         }
 
@@ -181,7 +199,6 @@ namespace WFC_Procedural_Generator_Framework
         private void Propagate(Position origin, int collapsedPattern)
         {
 
-            Queue<(Position, int)> removalQueue = new Queue<(Position, int)>();
             removalQueue.Enqueue((origin, collapsedPattern));
             int numberOfDirections = Enum.GetValues(typeof(Direction)).Length;
 
