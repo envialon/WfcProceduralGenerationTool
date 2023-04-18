@@ -53,7 +53,7 @@ namespace WFC_Procedural_Generator_Framework
         }
     }
 
-    public struct Cell
+    public class Cell
     {
         public HashSet<int> possiblePatterns;
         //first index is the pattern, second is the direction
@@ -112,6 +112,12 @@ namespace WFC_Procedural_Generator_Framework
 
             CalculateEntrophy();
         }
+
+        public override string ToString()
+        {
+            return entrophy.ToString("0.0");
+        }
+
     }
 
     /// <summary>

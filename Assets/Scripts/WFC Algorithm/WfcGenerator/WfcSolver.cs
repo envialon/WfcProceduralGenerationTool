@@ -25,7 +25,6 @@ namespace WFC_Procedural_Generator_Framework
         private PatternInfo[] patternInfo;
         private int numberOfPatterns;
         private int collapsedCount = 0;
-        int cellsToBeCollapsed = 0;
 
         private Queue<(Position, int)> removalQueue;
 
@@ -76,9 +75,7 @@ namespace WFC_Procedural_Generator_Framework
             this.width = width + 1 - (patternSize);
             this.height = height;// - (patternHeight - 1);
             this.depth = depth + 1 - (patternSize);
-
-            cellsToBeCollapsed = width * height * depth;
-
+            
             this.patternInfo = inputReader.GetPatternInfo();
             this.numberOfPatterns = patternInfo.Length;
 
@@ -96,8 +93,7 @@ namespace WFC_Procedural_Generator_Framework
             this.width = width + 1 - (patternSize);
             this.height = height;// - (patternHeight - 1);
             this.depth = depth + 1 - (patternSize);
-
-            cellsToBeCollapsed = width * height * depth;
+            
             InitializeOutputGrid();
         }
 
@@ -117,10 +113,10 @@ namespace WFC_Procedural_Generator_Framework
                 {
                     for (int k = 0; k < height; k++)
                     {
-                        Cell current = cellMap[i, k, j];
-                        if (!current.collapsed && minEntropy > current.entrophy)
+                        if (!cellMap[i, k, j].collapsed && 
+                            minEntropy > cellMap[i, k, j].entrophy)
                         {
-                            minEntropy = current.entrophy;
+                            minEntropy = cellMap[i, k, j].entrophy;
                             pos = new Position(i, k, j);
                         }
                     }
@@ -128,6 +124,24 @@ namespace WFC_Procedural_Generator_Framework
             }
             return pos;
         }
+
+        private void PrintCellEntrophy()
+        {
+            string msg = "";
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < depth; j++)
+                {
+                    for (int k = 0; k < height; k++)
+                    {
+                        msg += cellMap[i, k, j].ToString() + " ";
+                    }
+                }
+                msg += "\n";
+            }
+            UnityEngine.Debug.Log(msg);
+        }
+
 
         private (Position, int) Observe()
         {
@@ -166,7 +180,7 @@ namespace WFC_Procedural_Generator_Framework
             }
 
             int collapsedIndex = -1;
-            
+
             double randomValue = random.NextDouble();
             randomValue = randomValue * (sumOfFrecuencies);
             for (int i = 0; i < numberOfCandidates; i++)
@@ -175,13 +189,12 @@ namespace WFC_Procedural_Generator_Framework
                 {
                     if (randomValue > candidateFrecuencies[i])
                     {
-
                         randomValue -= candidateFrecuencies[i];
                         //Add removal updates to the queue
                         removalQueue.Enqueue((pos, candidatePatternIndices[i]));
 
                     }
-                    else { collapsedIndex = i;}
+                    else { collapsedIndex = i; }
                 }
                 else
                 {
@@ -190,7 +203,7 @@ namespace WFC_Procedural_Generator_Framework
             }
 
             collapsedCount++;
-         
+
             cellMap[pos.x, pos.y, pos.z].CollapseOn(candidatePatternIndices[collapsedIndex]);
             return candidatePatternIndices[collapsedIndex];
         }
@@ -200,14 +213,17 @@ namespace WFC_Procedural_Generator_Framework
         {
             int numberOfDirections = Enum.GetValues(typeof(Direction)).Length;
 
+            string msg = "Propagaation Function call:\n";
             while (removalQueue.Count > 0)
             {
                 (Position currentPosition, int removedPatternIndex) = removalQueue.Dequeue();
 
+                msg += $"\tRemoved pattern {removedPatternIndex} from cell {currentPosition.x}, {currentPosition.y}, {currentPosition.z}\n";
+
                 for (int direction = 0; direction < numberOfDirections; direction++)
                 {
                     Position neigbourCoord = currentPosition + Position.directions[direction];
-                    if (!PositionIsValid(neigbourCoord)) continue;
+                    if (!PositionIsValid(neigbourCoord) || cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].collapsed) continue;
                     int[,] neighbourEnablers = cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].tileEnablerCountsByDirection;
                     HashSet<int> compatiblePatterns = patternInfo[removedPatternIndex].GetCompatiblesInDirection((Direction)direction);
 
@@ -222,7 +238,6 @@ namespace WFC_Procedural_Generator_Framework
                                 if (neighbourEnablers[compatiblePattern, i] == 0)
                                 {
                                     cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].RemovePattern(compatiblePattern, patternInfo);
-
                                     //CHECK FOR NO MORE POSSIBLE TILES NOW
                                     removalQueue.Enqueue((neigbourCoord, compatiblePattern));
 
@@ -234,7 +249,7 @@ namespace WFC_Procedural_Generator_Framework
                     }
                 }
             }
-
+            UnityEngine.Debug.Log(msg);
         }
 
 
@@ -242,17 +257,21 @@ namespace WFC_Procedural_Generator_Framework
         {
             int cellsToBeCollapsed = width * height * depth;
             collapsedCount = 0;
+
+            PrintCellEntrophy();
             while (collapsedCount < cellsToBeCollapsed)
             {
                 (Position candidatePosition, int collapsedPattern) = Observe();
+                UnityEngine.Debug.Log($"Collapsed cell {candidatePosition} with pattern {collapsedPattern}");
                 Propagate();
+                PrintCellEntrophy();
             }
             return GetOutputTileIndexGrid();
         }
 
         public int[,,] Iterate()
         {
-            (Position candidatePosition, int collapsedPattern) = Observe();
+            Observe();
             Propagate();
             return GetOutputTileIndexGrid();
         }

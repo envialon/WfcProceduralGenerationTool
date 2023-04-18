@@ -13,6 +13,7 @@ namespace WFC_Procedural_Generator_Framework
             // solver = new WfcSolver(inputReader, outputX, outputY, outputZ);
         }
 
+
         public void Train(Tilemap inputTileMap, int patternSize = 2)
         {
             inputReader.Train(patternSize, inputTileMap);
