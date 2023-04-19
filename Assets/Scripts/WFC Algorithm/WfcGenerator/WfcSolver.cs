@@ -235,7 +235,7 @@ namespace WFC_Procedural_Generator_Framework
                             //check the other directions to see if we have a 0
                             for (int i = 0; i < numberOfDirections; i++)
                             {
-                                if (neighbourEnablers[compatiblePattern, i] == 0)
+                                if (neighbourEnablers[compatiblePattern, i] != 0)
                                 {
                                     cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].RemovePattern(compatiblePattern, patternInfo);
                                     //CHECK FOR NO MORE POSSIBLE TILES NOW
