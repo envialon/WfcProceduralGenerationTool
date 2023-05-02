@@ -1,9 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace WFC_Procedural_Generator_Framework
 {
@@ -61,23 +57,24 @@ namespace WFC_Procedural_Generator_Framework
         public float entrophy;
         public bool collapsed;
 
-        float sumOfPatternWeights;
-        float sumOfPatternLogWeights;
+        float sumOfRelativeFreq;
+        float sumOfRelativeFreqLog2;
         int collapsedIndex;
 
         public Cell(int[] possiblePatterns, PatternInfo[] patternInfo, int[,] tileEnablerTemplate, int collapsedValue = -1)
         {
             this.possiblePatterns = new HashSet<int>(possiblePatterns);
-            sumOfPatternWeights = 0;
-            sumOfPatternLogWeights = 0;
+            sumOfRelativeFreq = 0;
+            sumOfRelativeFreqLog2 = 0;
             entrophy = 0;
             this.collapsedIndex = collapsedValue;
             collapsed = false;
             for (int i = 0; i < possiblePatterns.Length; i++)
             {
-                sumOfPatternWeights += patternInfo[possiblePatterns[i]].relativeFrecuency;
+                float freq =  patternInfo[possiblePatterns[i]].relativeFrecuency;
+                sumOfRelativeFreq += freq;
                 //im doing it different from the rust resource, might be an error:
-                sumOfPatternLogWeights += patternInfo[possiblePatterns[i]].relativeFrecuencyLog2;
+                sumOfRelativeFreqLog2 += freq * (float)Math.Log(freq, 2);
             }
             tileEnablerCountsByDirection = new int[tileEnablerTemplate.GetLength(0), tileEnablerTemplate.GetLength(1)];
             Buffer.BlockCopy(tileEnablerTemplate, 0, tileEnablerCountsByDirection, 0, tileEnablerCountsByDirection.Length * sizeof(int));
@@ -95,12 +92,32 @@ namespace WFC_Procedural_Generator_Framework
             entrophy = 0;
             collapsed = true;
             collapsedIndex = patternToCollapse;
+            collapsedIndex = patternToCollapse;
         }
 
+        private void CalculateSumOfRelativeFrecuencies(PatternInfo[] patternInfo)
+        {
+            sumOfRelativeFreq= 0;
+            foreach (int i in possiblePatterns)
+            {
+                float freq = patternInfo[i].relativeFrecuency;
+                sumOfRelativeFreq += freq;
+            }
+        }
+
+        private void CalculateSumOfPatternLogWeights(PatternInfo[] patternInfo)
+        {            
+            sumOfRelativeFreqLog2 = 0;
+            foreach (int i in possiblePatterns)
+            {
+                float freq = patternInfo[i].relativeFrecuency;
+                sumOfRelativeFreqLog2 += freq * (float)Math.Log(freq, 2);
+            }
+        }
         private void CalculateEntrophy()
         {
-            System.Random rand = new System.Random();
-            entrophy = (float)(Math.Log(sumOfPatternWeights, 2) - (sumOfPatternLogWeights / sumOfPatternWeights) + rand.NextDouble() * (double)0.0001f);
+            Random rand = new Random(Guid.NewGuid().GetHashCode());
+            entrophy = (float)(Math.Log(sumOfRelativeFreq, 2) - (sumOfRelativeFreqLog2 / sumOfRelativeFreq) + (rand.NextDouble() * 0.0000001f));
         }
 
         public void RemovePattern(int patternIndex, PatternInfo[] patternInfo)
@@ -108,10 +125,12 @@ namespace WFC_Procedural_Generator_Framework
             if (possiblePatterns.Contains(patternIndex))
             {
                 possiblePatterns.Remove(patternIndex);
-                float freq = patternInfo[patternIndex].relativeFrecuency;
-                sumOfPatternWeights -= freq;
-                sumOfPatternLogWeights -= freq * (float)Math.Log(freq, 2); // might be worth to cach freq * log(freq,2) somewhere
+                //float freq = patternInfo[patternIndex].relativeFrecuency;
+                //sumOfRelativeFreq -= freq;
+                //sumOfPatternLogWeights -= patternInfo[patternIndex].relativeFrecuencyLog2; // might be worth to cach freq * log(freq,2) somewhere
 
+                CalculateSumOfRelativeFrecuencies(patternInfo);
+                CalculateSumOfPatternLogWeights(patternInfo);
                 CalculateEntrophy();
             }
         }

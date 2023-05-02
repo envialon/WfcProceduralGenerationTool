@@ -213,7 +213,7 @@ namespace WFC_Procedural_Generator_Framework
         {
             int numberOfDirections = Enum.GetValues(typeof(Direction)).Length;
 
-            string msg = "Propagaation Function call:\n";
+            string msg = "Propagation Function call:\n";
             while (removalQueue.Count > 0)
             {
                 (Position currentPosition, int removedPatternIndex) = removalQueue.Dequeue();
@@ -230,7 +230,7 @@ namespace WFC_Procedural_Generator_Framework
                     foreach (int compatiblePattern in compatiblePatterns)
                     {
                         int oppositeDirection = (direction + 2) % 4;
-                        if (neighbourEnablers[compatiblePattern, direction] == 1)
+                        if (neighbourEnablers[compatiblePattern, oppositeDirection] == 1)
                         {
                             //check the other directions to see if we have a 0
                             for (int i = 0; i < numberOfDirections; i++)
@@ -245,7 +245,7 @@ namespace WFC_Procedural_Generator_Framework
                                 }
                             }
                         }
-                        neighbourEnablers[compatiblePattern, direction]--;
+                        neighbourEnablers[compatiblePattern, oppositeDirection]--;
                     }
                 }
             }
@@ -305,25 +305,26 @@ namespace WFC_Procedural_Generator_Framework
                     if (patternIndex < 0)
                     {
                         pattern = new int[patternSize, 1, patternSize];
+                        //for (int i = 0; i < patternSize; i++)
+                        //{
+                        //    for (int j = 0; j < patternSize; j++)
+                        //    {
+                        //        pattern[i, 0, j] = -1;
+                        //    }
+                        //}
+                    }
+                    else
+                    {
+                        pattern = patternInfo[patternIndex].pattern; 
                         for (int i = 0; i < patternSize; i++)
                         {
                             for (int j = 0; j < patternSize; j++)
                             {
-                                pattern[i, 0, j] = -1;
+                                output[x + i, 0, z + j] = pattern[i, 0, j];
                             }
                         }
                     }
-                    else
-                    {
-                        pattern = patternInfo[patternIndex].pattern;
-                    }
-                    for (int i = 0; i < patternSize; i++)
-                    {
-                        for (int j = 0; j < patternSize; j++)
-                        {
-                            output[x + i, 0, z + j] = pattern[i, 0, j];
-                        }
-                    }
+                 
                 }
             }
             return output;
