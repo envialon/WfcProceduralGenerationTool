@@ -65,7 +65,7 @@ namespace WFC_Procedural_Generator_Framework
             }
         }
 
-        public WfcSolver(InputReader inputReader, int width = 1, int height = 1, int depth = 1)
+        public WfcSolver(InputReader inputReader, int width = -1, int height = -1, int depth = -1)
         {
             this.patternSize = inputReader.patternSize;
             this.finalWidth = width;
@@ -75,13 +75,16 @@ namespace WFC_Procedural_Generator_Framework
             this.width = width + 1 - (patternSize);
             this.height = height;// - (patternHeight - 1);
             this.depth = depth + 1 - (patternSize);
-            
+
             this.patternInfo = inputReader.GetPatternInfo();
             this.numberOfPatterns = patternInfo.Length;
 
             removalQueue = new Queue<(Position, int)>();
 
-            InitializeOutputGrid();
+            if (width != -1 && height != -1 && depth != -1)
+            {
+                InitializeOutputGrid();
+            }
         }
 
         public void SetOutputSize(int width, int height, int depth)
@@ -93,7 +96,7 @@ namespace WFC_Procedural_Generator_Framework
             this.width = width + 1 - (patternSize);
             this.height = height;// - (patternHeight - 1);
             this.depth = depth + 1 - (patternSize);
-            
+
             InitializeOutputGrid();
         }
 
@@ -113,7 +116,7 @@ namespace WFC_Procedural_Generator_Framework
                 {
                     for (int k = 0; k < height; k++)
                     {
-                        if (!cellMap[i, k, j].collapsed && 
+                        if (!cellMap[i, k, j].collapsed &&
                             minEntropy > cellMap[i, k, j].entrophy)
                         {
                             minEntropy = cellMap[i, k, j].entrophy;
@@ -315,7 +318,7 @@ namespace WFC_Procedural_Generator_Framework
                     }
                     else
                     {
-                        pattern = patternInfo[patternIndex].pattern; 
+                        pattern = patternInfo[patternIndex].pattern;
                         for (int i = 0; i < patternSize; i++)
                         {
                             for (int j = 0; j < patternSize; j++)
@@ -324,7 +327,7 @@ namespace WFC_Procedural_Generator_Framework
                             }
                         }
                     }
-                 
+
                 }
             }
             return output;

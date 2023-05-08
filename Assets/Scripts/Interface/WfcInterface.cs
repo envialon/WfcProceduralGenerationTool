@@ -43,6 +43,12 @@ namespace WFC_Procedural_Generator_Framework
         {
             inputMap = new Tilemap(inputMapSize, inputMapHeight);
             model = new WfcModel(inputMap);
+
+            if(boxCollider is null)
+            {
+                boxCollider = gameObject.GetComponent<BoxCollider>();
+            }
+
             boxCollider.size = new Vector3(inputMapSize, 0, inputMapSize);
             boxCollider.center = new Vector3(inputMapSize / 2 + 0.5f, 0, inputMapSize / 2 + 0.5f);
         }
