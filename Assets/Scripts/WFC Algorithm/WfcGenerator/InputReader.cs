@@ -14,7 +14,7 @@ namespace WFC_Procedural_Generator_Framework
         private int height;
         private int mapSize;
         private int[,,] offsettedIndexGrid;
-       //must change
+        //must change
         public int[,,] patternGrid;
         private PatternInfo[] patterns;
         private int totalPatterns = 0;
@@ -26,18 +26,23 @@ namespace WFC_Procedural_Generator_Framework
         private void PopulateIndexGrid()
         {
             Tile[,,] tilemap = inputTileMap.map;
-            offsettedIndexGrid = new int[inputTileMap.width+ patternSize, inputTileMap.height, inputTileMap.depth + patternSize];
+            offsettedIndexGrid = new int[inputTileMap.width + patternSize, inputTileMap.height, inputTileMap.depth + patternSize];
 
             for (int k = 0; k < height; k++)
             {
-                for (int i = 0; i < mapSize + patternSize; i++)
+                for (int i = 0; i < mapSize; i++)
                 {
-                    for (int j = 0; j < mapSize + patternSize; j++)
+                    for (int j = 0; j < mapSize; j++)
                     {
-                        offsettedIndexGrid[i, k, j] = tilemap[i % mapSize, k, j % mapSize].id * 4 + tilemap[i % mapSize, k, j % mapSize].rotation;
+                        offsettedIndexGrid[i, k, j] = tilemap[i , k, j].id * 4 + tilemap[i , k, j ].rotation;
                     }
                 }
             }
+        }
+        
+        private int mod(int x, int y)
+        {
+            return x - y * (int)Math.Floor((double)x / y);
         }
 
         private int[,,] Extract2DPatternAt(int x, int y)
@@ -47,7 +52,7 @@ namespace WFC_Procedural_Generator_Framework
             {
                 for (int j = 0; j < patternSize; j++)
                 {
-                    output[i, 0, j] = offsettedIndexGrid[i + x, 0, j + y];
+                    output[i, 0, j] = offsettedIndexGrid[mod((i + x), mapSize), 0, mod(j + y, mapSize)];
                 }
             }
             return output;
@@ -59,7 +64,7 @@ namespace WFC_Procedural_Generator_Framework
             string digits = "";
             foreach (int i in pattern)
             {
-                digits += i+".";
+                digits += i + ".";
             }
             return digits;
         }
@@ -72,9 +77,9 @@ namespace WFC_Procedural_Generator_Framework
             HashSet<PatternInfo> uniquePatterns = new HashSet<PatternInfo>();
             totalPatterns = 0;
 
-            for (int i = 0; i <= mapSize - patternSize; i++)
+            for (int i = -patternSize; i <= mapSize + patternSize; i++)
             {
-                for (int j = 0; j <= mapSize - patternSize; j++)
+                for (int j = -patternSize; j <= mapSize ; j++)
                 {
                     int[,,] pattern = Extract2DPatternAt(i, j);
                     string patternHash = hashPattern(pattern);
@@ -86,7 +91,7 @@ namespace WFC_Procedural_Generator_Framework
                     }
                     totalPatterns++;
                     patternFrecuency[patternHash]++;
-                    patternGrid[i, 0, j] = patternFrecuency[patternHash].id;
+                   //  patternGrid[i % mapSize, 0, j % mapSize] = patternFrecuency[patternHash].id;
                     //PatternInfo actualValue = new PatternInfo();
                     //uniquePatterns.TryGetValue(candidate, out actualValue);
                     //actualValue.frecuency++;
@@ -245,11 +250,11 @@ namespace WFC_Procedural_Generator_Framework
 
         public int[,,] GetOutputTileIndexGrid()
         {
-            int[,,] output = new int[mapSize, height,mapSize];
+            int[,,] output = new int[mapSize, height, mapSize];
 
-            for (int x = 0; x < mapSize-patternSize; x++)
+            for (int x = 0; x < mapSize - patternSize; x++)
             {
-                for (int z = 0; z < mapSize-patternSize; z++)
+                for (int z = 0; z < mapSize - patternSize; z++)
                 {
                     int patternIndex = patternGrid[x, 0, z];
                     int[,,] pattern = patterns[patternIndex].pattern;
@@ -264,7 +269,41 @@ namespace WFC_Procedural_Generator_Framework
             }
             return output;
         }
-        
+
+        public string GetMatrixVisualization(int[,,] mat)
+        {
+            string patternVisualization = "";
+            for (int i = 0; i < mat.GetLength(0); i++)
+            {
+                for (int j = 0; j < mat.GetLength(2); j++)
+                {
+                    patternVisualization += "\t" + mat[i, 0, j] + "\t";
+                }
+                patternVisualization += "\n";
+            }
+            return patternVisualization;
+        }
+
+        public string GetPatternSummary()
+        {
+            const string spacer = "\n/////////////////////\n";
+            string messsage = "";
+            messsage += "InputMap:\n" + GetMatrixVisualization(offsettedIndexGrid) + spacer + spacer;
+
+            messsage += "Pattern Info:\n" + spacer;
+            foreach (PatternInfo pattern in patterns)
+            {
+                string patternMessage = "Pattern " + pattern.id + ":\n";
+                patternMessage += "Frecuency: " + pattern.frecuency + "\n";
+                patternMessage += "RelativeFrecuency: " + pattern.relativeFrecuency + "\n";
+                patternMessage += "Tile pattern:\n " + GetMatrixVisualization(pattern.pattern) + "\n";
+
+                messsage += patternMessage + spacer;
+            }
+
+            return messsage;
+        }
+
         public InputReader(Tilemap inputTileMap, int patternSize = 2)
         {
             Initialize(inputTileMap, patternSize);

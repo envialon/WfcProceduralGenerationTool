@@ -94,11 +94,15 @@ namespace WFC_Procedural_Generator_Framework
 
         private void DrawTile(Tile currentTile, Vector3 tilePos, Camera cam)
         {
-            Quaternion rotation = Quaternion.Euler(new Vector3(0, 90 * currentTile.rotation, 0));
+            Mesh mesh = tileSet.GetMesh(currentTile.id);
+            if (mesh)
+            {
+                Quaternion rotation = Quaternion.Euler(new Vector3(0, 90 * currentTile.rotation, 0));
 
-            Matrix4x4 currentTRS = Matrix4x4.TRS(transform.position + tilePos, Quaternion.identity, Vector3.one);
+                Matrix4x4 currentTRS = Matrix4x4.TRS(transform.position + tilePos, Quaternion.identity, Vector3.one);
 
-            Graphics.DrawMesh(tileSet.GetMesh(currentTile.id), currentTRS, tileSet.GetMaterial(currentTile.id), 0, cam);
+                Graphics.DrawMesh(tileSet.GetMesh(currentTile.id), currentTRS, tileSet.GetMaterial(currentTile.id), 0, cam);
+            }
         }
 
         private void DrawInputMap(Camera cam)
@@ -196,6 +200,7 @@ namespace WFC_Procedural_Generator_Framework
         public void Train()
         {
             model.Train(inputMap, patternSize);
+            Debug.Log(model.inputReader.GetPatternSummary());
         }
 
         public void Generate()
@@ -261,6 +266,7 @@ namespace WFC_Procedural_Generator_Framework
             if (GUILayout.Button("Train"))
             {
                 t.Train();
+                
             }
 
             if(GUILayout.Button("Resize output")) {
