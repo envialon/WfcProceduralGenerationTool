@@ -26,7 +26,7 @@ namespace WFC_Procedural_Generator_Framework
         private void PopulateIndexGrid()
         {
             Tile[,,] tilemap = inputTileMap.map;
-            offsettedIndexGrid = new int[inputTileMap.width + patternSize, inputTileMap.height, inputTileMap.depth + patternSize];
+            offsettedIndexGrid = new int[inputTileMap.width, inputTileMap.height, inputTileMap.depth];
 
             for (int k = 0; k < height; k++)
             {

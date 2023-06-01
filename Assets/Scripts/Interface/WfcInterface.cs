@@ -50,7 +50,7 @@ namespace WFC_Procedural_Generator_Framework
             }
 
             boxCollider.size = new Vector3(inputMapSize, 0, inputMapSize);
-            boxCollider.center = new Vector3(inputMapSize / 2 + 0.5f, 0, inputMapSize / 2 + 0.5f);
+            boxCollider.center = new Vector3(inputMapSize / 2, 0, inputMapSize / 2);
         }
 
         private void OnEnable()
