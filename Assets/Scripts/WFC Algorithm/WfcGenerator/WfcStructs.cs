@@ -11,7 +11,7 @@ namespace WFC_Procedural_Generator_Framework
         west,
     }
 
-    public struct Position
+    public struct Position 
     {
         public int x; public int y; public int z;
 
@@ -35,21 +35,28 @@ namespace WFC_Procedural_Generator_Framework
         {
             return "{" + x + ", " + y + ", " + z + "}";
         }
+
+        
     }
 
-    public struct RemovalUpdate
+    public struct RemovalUpdate 
     {
-        int patternIndex;
-        Position position;
+        public int patternIndex;
+        public Position position;
 
         public RemovalUpdate(Position position, int patternIndex)
         {
             this.patternIndex = patternIndex;
             this.position = position;
         }
+
+        public override string ToString()
+        {
+            return position.ToString() + ", " + patternIndex;
+        }
     }
 
-    public class Cell
+    public class Cell : IComparable
     {
         public HashSet<int> possiblePatterns;
         //first index is the pattern, second is the direction
@@ -71,7 +78,7 @@ namespace WFC_Procedural_Generator_Framework
             collapsed = false;
             for (int i = 0; i < possiblePatterns.Length; i++)
             {
-                float freq =  patternInfo[possiblePatterns[i]].relativeFrecuency;
+                float freq = patternInfo[possiblePatterns[i]].relativeFrecuency;
                 sumOfRelativeFreq += freq;
                 //im doing it different from the rust resource, might be an error:
                 sumOfRelativeFreqLog2 += freq * (float)Math.Log(freq, 2);
@@ -97,7 +104,7 @@ namespace WFC_Procedural_Generator_Framework
 
         private void CalculateSumOfRelativeFrecuencies(PatternInfo[] patternInfo)
         {
-            sumOfRelativeFreq= 0;
+            sumOfRelativeFreq = 0;
             foreach (int i in possiblePatterns)
             {
                 float freq = patternInfo[i].relativeFrecuency;
@@ -106,7 +113,7 @@ namespace WFC_Procedural_Generator_Framework
         }
 
         private void CalculateSumOfPatternLogWeights(PatternInfo[] patternInfo)
-        {            
+        {
             sumOfRelativeFreqLog2 = 0;
             foreach (int i in possiblePatterns)
             {
@@ -117,7 +124,7 @@ namespace WFC_Procedural_Generator_Framework
         private void CalculateEntrophy()
         {
             Random rand = new Random(Guid.NewGuid().GetHashCode());
-            entrophy = (float)(Math.Log(sumOfRelativeFreq, 2) - (sumOfRelativeFreqLog2 / sumOfRelativeFreq) + (rand.NextDouble() * 0.0000001f));
+            entrophy = (float)(Math.Log(sumOfRelativeFreq, 2) - (sumOfRelativeFreqLog2 / sumOfRelativeFreq) + (rand.NextDouble() * 0.001f));
         }
 
         public void RemovePattern(int patternIndex, PatternInfo[] patternInfo)
@@ -135,6 +142,23 @@ namespace WFC_Procedural_Generator_Framework
             }
         }
 
+        public bool ContainsAnyZeroEnablerCount(int compatiblePattern)
+        {
+            int directions = tileEnablerCountsByDirection.GetLength(1);
+            for (int i = 0; i < directions; i++)
+            {
+                if (tileEnablerCountsByDirection[compatiblePattern, i] == 0) return true;
+            }
+            return false;
+        }
+
+        int IComparable.CompareTo(object o)
+        {
+            Cell other = o as Cell;
+            if (entrophy < other.entrophy) return -1;
+            if (entrophy == other.entrophy) return 0;
+            return 1;
+        }
         public override string ToString()
         {
             return entrophy.ToString("0.0");

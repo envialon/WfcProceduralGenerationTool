@@ -4,8 +4,6 @@ using System.Linq;
 
 namespace WFC_Procedural_Generator_Framework
 {
-
-
     public class WfcSolver
     {
         int width;
@@ -18,15 +16,14 @@ namespace WFC_Procedural_Generator_Framework
 
         int patternSize;
 
-
-
         private Random random = new Random();
+        private List<Position> positionsByEntrophy;
         public Cell[,,] cellMap;
         private PatternInfo[] patternInfo;
         private int numberOfPatterns;
         private int collapsedCount = 0;
 
-        private Queue<(Position, int)> removalQueue;
+        private Queue<RemovalUpdate> removalQueue;
 
 
         private int[,] InitialEnablerCount()
@@ -53,6 +50,7 @@ namespace WFC_Procedural_Generator_Framework
             int[,] enablerCountTemplate = InitialEnablerCount();
 
             cellMap = new Cell[width, height, depth];
+            positionsByEntrophy = new List<Position>();
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < depth; j++)
@@ -60,6 +58,7 @@ namespace WFC_Procedural_Generator_Framework
                     for (int k = 0; k < height; k++)
                     {
                         cellMap[i, k, j] = new Cell(Enumerable.Range(0, patternInfo.Length).ToArray(), patternInfo, enablerCountTemplate);
+                        positionsByEntrophy.Add(new Position(i, k, j));
                     }
                 }
             }
@@ -79,7 +78,7 @@ namespace WFC_Procedural_Generator_Framework
             this.patternInfo = inputReader.GetPatternInfo();
             this.numberOfPatterns = patternInfo.Length;
 
-            removalQueue = new Queue<(Position, int)>();
+            removalQueue = new Queue<RemovalUpdate>();
 
             if (width != -1 && height != -1 && depth != -1)
             {
@@ -160,6 +159,8 @@ namespace WFC_Procedural_Generator_Framework
             int[] candidatePatternIndices = cellMap[pos.x, pos.y, pos.z].possiblePatterns.ToArray();
             int numberOfCandidates = candidatePatternIndices.Length;
 
+            positionsByEntrophy.Remove(positionsByEntrophy.First());
+
             if (numberOfCandidates == 0)
             {
                 collapsedCount++;
@@ -194,14 +195,15 @@ namespace WFC_Procedural_Generator_Framework
                     {
                         randomValue -= candidateFrecuencies[i];
                         //Add removal updates to the queue
-                        removalQueue.Enqueue((pos, candidatePatternIndices[i]));
-
+                        // removalQueue.Enqueue((pos, candidatePatternIndices[i]));
+                        removalQueue.Enqueue(new RemovalUpdate(pos, candidatePatternIndices[i]));
                     }
                     else { collapsedIndex = i; }
                 }
                 else
                 {
-                    removalQueue.Enqueue((pos, candidatePatternIndices[i]));
+                    // removalQueue.Enqueue((pos, candidatePatternIndices[i]));
+                    removalQueue.Enqueue(new RemovalUpdate(pos, candidatePatternIndices[i]));
                 }
             }
 
@@ -212,43 +214,84 @@ namespace WFC_Procedural_Generator_Framework
         }
 
 
-        private void Propagate()
+        private void modelSynthesisPropagation()
         {
             int numberOfDirections = Enum.GetValues(typeof(Direction)).Length;
 
             string msg = "Propagation Function call:\n";
             while (removalQueue.Count > 0)
             {
-                (Position currentPosition, int removedPatternIndex) = removalQueue.Dequeue();
+                RemovalUpdate removalUpdate = removalQueue.Dequeue();
 
-                msg += $"\tRemoved pattern {removedPatternIndex} from cell {currentPosition.x}, {currentPosition.y}, {currentPosition.z}\n";
+                msg += $"\tRemoved pattern {removalUpdate.patternIndex} from cell {removalUpdate.position.x}, {removalUpdate.position.y}, {removalUpdate.position.z}\n";
 
                 for (int direction = 0; direction < numberOfDirections; direction++)
                 {
-                    Position neigbourCoord = currentPosition + Position.directions[direction];
+                    Position neigbourCoord = removalUpdate.position + Position.directions[direction];
+
                     if (!PositionIsValid(neigbourCoord) || cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].collapsed) continue;
                     int[,] neighbourEnablers = cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].tileEnablerCountsByDirection;
-                    HashSet<int> compatiblePatterns = patternInfo[removedPatternIndex].GetCompatiblesInDirection((Direction)direction);
+                    HashSet<int> compatiblePatterns = patternInfo[removalUpdate.patternIndex].GetCompatiblesInDirection((Direction)direction);
 
                     foreach (int compatiblePattern in compatiblePatterns)
                     {
                         int oppositeDirection = (direction + 2) % 4;
-                        if (neighbourEnablers[compatiblePattern, oppositeDirection] == 1)
-                        {
-                            //check the other directions to see if we have a 0
-                            for (int i = 0; i < numberOfDirections; i++)
-                            {
-                                if (neighbourEnablers[compatiblePattern, i] != 0)
-                                {
-                                    cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].RemovePattern(compatiblePattern, patternInfo);
-                                    //CHECK FOR NO MORE POSSIBLE TILES NOW
-                                    removalQueue.Enqueue((neigbourCoord, compatiblePattern));
 
-                                    break;
-                                }
-                            }
+                        if (neighbourEnablers[compatiblePattern, direction] == 1)
+                        {
+                            //check the other directions to see if we don't have a 0 in another direction, if so, we can remove this pattern from the list
+                            if (!cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].ContainsAnyZeroEnablerCount(compatiblePattern))
+                            {
+                                cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].RemovePattern(compatiblePattern, patternInfo);
+
+                            }                          
                         }
-                        neighbourEnablers[compatiblePattern, oppositeDirection]--;
+                        //oppositeDirection here, if not doesnt' work must think about this...
+                        neighbourEnablers[compatiblePattern, direction]--;
+                    }
+                }
+            }
+            UnityEngine.Debug.Log(msg);
+        }
+
+        private void wfcPropagation()
+        {
+            int numberOfDirections = Enum.GetValues(typeof(Direction)).Length;
+
+            string msg = "Propagation Function call:\n";
+            while (removalQueue.Count > 0)
+            {
+                RemovalUpdate removalUpdate = removalQueue.Dequeue();
+
+                msg += $"\tRemoved pattern {removalUpdate.patternIndex} from cell {removalUpdate.position.x}, {removalUpdate.position.y}, {removalUpdate.position.z}\n";
+
+                for (int direction = 0; direction < numberOfDirections; direction++)
+                {
+                    Position neigbourCoord = removalUpdate.position + Position.directions[direction];
+
+                    if (!PositionIsValid(neigbourCoord) || cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].collapsed) continue;
+                    int[,] neighbourEnablers = cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].tileEnablerCountsByDirection;
+                    HashSet<int> compatiblePatterns = patternInfo[removalUpdate.patternIndex].GetCompatiblesInDirection((Direction)direction);
+
+                    foreach (int compatiblePattern in compatiblePatterns)
+                    {
+                        int oppositeDirection = (direction + 2) % 4;
+
+                        if (neighbourEnablers[compatiblePattern, direction] == 1)
+                        {
+                            //check the other directions to see if we don't have a 0 in another direction, if so, we can remove this pattern from the list
+                            if (!cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].ContainsAnyZeroEnablerCount(compatiblePattern))
+                            {
+                                cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].RemovePattern(compatiblePattern, patternInfo);
+
+                            }
+                            //CHECK FOR NO MORE POSSIBLE TILES NOW
+
+                            removalQueue.Enqueue(new RemovalUpdate(neigbourCoord, compatiblePattern));
+
+                        }
+                        //oppositeDirection here, if not doesnt' work must think about this...
+                        neighbourEnablers[compatiblePattern, direction]--;
                     }
                 }
             }
@@ -266,7 +309,7 @@ namespace WFC_Procedural_Generator_Framework
             {
                 (Position candidatePosition, int collapsedPattern) = Observe();
                 UnityEngine.Debug.Log($"Collapsed cell {candidatePosition} with pattern {collapsedPattern}");
-                Propagate();
+                modelSynthesisPropagation();
                 PrintCellEntrophy();
             }
             return GetOutputTileIndexGrid();
@@ -275,7 +318,7 @@ namespace WFC_Procedural_Generator_Framework
         public int[,,] Iterate()
         {
             Observe();
-            Propagate();
+            wfcPropagation();
             return GetOutputTileIndexGrid();
         }
 
