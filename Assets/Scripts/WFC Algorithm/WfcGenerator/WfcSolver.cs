@@ -202,47 +202,7 @@ namespace WFC_Procedural_Generator_Framework
             cellMap[pos.x, pos.y, pos.z].CollapseOn(candidatePatternIndices[collapsedIndex]);
             return candidatePatternIndices[collapsedIndex];
         }
-
-
-        private void modelSynthesisPropagation()
-        {
-            int numberOfDirections = Enum.GetValues(typeof(Direction)).Length;
-
-            string msg = "Propagation Function call:\n";
-            while (removalQueue.Count > 0)
-            {
-                RemovalUpdate removalUpdate = removalQueue.Dequeue();
-
-                msg += $"\tRemoved pattern {removalUpdate.patternIndex} from cell {removalUpdate.position.x}, {removalUpdate.position.y}, {removalUpdate.position.z}\n";
-
-                for (int direction = 0; direction < numberOfDirections; direction++)
-                {
-                    Position neigbourCoord = removalUpdate.position + Position.directions[direction];
-
-                    if (!PositionIsValid(neigbourCoord) || cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].collapsed) continue;
-                    int[,] neighbourEnablers = cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].tileEnablerCountsByDirection;
-                    HashSet<int> compatiblePatterns = patternInfo[removalUpdate.patternIndex].GetCompatiblesInDirection((Direction)direction);
-
-                    foreach (int compatiblePattern in compatiblePatterns)
-                    {
-                        int oppositeDirection = (direction + 2) % 4;
-
-                        if (neighbourEnablers[compatiblePattern, direction] == 1)
-                        {
-                            //check the other directions to see if we don't have a 0 in another direction, if so, we can remove this pattern from the list
-                            if (!cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].ContainsAnyZeroEnablerCount(compatiblePattern))
-                            {
-                                cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].RemovePattern(compatiblePattern, patternInfo);
-
-                            }
-                        }
-                        //oppositeDirection here, if not doesnt' work must think about this...
-                        neighbourEnablers[compatiblePattern, direction]--;
-                    }
-                }
-            }
-            UnityEngine.Debug.Log(msg);
-        }
+        
 
         private void wfcPropagation()
         {
@@ -299,7 +259,7 @@ namespace WFC_Procedural_Generator_Framework
             {
                 (Position candidatePosition, int collapsedPattern) = Observe();
                 UnityEngine.Debug.Log($"Collapsed cell {candidatePosition} with pattern {collapsedPattern}");
-                modelSynthesisPropagation();
+                wfcPropagation();
                 PrintCellEntrophy();
             }
             return GetOutputTileIndexGrid();
@@ -344,7 +304,5 @@ namespace WFC_Procedural_Generator_Framework
             }
             return output;
         }
-
-
     }
 }
