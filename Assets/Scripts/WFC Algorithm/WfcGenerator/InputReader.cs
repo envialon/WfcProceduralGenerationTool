@@ -34,12 +34,12 @@ namespace WFC_Procedural_Generator_Framework
                 {
                     for (int j = 0; j < mapSize; j++)
                     {
-                        offsettedIndexGrid[i, k, j] = tilemap[i , k, j].id * 4 + tilemap[i , k, j ].rotation;
+                        offsettedIndexGrid[i, k, j] = tilemap[i, k, j].id * 4 + tilemap[i, k, j].rotation;
                     }
                 }
             }
         }
-        
+
         private int mod(int x, int y)
         {
             return x - y * (int)Math.Floor((double)x / y);
@@ -79,7 +79,7 @@ namespace WFC_Procedural_Generator_Framework
 
             for (int i = -patternSize; i <= mapSize + patternSize; i++)
             {
-                for (int j = -patternSize; j <= mapSize ; j++)
+                for (int j = -patternSize; j <= mapSize; j++)
                 {
                     int[,,] pattern = Extract2DPatternAt(i, j);
                     string patternHash = hashPattern(pattern);
@@ -91,7 +91,7 @@ namespace WFC_Procedural_Generator_Framework
                     }
                     totalPatterns++;
                     patternFrecuency[patternHash]++;
-                   //  patternGrid[i % mapSize, 0, j % mapSize] = patternFrecuency[patternHash].id;
+                    //  patternGrid[i % mapSize, 0, j % mapSize] = patternFrecuency[patternHash].id;
                     //PatternInfo actualValue = new PatternInfo();
                     //uniquePatterns.TryGetValue(candidate, out actualValue);
                     //actualValue.frecuency++;
@@ -116,15 +116,28 @@ namespace WFC_Procedural_Generator_Framework
                 patterns[i].UpdateFrecuencies(totalPatterns);
             }
         }
-
-        private void CheckForNeighbourhood2D(int currentIndex, PatternInfo current, int candidateIndex, PatternInfo candidate)
+           
+        private bool NorthNeighbour(PatternInfo current, PatternInfo candidate)
         {
-            bool northNeighbour = true;
-            bool southNeighbour = true;
-            bool eastNeighbour = true;
-            bool westNeighbour = true;
+            int[,,] currentGrid = current.pattern;
+            int[,,] candidateGrid = candidate.pattern;
 
-            int lastIndex = patternSize - 1;
+            for (int i = 1; i < patternSize; i++)
+            {
+                for (int j = 0; j < patternSize; j++)
+                {
+                    int a = currentGrid[i, 0, j];
+                    int b = candidateGrid[i-1, 0, j];
+                    if (a != b)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        private bool EastNeighbour(PatternInfo current, PatternInfo candidate)
+        {
             int[,,] currentGrid = current.pattern;
             int[,,] candidateGrid = candidate.pattern;
 
@@ -132,32 +145,48 @@ namespace WFC_Procedural_Generator_Framework
             {
                 for (int j = 1; j < patternSize; j++)
                 {
-                    int mirrorJ = lastIndex - j;
-                    northNeighbour &= currentGrid[i, 0, j] == candidateGrid[i, 0, mirrorJ];
-                    southNeighbour &= currentGrid[i, 0, mirrorJ] == candidateGrid[i, 0, j];
-                    eastNeighbour &= currentGrid[j, 0, i] == candidateGrid[mirrorJ, 0, i];
-                    westNeighbour &= currentGrid[mirrorJ, 0, i] == candidateGrid[j, 0, i];
+                    int a = currentGrid[i, 0, j];
+                    int b = candidateGrid[i, 0, j-1];
+                    if (a != b)
+                    {
+                        return false;
+                    }
                 }
             }
-            if (northNeighbour)
-            {
-                candidate.neigbourIndices[Direction.north].Add(currentIndex);
-                current.neigbourIndices[Direction.north].Add(candidateIndex);
-            }
-            if (southNeighbour)
+            return true;
+        }
+
+        private void OldCheckForNeighborhood(int currentIndex, PatternInfo current, int candidateIndex, PatternInfo candidate)
+        {
+            //bool northNeighbour = true;
+            //bool southNeighbour = true;
+            //bool eastNeighbour = true;
+            //bool westNeighbour = true;
+
+            //int lastIndex = patternSize - 1;
+            //int[,,] currentGrid = current.pattern;
+            //int[,,] candidateGrid = candidate.pattern;
+
+            //for (int i = 0; i < patternSize; i++)
+            //{
+            //    for (int j = 0; j < patternSize; j++)
+            //    {
+            //        int mirrorJ = lastIndex - j;
+            //        northNeighbour &= currentGrid[i, 0, j] == candidateGrid[i, 0, mirrorJ];
+            //        southNeighbour &= currentGrid[i, 0, mirrorJ] == candidateGrid[i, 0, j];
+            //        eastNeighbour &= currentGrid[j, 0, i] == candidateGrid[mirrorJ, 0, i];
+            //        westNeighbour &= currentGrid[mirrorJ, 0, i] == candidateGrid[j, 0, i];
+            //    }
+            //}       
+            if (NorthNeighbour(current, candidate))
             {
                 candidate.neigbourIndices[Direction.south].Add(currentIndex);
-                current.neigbourIndices[Direction.south].Add(candidateIndex);
+                current.neigbourIndices[Direction.north].Add(candidateIndex);
             }
-            if (eastNeighbour)
-            {
-                candidate.neigbourIndices[Direction.east].Add(currentIndex);
-                current.neigbourIndices[Direction.east].Add(candidateIndex);
-            }
-            if (westNeighbour)
+            if (EastNeighbour(current, candidate))
             {
                 candidate.neigbourIndices[Direction.west].Add(currentIndex);
-                current.neigbourIndices[Direction.west].Add(candidateIndex);
+                current.neigbourIndices[Direction.east].Add(candidateIndex);
             }
         }
 
@@ -167,10 +196,10 @@ namespace WFC_Procedural_Generator_Framework
             for (int i = 0; i < numberOfPatterns; i++)
             {
                 PatternInfo current = patterns[i];
-                for (int j = i; j < numberOfPatterns; j++)
+                for (int j = 0; j < numberOfPatterns; j++)
                 {
                     PatternInfo candidate = patterns[j];
-                    CheckForNeighbourhood2D(i, current, j, candidate);
+                    OldCheckForNeighborhood(i, current, j, candidate);
                 }
             }
         }
@@ -284,6 +313,23 @@ namespace WFC_Procedural_Generator_Framework
             return patternVisualization;
         }
 
+        private string GetNeighboursVisualization(Dictionary<Direction, HashSet<int>> neighbours)
+        {
+            string str = "";
+
+            foreach (KeyValuePair<Direction, HashSet<int>> entry in neighbours)
+            {
+                str += "\t" + entry.Key + ": ";
+                foreach (int index in entry.Value)
+                {
+                    str += index + ", ";
+                }
+                str += "\n";
+            }
+
+            return str;
+        }
+
         public string GetPatternSummary()
         {
             const string spacer = "\n/////////////////////\n";
@@ -297,6 +343,8 @@ namespace WFC_Procedural_Generator_Framework
                 patternMessage += "Frecuency: " + pattern.frecuency + "\n";
                 patternMessage += "RelativeFrecuency: " + pattern.relativeFrecuency + "\n";
                 patternMessage += "Tile pattern:\n " + GetMatrixVisualization(pattern.pattern) + "\n";
+                patternMessage += "Neigbours:\n" + GetNeighboursVisualization(pattern.neigbourIndices) + "\n";
+
 
                 messsage += patternMessage + spacer;
             }

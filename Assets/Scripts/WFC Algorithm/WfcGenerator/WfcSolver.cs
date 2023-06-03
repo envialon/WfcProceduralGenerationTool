@@ -10,10 +10,6 @@ namespace WFC_Procedural_Generator_Framework
         int height;
         int depth;
 
-        int finalWidth;
-        int finalHeight;
-        int finalDepth;
-
         int patternSize;
 
         private Random random = new Random();
@@ -67,13 +63,10 @@ namespace WFC_Procedural_Generator_Framework
         public WfcSolver(InputReader inputReader, int width = -1, int height = -1, int depth = -1)
         {
             this.patternSize = inputReader.patternSize;
-            this.finalWidth = width;
-            this.finalHeight = height;
-            this.finalDepth = depth;
 
-            this.width = width + 1 - (patternSize);
+            this.width = width ;
             this.height = height;// - (patternHeight - 1);
-            this.depth = depth + 1 - (patternSize);
+            this.depth = depth;
 
             this.patternInfo = inputReader.GetPatternInfo();
             this.numberOfPatterns = patternInfo.Length;
@@ -88,13 +81,10 @@ namespace WFC_Procedural_Generator_Framework
 
         public void SetOutputSize(int width, int height, int depth)
         {
-            this.finalWidth = width;
-            this.finalHeight = height;
-            this.finalDepth = depth;
 
-            this.width = width + 1 - (patternSize);
+            this.width = width;
             this.height = height;// - (patternHeight - 1);
-            this.depth = depth + 1 - (patternSize);
+            this.depth = depth;
 
             InitializeOutputGrid();
         }
@@ -244,7 +234,7 @@ namespace WFC_Procedural_Generator_Framework
                             {
                                 cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].RemovePattern(compatiblePattern, patternInfo);
 
-                            }                          
+                            }
                         }
                         //oppositeDirection here, if not doesnt' work must think about this...
                         neighbourEnablers[compatiblePattern, direction]--;
@@ -340,37 +330,16 @@ namespace WFC_Procedural_Generator_Framework
 
         public int[,,] GetOutputTileIndexGrid()
         {
-            int[,,] output = new int[finalWidth, finalHeight, finalDepth];
+            int[,,] output = new int[width, width, width];
 
             for (int x = 0; x < width; x++)
             {
                 for (int z = 0; z < depth; z++)
                 {
                     int patternIndex = cellMap[x, 0, z].GetCollapsedIndex();
-                    int[,,] pattern;
-                    if (patternIndex < 0)
-                    {
-                        pattern = new int[patternSize, 1, patternSize];
-                        //for (int i = 0; i < patternSize; i++)
-                        //{
-                        //    for (int j = 0; j < patternSize; j++)
-                        //    {
-                        //        pattern[i, 0, j] = -1;
-                        //    }
-                        //}
-                    }
-                    else
-                    {
-                        pattern = patternInfo[patternIndex].pattern;
-                        for (int i = 0; i < patternSize; i++)
-                        {
-                            for (int j = 0; j < patternSize; j++)
-                            {
-                                output[x + i, 0, z + j] = pattern[i, 0, j];
-                            }
-                        }
-                    }
-
+                    int[,,] pattern = patternInfo[patternIndex].pattern;
+                    int tile = pattern[0, 0, 0];
+                    output[x, 0, z] = tile;
                 }
             }
             return output;
