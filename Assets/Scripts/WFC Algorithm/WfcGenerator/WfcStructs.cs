@@ -5,10 +5,10 @@ namespace WFC_Procedural_Generator_Framework
 {
     public enum Direction
     {
-        north,
-        east,
         south,
+        east,
         west,
+        north,
     }
 
     public struct Position
@@ -17,10 +17,10 @@ namespace WFC_Procedural_Generator_Framework
 
 
         public static Position[] directions = new Position[]{
-                                            new Position(0, 0, 1),
-                                            new Position(1, 0, 0),
                                             new Position(0, 0, -1),
                                             new Position(-1, 0, 0),
+                                            new Position(1, 0, 0),
+                                            new Position(0, 0, 1),
                                             };
         public Position(int x = 0, int y = 0, int z = 0)
         {

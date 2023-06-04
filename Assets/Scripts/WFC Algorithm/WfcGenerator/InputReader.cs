@@ -117,7 +117,7 @@ namespace WFC_Procedural_Generator_Framework
             }
         }
            
-        private bool NorthNeighbour(PatternInfo current, PatternInfo candidate)
+        private bool EastNeighbour(PatternInfo current, PatternInfo candidate)
         {
             int[,,] currentGrid = current.pattern;
             int[,,] candidateGrid = candidate.pattern;
@@ -136,7 +136,7 @@ namespace WFC_Procedural_Generator_Framework
             }
             return true;
         }
-        private bool EastNeighbour(PatternInfo current, PatternInfo candidate)
+        private bool NorthNeighbour(PatternInfo current, PatternInfo candidate)
         {
             int[,,] currentGrid = current.pattern;
             int[,,] candidateGrid = candidate.pattern;
