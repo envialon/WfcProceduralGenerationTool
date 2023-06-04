@@ -214,7 +214,10 @@ namespace WFC_Procedural_Generator_Framework
             {
                 int oppositeDirection = (direction + 2) % 4;
 
-                if (neighbourEnablers[compatiblePattern, direction] == 1)
+                //oppositeDirection here, if not doesnt' work must think about this...
+                neighbourEnablers[compatiblePattern, direction]--;
+                
+                if (neighbourEnablers[compatiblePattern, direction] == 0)
                 {
                     //check the other directions to see if we don't have a 0 in another direction, if so, we can remove this pattern from the list
                     if (!cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].ContainsAnyZeroEnablerCount(compatiblePattern))
@@ -225,8 +228,6 @@ namespace WFC_Procedural_Generator_Framework
 
                     removalQueue.Enqueue(new RemovalUpdate(neighbourCoord, compatiblePattern));
                 }
-                //oppositeDirection here, if not doesnt' work must think about this...
-                neighbourEnablers[compatiblePattern, direction]--;
             }
         }
 
