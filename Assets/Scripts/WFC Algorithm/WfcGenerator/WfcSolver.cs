@@ -219,11 +219,8 @@ namespace WFC_Procedural_Generator_Framework
                 
                 if (neighbourEnablers[compatiblePattern, oppositeDirection] == 0)
                 {
-                    //if it has a 0 in another direction we have already removed them from this cell.
-                    if (!cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].ContainsAnyZeroEnablerCount(compatiblePattern))
-                    {
-                        cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].RemovePattern(compatiblePattern, patternInfo);
-                    }
+                    cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].RemovePattern(compatiblePattern, patternInfo);
+                    
                     //CHECK FOR NO MORE POSSIBLE TILES NOW
 
                     removalQueue.Enqueue(new RemovalUpdate(neighbourCoord, compatiblePattern));
