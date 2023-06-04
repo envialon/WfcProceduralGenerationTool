@@ -139,8 +139,8 @@ namespace WFC_Procedural_Generator_Framework
         {
             // find cell with minimal entropy;
             Position candidatePosition = FindLowestEntropyCell();
-            int removedPattern = CollapseBasedOnPatternFrecuency(candidatePosition);
-            return (candidatePosition, removedPattern);
+            int collapsedPattern = CollapseBasedOnPatternFrecuency(candidatePosition);
+            return (candidatePosition, collapsedPattern);
         }
 
         //we can optimize this:
@@ -202,7 +202,33 @@ namespace WFC_Procedural_Generator_Framework
             cellMap[pos.x, pos.y, pos.z].CollapseOn(candidatePatternIndices[collapsedIndex]);
             return candidatePatternIndices[collapsedIndex];
         }
-        
+
+
+        private void RemoveUncompatiblePatternsInNeighbour(RemovalUpdate removalUpdate, Position neighbourCoord, int direction)
+        {
+            Cell neighbourCell = cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z];
+            int[,] neighbourEnablers = cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].tileEnablerCountsByDirection;
+            HashSet<int> compatiblePatterns = patternInfo[removalUpdate.patternIndex].GetCompatiblesInDirection((Direction)direction);
+
+            foreach (int compatiblePattern in compatiblePatterns)
+            {
+                int oppositeDirection = (direction + 2) % 4;
+
+                if (neighbourEnablers[compatiblePattern, direction] == 1)
+                {
+                    //check the other directions to see if we don't have a 0 in another direction, if so, we can remove this pattern from the list
+                    if (!cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].ContainsAnyZeroEnablerCount(compatiblePattern))
+                    {
+                        cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].RemovePattern(compatiblePattern, patternInfo);
+                    }
+                    //CHECK FOR NO MORE POSSIBLE TILES NOW
+
+                    removalQueue.Enqueue(new RemovalUpdate(neighbourCoord, compatiblePattern));
+                }
+                //oppositeDirection here, if not doesnt' work must think about this...
+                neighbourEnablers[compatiblePattern, direction]--;
+            }
+        }
 
         private void wfcPropagation()
         {
@@ -217,32 +243,12 @@ namespace WFC_Procedural_Generator_Framework
 
                 for (int direction = 0; direction < numberOfDirections; direction++)
                 {
-                    Position neigbourCoord = removalUpdate.position + Position.directions[direction];
+                    Position neighbourCoord = removalUpdate.position + Position.directions[direction];
+                    
+                    if (!PositionIsValid(neighbourCoord) || cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].collapsed) continue;
 
-                    if (!PositionIsValid(neigbourCoord) || cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].collapsed) continue;
-                    int[,] neighbourEnablers = cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].tileEnablerCountsByDirection;
-                    HashSet<int> compatiblePatterns = patternInfo[removalUpdate.patternIndex].GetCompatiblesInDirection((Direction)direction);
-
-                    foreach (int compatiblePattern in compatiblePatterns)
-                    {
-                        int oppositeDirection = (direction + 2) % 4;
-
-                        if (neighbourEnablers[compatiblePattern, direction] == 1)
-                        {
-                            //check the other directions to see if we don't have a 0 in another direction, if so, we can remove this pattern from the list
-                            if (!cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].ContainsAnyZeroEnablerCount(compatiblePattern))
-                            {
-                                cellMap[neigbourCoord.x, neigbourCoord.y, neigbourCoord.z].RemovePattern(compatiblePattern, patternInfo);
-
-                            }
-                            //CHECK FOR NO MORE POSSIBLE TILES NOW
-
-                            removalQueue.Enqueue(new RemovalUpdate(neigbourCoord, compatiblePattern));
-
-                        }
-                        //oppositeDirection here, if not doesnt' work must think about this...
-                        neighbourEnablers[compatiblePattern, direction]--;
-                    }
+                    RemoveUncompatiblePatternsInNeighbour(removalUpdate, neighbourCoord, direction);
+                    
                 }
             }
             UnityEngine.Debug.Log(msg);
