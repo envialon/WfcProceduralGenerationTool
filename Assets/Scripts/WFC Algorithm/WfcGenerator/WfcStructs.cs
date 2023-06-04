@@ -11,7 +11,7 @@ namespace WFC_Procedural_Generator_Framework
         west,
     }
 
-    public struct Position 
+    public struct Position
     {
         public int x; public int y; public int z;
 
@@ -36,10 +36,10 @@ namespace WFC_Procedural_Generator_Framework
             return "{" + x + ", " + y + ", " + z + "}";
         }
 
-        
+
     }
 
-    public struct RemovalUpdate 
+    public struct RemovalUpdate
     {
         public int patternIndex;
         public Position position;
@@ -143,13 +143,11 @@ namespace WFC_Procedural_Generator_Framework
         }
 
         public bool ContainsAnyZeroEnablerCount(int compatiblePattern)
-        {
-            int directions = tileEnablerCountsByDirection.GetLength(1);
-            for (int i = 0; i < directions; i++)
-            {
-                if (tileEnablerCountsByDirection[compatiblePattern, i] == 0) return true;
-            }
-            return false;
+        {            
+            return  tileEnablerCountsByDirection[compatiblePattern, 0] == 0 ||
+                    tileEnablerCountsByDirection[compatiblePattern, 1] == 0 ||
+                    tileEnablerCountsByDirection[compatiblePattern, 2] == 0 ||
+                    tileEnablerCountsByDirection[compatiblePattern, 3] == 0;
         }
 
         int IComparable.CompareTo(object o)

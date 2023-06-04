@@ -214,12 +214,12 @@ namespace WFC_Procedural_Generator_Framework
             {
                 int oppositeDirection = (direction + 2) % 4;
 
-                //oppositeDirection here, if not doesnt' work must think about this...
-                neighbourEnablers[compatiblePattern, direction]--;
+                //We must remove in the opossite direction from the pov of the neighbour cell.
+                neighbourEnablers[compatiblePattern, oppositeDirection]--;
                 
-                if (neighbourEnablers[compatiblePattern, direction] == 0)
+                if (neighbourEnablers[compatiblePattern, oppositeDirection] == 0)
                 {
-                    //check the other directions to see if we don't have a 0 in another direction, if so, we can remove this pattern from the list
+                    //if it has a 0 in another direction we have already removed them from this cell.
                     if (!cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].ContainsAnyZeroEnablerCount(compatiblePattern))
                     {
                         cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].RemovePattern(compatiblePattern, patternInfo);
