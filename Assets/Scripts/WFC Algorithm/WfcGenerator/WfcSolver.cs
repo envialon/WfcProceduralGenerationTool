@@ -215,10 +215,12 @@ namespace WFC_Procedural_Generator_Framework
                 int oppositeDirection = (direction + 2) % 4;
 
                 //We must remove in the opossite direction from the pov of the neighbour cell.
-                neighbourEnablers[compatiblePattern, oppositeDirection]--;
+                neighbourEnablers[compatiblePattern, direction]--;
                 
-                if (neighbourEnablers[compatiblePattern, oppositeDirection] == 0)
+                if (neighbourEnablers[compatiblePattern, direction] == 0 &&
+                    cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].possiblePatterns.Contains(compatiblePattern))
                 {
+                    
                     cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].RemovePattern(compatiblePattern, patternInfo);
                     
                     //CHECK FOR NO MORE POSSIBLE TILES NOW
