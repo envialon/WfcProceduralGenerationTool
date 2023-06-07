@@ -7,16 +7,18 @@ namespace WFC_Procedural_Generator_Framework
         public InputReader inputReader;
         public WfcSolver solver;
 
+        public bool enablePatternReflection = true;
+        public bool enablePatternRotations = true;
+
         public WfcModel(Tilemap data)
         {
             inputReader = new InputReader(data, patternSize);
             // solver = new WfcSolver(inputReader, outputX, outputY, outputZ);
         }
 
-
         public void Train(Tilemap inputTileMap, int patternSize = 2)
         {
-            inputReader.Train(patternSize, inputTileMap);
+            inputReader.Train(patternSize, inputTileMap, enablePatternReflection, enablePatternRotations);
             solver = new WfcSolver(inputReader);
         }
 

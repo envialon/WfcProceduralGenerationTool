@@ -6,12 +6,10 @@ namespace WFC_Procedural_Generator_Framework
 {
     public class WfcSolver
     {
-        int width;
-        int height;
-        int depth;
-
-        int patternSize;
-
+        public int width;
+        public int height;
+        public int depth;
+        
         private Random random = new Random();
         private List<Position> positionsByEntrophy;
         public Cell[,,] cellMap;
@@ -62,7 +60,6 @@ namespace WFC_Procedural_Generator_Framework
 
         public WfcSolver(InputReader inputReader, int width = -1, int height = -1, int depth = -1)
         {
-            this.patternSize = inputReader.patternSize;
 
             this.width = width ;
             this.height = height;// - (patternHeight - 1);

@@ -19,6 +19,10 @@ namespace WFC_Procedural_Generator_Framework
         private PatternInfo[] patterns;
         private int totalPatterns = 0;
 
+        public bool enablePatternReflection;
+        public bool enablePatternRotations;
+
+
         /// <summary>
         /// Deberemos transformar la información de tile y rotación a enteros puramente, acabaremos con 
         /// 4N índices únicos donde N es el tamaño de tileset.
@@ -59,7 +63,7 @@ namespace WFC_Procedural_Generator_Framework
         }
 
 
-        private string hashPattern(int[,,] pattern)
+        private string HashPattern(int[,,] pattern)
         {
             string digits = "";
             foreach (int i in pattern)
@@ -69,12 +73,86 @@ namespace WFC_Procedural_Generator_Framework
             return digits;
         }
 
+        private int[,,] ReflectMatrix2D(in int[,,] pattern)
+        {
+            int[,,] output = new int[patternSize, 1, patternSize];
+
+            for (int i = 0; i < patternSize; i++)
+            {
+                for (int j = 0; j < patternSize; j++)
+                {
+                    output[i, 0, j] = pattern[i, 0, patternSize - j - 1];
+                }
+            }
+            return output;
+        }
+
+        private int[,,] RotateMatrix2D(in int[,,] pattern)
+        {
+            int[,,] output = new int[patternSize, 1, patternSize];
+            for (int i = 0; i < patternSize; i++)
+            {
+                for (int j = 0; j <= i; j++)
+                {
+                    output[i, 0, j] = pattern[j, 0, i];
+                    output[j, 0, i] = pattern[i, 0, j];
+                    
+                }
+            }
+
+            return ReflectMatrix2D(in output);
+
+        }
+
+        private void RotatePatterns(Dictionary<string, PatternInfo> patternFrecuency)
+        {
+            PatternInfo[] patterns = patternFrecuency.Values.ToArray();
+            foreach (PatternInfo pattern in patterns)
+            {
+                int[,,] rotatedPattern;
+
+                for (int direction = 0; direction < 3; direction++)
+                {
+                    rotatedPattern = RotateMatrix2D(in pattern.pattern);
+                    string patternHash = HashPattern(rotatedPattern);
+                    if (!patternFrecuency.ContainsKey(patternHash))
+                    {
+                        totalPatterns++;
+                        patternFrecuency.Add(patternHash, new PatternInfo(rotatedPattern, patternFrecuency.Count, pattern.frecuency));
+                    }
+                }
+            }
+        }
+
+        private void ReflectPatterns(Dictionary<string, PatternInfo> patternFrecuency)
+        {
+            PatternInfo[] patterns = patternFrecuency.Values.ToArray();
+            foreach (PatternInfo pattern in patterns)
+            {
+                //reflect it and check if its already in patternFrecuency, if not, add it
+                int[,,] reflectedPattern = ReflectMatrix2D(in pattern.pattern);
+                string preReflection = HashPattern(pattern.pattern);
+
+                //for (int i = 0; i < patternSize; i++)
+                //{
+                //    for (int j = 0; j < patternSize; j++)
+                //    {
+                //        reflectedPattern[i, 0, j] = pattern.pattern[i, 0, patternSize - j - 1];
+                //    }
+                //}
+                string reflectedPatternHash = HashPattern(reflectedPattern);
+                if (!patternFrecuency.ContainsKey(reflectedPatternHash))
+                {
+                    totalPatterns++;
+                    patternFrecuency.Add(reflectedPatternHash, new PatternInfo(reflectedPattern, patternFrecuency.Count, pattern.frecuency));
+                }
+            }
+        }
+
         private void ExtractUniquePatterns()
         {
             //usamos el diccionario para aprovechar el hasheo
-
             Dictionary<string, PatternInfo> patternFrecuency = new Dictionary<string, PatternInfo>();
-            HashSet<PatternInfo> uniquePatterns = new HashSet<PatternInfo>();
             totalPatterns = 0;
 
             for (int i = -patternSize; i <= mapSize + patternSize; i++)
@@ -82,30 +160,28 @@ namespace WFC_Procedural_Generator_Framework
                 for (int j = -patternSize; j <= mapSize; j++)
                 {
                     int[,,] pattern = Extract2DPatternAt(i, j);
-                    string patternHash = hashPattern(pattern);
-                    // PatternInfo candidate = new PatternInfo(pattern, uniquePatterns.Count);
-                    if (!patternFrecuency.ContainsKey(hashPattern(pattern)))
+                    string patternHash = HashPattern(pattern);
+                    if (!patternFrecuency.ContainsKey(HashPattern(pattern)))
                     {
-                        //uniquePatterns.Add(candidate);
                         patternFrecuency.Add(patternHash, new PatternInfo(pattern, patternFrecuency.Count));
                     }
                     totalPatterns++;
                     patternFrecuency[patternHash]++;
-                    //  patternGrid[i % mapSize, 0, j % mapSize] = patternFrecuency[patternHash].id;
-                    //PatternInfo actualValue = new PatternInfo();
-                    //uniquePatterns.TryGetValue(candidate, out actualValue);
-                    //actualValue.frecuency++;
-                    //patternGrid[i, 0, j] = actualValue.id;
                 }
             }
 
+            if (enablePatternReflection)
+            {
+                Debug.Log("Reflection");
+                ReflectPatterns(patternFrecuency);
+            }
+            if (enablePatternRotations)
+            {
+                Debug.Log("Rotation");
+                RotatePatterns(patternFrecuency);
+            }
+
             patterns = patternFrecuency.Values.ToArray();
-            int numberOfValues = patterns.Length;
-            //for (int i = 0; i < numberOfValues; i++)
-            //{
-            //    patterns[i].relativeFrecuency = patterns[i].frecuency / totalPatterns;
-            //    patterns[i].relativeFrecuencyLog2 = MathF.Log(patterns[i].relativeFrecuencyLog2, 2);
-            //}
         }
 
         private void UpdateFrecuencies()
@@ -116,7 +192,7 @@ namespace WFC_Procedural_Generator_Framework
                 patterns[i].UpdateFrecuencies(totalPatterns);
             }
         }
-           
+
         private bool EastNeighbour(PatternInfo current, PatternInfo candidate)
         {
             int[,,] currentGrid = current.pattern;
@@ -127,7 +203,7 @@ namespace WFC_Procedural_Generator_Framework
                 for (int j = 0; j < patternSize; j++)
                 {
                     int a = currentGrid[i, 0, j];
-                    int b = candidateGrid[i-1, 0, j];
+                    int b = candidateGrid[i - 1, 0, j];
                     if (a != b)
                     {
                         return false;
@@ -146,7 +222,7 @@ namespace WFC_Procedural_Generator_Framework
                 for (int j = 1; j < patternSize; j++)
                 {
                     int a = currentGrid[i, 0, j];
-                    int b = candidateGrid[i, 0, j-1];
+                    int b = candidateGrid[i, 0, j - 1];
                     if (a != b)
                     {
                         return false;
@@ -158,26 +234,6 @@ namespace WFC_Procedural_Generator_Framework
 
         private void OldCheckForNeighborhood(int currentIndex, PatternInfo current, int candidateIndex, PatternInfo candidate)
         {
-            //bool northNeighbour = true;
-            //bool southNeighbour = true;
-            //bool eastNeighbour = true;
-            //bool westNeighbour = true;
-
-            //int lastIndex = patternSize - 1;
-            //int[,,] currentGrid = current.pattern;
-            //int[,,] candidateGrid = candidate.pattern;
-
-            //for (int i = 0; i < patternSize; i++)
-            //{
-            //    for (int j = 0; j < patternSize; j++)
-            //    {
-            //        int mirrorJ = lastIndex - j;
-            //        northNeighbour &= currentGrid[i, 0, j] == candidateGrid[i, 0, mirrorJ];
-            //        southNeighbour &= currentGrid[i, 0, mirrorJ] == candidateGrid[i, 0, j];
-            //        eastNeighbour &= currentGrid[j, 0, i] == candidateGrid[mirrorJ, 0, i];
-            //        westNeighbour &= currentGrid[mirrorJ, 0, i] == candidateGrid[j, 0, i];
-            //    }
-            //}       
             if (NorthNeighbour(current, candidate))
             {
                 candidate.neigbourIndices[Direction.south].Add(currentIndex);
@@ -248,8 +304,10 @@ namespace WFC_Procedural_Generator_Framework
             return patterns;
         }
 
-        public void Train(int patternSize = 2, Tilemap inputTileMap = null)
+        public void Train(int patternSize = 2, Tilemap inputTileMap = null, bool enableReflection = true, bool enableRotation = true)
         {
+            this.enablePatternReflection = enableReflection;
+            this.enablePatternRotations = enableRotation;
             if (inputTileMap is not null)
             {
                 Initialize(inputTileMap, patternSize);

@@ -13,6 +13,8 @@ namespace WFC_Procedural_Generator_Framework
         public int inputMapSize = 10;
         public int inputMapHeight = 1;
 
+        
+
         public Vector3Int outputSize = new Vector3Int(20, 1, 20);
         public TileSet tileSet;
         public int selectedTile = 0;
@@ -20,7 +22,7 @@ namespace WFC_Procedural_Generator_Framework
         private Grid grid;
         private BoxCollider boxCollider;
 
-        private WfcModel model;
+        public WfcModel model;
         private Tilemap inputMap;
         private Tilemap lastMapGenerated;
 
@@ -119,7 +121,7 @@ namespace WFC_Procedural_Generator_Framework
                 Matrix4x4 currentTRS = Matrix4x4.TRS(transform.position + tilePos + rotationOffset,
                                                     rotation,
                                                     Vector3.one);
-
+               
                 Graphics.DrawMesh(tileSet.GetMesh(currentTile.id), currentTRS, tileSet.GetMaterial(currentTile.id), 0, cam);
             }
         }
@@ -163,11 +165,11 @@ namespace WFC_Procedural_Generator_Framework
             {
                 case KeyCode.N:
 
-                    selectedTile = (selectedTile + 1) % tileSet.tiles.Count;
+                    selectedTile = Mathf.Abs((selectedTile - 1)) % tileSet.tiles.Count;
                     break;
 
                 case KeyCode.M:
-                    selectedTile = Mathf.Abs((selectedTile - 1)) % tileSet.tiles.Count;
+                    selectedTile = (selectedTile + 1) % tileSet.tiles.Count;
                     break;
             }
         }
@@ -275,6 +277,13 @@ namespace WFC_Procedural_Generator_Framework
         {
             DrawDefaultInspector();
 
+            GUILayout.BeginHorizontal();
+            t.model.enablePatternReflection = EditorGUILayout.Toggle("Enable pattern reflection", t.model.enablePatternReflection);
+            t.model.enablePatternRotations = EditorGUILayout.Toggle("Enable pattern rotation", t.model.enablePatternRotations);
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(20);
+            
             if (GUILayout.Button("Clear"))
             {
                 t.Clear();

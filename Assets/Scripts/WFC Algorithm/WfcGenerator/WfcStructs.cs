@@ -177,11 +177,11 @@ namespace WFC_Procedural_Generator_Framework
 
         public Dictionary<Direction, HashSet<int>> neigbourIndices;
 
-        public PatternInfo(int[,,] pattern, int patternId)
+        public PatternInfo(int[,,] pattern, int patternId, int frecuency = 0)
         {
             this.pattern = pattern;
             this.id = patternId;
-            frecuency = 0;
+            this.frecuency = frecuency;
             relativeFrecuency = 0;
             relativeFrecuencyLog2 = 0;
             neigbourIndices = new Dictionary<Direction, HashSet<int>>
