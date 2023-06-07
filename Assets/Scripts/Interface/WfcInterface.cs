@@ -44,7 +44,7 @@ namespace WFC_Procedural_Generator_Framework
             inputMap = new Tilemap(inputMapSize, inputMapHeight);
             model = new WfcModel(inputMap);
 
-            if(boxCollider is null)
+            if (boxCollider is null)
             {
                 boxCollider = gameObject.GetComponent<BoxCollider>();
             }
@@ -92,6 +92,21 @@ namespace WFC_Procedural_Generator_Framework
             }
         }
 
+        private Vector3 GetRotationOffset(Tile currentTile)
+        {
+            switch (currentTile.rotation)
+            {
+                case 1:
+                    return new Vector3(0, 0, 1);
+                case 2:
+                    return new Vector3(1, 0, 1);
+                case 3:
+                    return new Vector3(1, 0, 0);
+                default:
+                    return Vector3.zero;
+            }
+        }
+
         private void DrawTile(Tile currentTile, Vector3 tilePos, Camera cam)
         {
             Mesh mesh = tileSet.GetMesh(currentTile.id);
@@ -99,7 +114,11 @@ namespace WFC_Procedural_Generator_Framework
             {
                 Quaternion rotation = Quaternion.Euler(new Vector3(0, 90 * currentTile.rotation, 0));
 
-                Matrix4x4 currentTRS = Matrix4x4.TRS(transform.position + tilePos, Quaternion.identity, Vector3.one);
+                Vector3 rotationOffset = GetRotationOffset(currentTile);
+
+                Matrix4x4 currentTRS = Matrix4x4.TRS(transform.position + tilePos + rotationOffset,
+                                                    rotation,
+                                                    Vector3.one);
 
                 Graphics.DrawMesh(tileSet.GetMesh(currentTile.id), currentTRS, tileSet.GetMaterial(currentTile.id), 0, cam);
             }
@@ -266,16 +285,17 @@ namespace WFC_Procedural_Generator_Framework
             if (GUILayout.Button("Train"))
             {
                 t.Train();
-                
+
             }
 
-            if(GUILayout.Button("Resize output")) {
+            if (GUILayout.Button("Resize output"))
+            {
                 t.ResizeOutput();
             }
 
             GUILayout.Space(10);
 
-            if(GUILayout.Button("Iterate"))
+            if (GUILayout.Button("Iterate"))
             {
                 t.Iterate();
             }

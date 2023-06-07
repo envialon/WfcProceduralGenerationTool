@@ -296,7 +296,7 @@ namespace WFC_Procedural_Generator_Framework
 
         public int[,,] GetOutputTileIndexGrid()
         {
-            int[,,] output = new int[width, width, width];
+            int[,,] output = new int[width, height, width];
 
             for (int x = 0; x < width; x++)
             {
