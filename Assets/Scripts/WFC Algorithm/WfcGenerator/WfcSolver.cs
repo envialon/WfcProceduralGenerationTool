@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace WFC_Procedural_Generator_Framework
+namespace WFC_Model
 {
     public class WfcSolver
     {
@@ -11,8 +11,8 @@ namespace WFC_Procedural_Generator_Framework
         public int depth;
         
         private Random random = new Random();
-        private List<Position> positionsByEntrophy;
         public Cell[,,] cellMap;
+
         private PatternInfo[] patternInfo;
         private int numberOfPatterns;
         private int collapsedCount = 0;
@@ -44,7 +44,6 @@ namespace WFC_Procedural_Generator_Framework
             int[,] enablerCountTemplate = InitialEnablerCount();
 
             cellMap = new Cell[width, height, depth];
-            positionsByEntrophy = new List<Position>();
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < depth; j++)
@@ -52,7 +51,7 @@ namespace WFC_Procedural_Generator_Framework
                     for (int k = 0; k < height; k++)
                     {
                         cellMap[i, k, j] = new Cell(Enumerable.Range(0, patternInfo.Length).ToArray(), patternInfo, enablerCountTemplate);
-                        positionsByEntrophy.Add(new Position(i, k, j));
+                        
                     }
                 }
             }
@@ -145,8 +144,7 @@ namespace WFC_Procedural_Generator_Framework
         {
             int[] candidatePatternIndices = cellMap[pos.x, pos.y, pos.z].possiblePatterns.ToArray();
             int numberOfCandidates = candidatePatternIndices.Length;
-
-            positionsByEntrophy.Remove(positionsByEntrophy.First());
+            
 
             if (numberOfCandidates == 0)
             {
@@ -181,15 +179,12 @@ namespace WFC_Procedural_Generator_Framework
                     if (randomValue > candidateFrecuencies[i])
                     {
                         randomValue -= candidateFrecuencies[i];
-                        //Add removal updates to the queue
-                        // removalQueue.Enqueue((pos, candidatePatternIndices[i]));
                         removalQueue.Enqueue(new RemovalUpdate(pos, candidatePatternIndices[i]));
                     }
                     else { collapsedIndex = i; }
                 }
                 else
                 {
-                    // removalQueue.Enqueue((pos, candidatePatternIndices[i]));
                     removalQueue.Enqueue(new RemovalUpdate(pos, candidatePatternIndices[i]));
                 }
             }

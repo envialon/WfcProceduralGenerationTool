@@ -1,7 +1,7 @@
 using System;
 
 
-namespace WFC_Procedural_Generator_Framework
+namespace WFC_Model
 {
     [Serializable]
     public struct Tile

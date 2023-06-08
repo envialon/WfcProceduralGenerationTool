@@ -1,6 +1,5 @@
-using UnityEngine;
 
-namespace WFC_Procedural_Generator_Framework
+namespace WFC_Model
 {
     public class Tilemap
     {

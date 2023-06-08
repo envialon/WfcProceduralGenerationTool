@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Debug = UnityEngine.Debug;
 
-namespace WFC_Procedural_Generator_Framework
+namespace WFC_Model
 {
     public class InputReader
     {
@@ -92,11 +92,9 @@ namespace WFC_Procedural_Generator_Framework
             int[,,] output = new int[patternSize, 1, patternSize];
             for (int i = 0; i < patternSize; i++)
             {
-                for (int j = 0; j <= i; j++)
+                for (int j = 0; j < patternSize; j++)
                 {
-                    output[i, 0, j] = pattern[j, 0, i];
-                    output[j, 0, i] = pattern[i, 0, j];
-                    
+                    output[i, 0, j] = pattern[j, 0, i];                   
                 }
             }
 
@@ -130,16 +128,7 @@ namespace WFC_Procedural_Generator_Framework
             foreach (PatternInfo pattern in patterns)
             {
                 //reflect it and check if its already in patternFrecuency, if not, add it
-                int[,,] reflectedPattern = ReflectMatrix2D(in pattern.pattern);
-                string preReflection = HashPattern(pattern.pattern);
-
-                //for (int i = 0; i < patternSize; i++)
-                //{
-                //    for (int j = 0; j < patternSize; j++)
-                //    {
-                //        reflectedPattern[i, 0, j] = pattern.pattern[i, 0, patternSize - j - 1];
-                //    }
-                //}
+                int[,,] reflectedPattern = ReflectMatrix2D(in pattern.pattern); 
                 string reflectedPatternHash = HashPattern(reflectedPattern);
                 if (!patternFrecuency.ContainsKey(reflectedPatternHash))
                 {
@@ -172,12 +161,12 @@ namespace WFC_Procedural_Generator_Framework
 
             if (enablePatternReflection)
             {
-                Debug.Log("Reflection");
+                //Debug.Log("Reflection");
                 ReflectPatterns(patternFrecuency);
             }
             if (enablePatternRotations)
             {
-                Debug.Log("Rotation");
+                //Debug.Log("Rotation");
                 RotatePatterns(patternFrecuency);
             }
 

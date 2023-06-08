@@ -1,39 +1,36 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace WFC_Procedural_Generator_Framework
+[CreateAssetMenu(fileName = "newTileSet", menuName = "ScriptableObjects/TileSet", order = 1)]
+public class TileSet : ScriptableObject
 {
-    [CreateAssetMenu(fileName = "newTileSet", menuName = "ScriptableObjects/TileSet", order = 1)]
-    public class TileSet : ScriptableObject
+    [SerializeField]
+    public List<TileAttributes> tiles;
+
+    private void Awake()
     {
-        [SerializeField]
-        public List<TileAttributes> tiles;
-
-        private void Awake()
+        if (tiles is null)
         {
-            if (tiles is null)
-            {
-                tiles = new List<TileAttributes>();
-            }
-            if (tiles.Count > 0)
-            {
-                tiles.Insert(0, new TileAttributes()); //white space tile must have id 0
-            }
-            else
-            {
-                tiles.Add(new TileAttributes()); //white space tile must have id 0
-            }
+            tiles = new List<TileAttributes>();
         }
-
-        public Mesh GetMesh(int id)
+        if (tiles.Count > 0)
         {
-            return tiles[id].mesh;
+            tiles.Insert(0, new TileAttributes()); //white space tile must have id 0
         }
-
-        public Material GetMaterial(int id)
+        else
         {
-            return tiles[id].material;
+            tiles.Add(new TileAttributes()); //white space tile must have id 0
         }
-
     }
+
+    public Mesh GetMesh(int id)
+    {
+        return tiles[id].mesh;
+    }
+
+    public Material GetMaterial(int id)
+    {
+        return tiles[id].material;
+    }
+
 }

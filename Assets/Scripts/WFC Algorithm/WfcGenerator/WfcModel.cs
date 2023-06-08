@@ -1,4 +1,4 @@
-namespace WFC_Procedural_Generator_Framework
+namespace WFC_Model
 {
     public class WfcModel
     {
@@ -13,7 +13,6 @@ namespace WFC_Procedural_Generator_Framework
         public WfcModel(Tilemap data)
         {
             inputReader = new InputReader(data, patternSize);
-            // solver = new WfcSolver(inputReader, outputX, outputY, outputZ);
         }
 
         public void Train(Tilemap inputTileMap, int patternSize = 2)

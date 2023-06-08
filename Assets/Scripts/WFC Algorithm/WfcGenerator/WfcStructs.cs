@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace WFC_Procedural_Generator_Framework
+namespace WFC_Model
 {
     public enum Direction
     {
