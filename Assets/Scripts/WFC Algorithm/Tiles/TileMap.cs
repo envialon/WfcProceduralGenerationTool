@@ -1,12 +1,12 @@
 
 namespace WFC_Model
 {
+    [System.Serializable]
     public class Tilemap
     {
         public int width = 10;
         public int depth = 10;
         public int height = 1;
-
         public Tile[,,] map;
 
         public Tilemap(int mapSize = 10, int height = 1)
@@ -16,12 +16,21 @@ namespace WFC_Model
             this.height = height;
             map = new Tile[mapSize, height, mapSize];
         }
+
         public Tilemap(int width = 10, int height = 1, int depth = 10)
         {
             this.width = width;
             this.depth = depth;
             this.height = height;
             map = new Tile[width, height, width];
+        }
+
+        public Tilemap(Tilemap other)
+        {
+            this.width = other.width;
+            this.depth = other.depth;
+            this.height = other.height;
+            this.map = (Tile[,,])other.map.Clone();
         }
 
         //Constructor from the output of the WFC algorithm
@@ -85,6 +94,6 @@ namespace WFC_Model
         public void Clear()
         {
             map = new Tile[width, height, depth];
-        }
+        }             
     }
 }

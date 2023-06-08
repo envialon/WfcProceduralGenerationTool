@@ -7,6 +7,8 @@ using WFC_Model;
 [RequireComponent(typeof(BoxCollider))]
 public class WfcInterface : MonoBehaviour
 {
+    private const string inputMapSerializationPath = "Assets/Generated/";
+
     public int patternSize = 2;
     private int patternSizeCheck = 0;
     public int inputMapSize = 10;
@@ -15,6 +17,7 @@ public class WfcInterface : MonoBehaviour
     private int inputMapHeightCheck = 0;
 
     public Vector3Int outputSize = new Vector3Int(20, 1, 20);
+    private Vector3Int outputSizeCheck = Vector3Int.zero;
     public TileSet tileSet;
     public int selectedTile = 0;
 
@@ -38,6 +41,7 @@ public class WfcInterface : MonoBehaviour
     private void OnValidate()
     {
         ResizeInputMap();
+        ResizeOutputMap();
     }
 
     private void ResizeInputMap()
@@ -61,7 +65,13 @@ public class WfcInterface : MonoBehaviour
 
     }
 
-
+    private void ResizeOutputMap()
+    {
+        if (outputSizeCheck != outputSize && model is not null)
+        {
+            model.SetOutputSize(outputSize.x, outputSize.y, outputSize.z);
+        }
+    }
 
     private void OnEnable()
     {
@@ -86,6 +96,7 @@ public class WfcInterface : MonoBehaviour
         boxCollider = GetComponent<BoxCollider>();
 
         ResizeInputMap();
+        ResizeOutputMap();
     }
 
     private void DrawWithCamera(Camera cam)
@@ -233,6 +244,16 @@ public class WfcInterface : MonoBehaviour
         Debug.Log(model.inputReader.GetPatternSummary());
     }
 
+    public void SerializeInputMap()
+    {       
+        TilemapSerializer.SerializeTilemap(inputMap, inputMapSerializationPath);
+    }
+
+    public void LoadSerializedInputMap(string path)
+    {
+        inputMap = TilemapSerializer.DeserializeTilemap(path);
+    }
+
     public void Generate()
     {
         int[,,] generatedIndexMap = model.Generate(outputSize.x, outputSize.y, outputSize.z); ;
@@ -251,40 +272,22 @@ public class WfcInterface : MonoBehaviour
         lastMapGenerated = new Tilemap(generatedIndexMap);
     }
 
-    internal void ResizeOutput()
-    {
-        model.SetOutputSize(outputSize.x, outputSize.y, outputSize.z);
-    }
 
-    internal void Iterate()
-    {
-        int[,,] generatedIndexMap = model.Iterate();
-        string msg = "";
-        for (int i = 0; i < generatedIndexMap.GetLength(0); i++)
-        {
-            for (int j = 0; j < generatedIndexMap.GetLength(2); j++)
-            {
-                msg += generatedIndexMap[i, 0, j] + " ";
-            }
-            msg += "\n";
-        }
-        Debug.Log(msg);
-    }
 }
 
 [CustomEditor(typeof(WfcInterface))]
 public class WfcInterfaceEditor : Editor
 {
     WfcInterface t;
+    UnityEngine.Object obj = null;
 
     private void Awake()
     {
         t = (WfcInterface)target;
     }
 
-    public override void OnInspectorGUI()
+    private void TrainingEditor()
     {
-        DrawDefaultInspector();
 
         GUILayout.BeginHorizontal();
         t.model.enablePatternReflection = EditorGUILayout.Toggle("Enable pattern reflection", t.model.enablePatternReflection);
@@ -292,31 +295,47 @@ public class WfcInterfaceEditor : Editor
         GUILayout.EndHorizontal();
 
         GUILayout.Space(20);
+        
+        obj = EditorGUILayout.ObjectField( "Serialized input map file:", obj, typeof(UnityEngine.Object), false);
 
-        if (GUILayout.Button("Clear"))
+
+        GUILayout.BeginHorizontal();
+        
+        if (GUILayout.Button("Load serialized input map") && obj)
         {
-            t.Clear();
+            t.LoadSerializedInputMap(AssetDatabase.GetAssetPath(obj));
+        }        
+        
+        if(GUILayout.Button("Serialize current input map"))
+        {
+            t.SerializeInputMap();
         }
+
+        GUILayout.EndHorizontal();
 
         GUILayout.Space(10);
 
         if (GUILayout.Button("Train"))
         {
             t.Train();
-
         }
+    }
 
-        if (GUILayout.Button("Resize output"))
+
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+
+        if (GUILayout.Button("Clear"))
         {
-            t.ResizeOutput();
+            t.Clear();
         }
+
+        GUILayout.Space(20);
+
+        TrainingEditor();
 
         GUILayout.Space(10);
-
-        if (GUILayout.Button("Iterate"))
-        {
-            t.Iterate();
-        }
 
         if (GUILayout.Button("Generate"))
         {
