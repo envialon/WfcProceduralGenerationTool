@@ -9,36 +9,39 @@ namespace WFC_Model
         public int height = 1;
         public Tile[] map;
 
+        private int yOffset;
+        private int zOffset;
+
+
+        private void InitializeParams(int width = 10, int height = 1, int depth = 10)
+        {
+            this.width = width;
+            this.depth = depth;
+            this.height = height;
+        }
+
         public Tilemap(int mapSize = 10, int height = 1)
         {
-            this.width = mapSize;
-            this.depth = mapSize;
-            this.height = height;
+            InitializeParams(mapSize, height, mapSize);
             Clear();
         }
 
         public Tilemap(int width = 10, int height = 1, int depth = 10)
         {
-            this.width = width;
-            this.depth = depth;
-            this.height = height;
+            InitializeParams(width, height, depth);
             Clear();
         }
 
         public Tilemap(Tilemap other)
         {
-            this.width = other.width;
-            this.depth = other.depth;
-            this.height = other.height;
+            InitializeParams(width, height, depth);
             this.map = (Tile[])other.map.Clone();
         }
 
         //Constructor from the output of the WFC algorithm
         public Tilemap(int[,,] indexMap)
         {
-            this.width = indexMap.GetLength(0);
-            this.height = indexMap.GetLength(1);
-            this.depth = indexMap.GetLength(2);
+            InitializeParams(indexMap.GetLength(0), indexMap.GetLength(1), indexMap.GetLength(2));
             Clear();
 
             for (int i = 0; i < width; i++)
@@ -49,7 +52,7 @@ namespace WFC_Model
                     {
                         int tileId = indexMap[i, k, j] / 4;
                         int rotation = indexMap[i, k, j] - tileId * 4;
-                        map[i + (k * width) + (j * width * height)] = new Tile(tileId, rotation);
+                        SetTile(new Tile(tileId, rotation), i, k, j);
                     }
                 }
             }
@@ -85,7 +88,7 @@ namespace WFC_Model
                     {
                         output[i, j] = 0; continue;
                     }
-                    output[i, j] = map[(x + i) + (y * width) + (z+j* width * height)].id;
+                    output[i, j] = map[(x + i) + (y * width) + (z + j * width * height)].id;
 
                 }
             }
