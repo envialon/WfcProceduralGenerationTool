@@ -29,7 +29,6 @@ namespace WFC_Model
         /// </summary>
         private void PopulateIndexGrid()
         {
-            Tile[,,] tilemap = inputTileMap.map;
             offsettedIndexGrid = new int[inputTileMap.width, inputTileMap.height, inputTileMap.depth];
 
             for (int k = 0; k < height; k++)
@@ -38,7 +37,7 @@ namespace WFC_Model
                 {
                     for (int j = 0; j < mapSize; j++)
                     {
-                        offsettedIndexGrid[i, k, j] = tilemap[i, k, j].id * 4 + tilemap[i, k, j].rotation;
+                        offsettedIndexGrid[i, k, j] = inputTileMap.GetTile(i, k, j).id * 4 + inputTileMap.GetTile(i, k, j).rotation;
                     }
                 }
             }

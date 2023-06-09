@@ -24,7 +24,7 @@ public class SerializableTilemap : ScriptableObject
     public  Tilemap GetTilemap()
     {
         Tilemap tm = new Tilemap(width, height, depth);
-        tm.map = (Tile[,,])tiles.Clone();
+        tm.map = (Tile[])tiles.Clone();
         return tm;
     }
 
