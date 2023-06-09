@@ -245,7 +245,7 @@ public class WfcInterface : MonoBehaviour
     }
 
     public void SerializeInputMap()
-    {       
+    {
         TilemapSerializer.SerializeTilemap(inputMap, inputMapSerializationPath);
     }
 
@@ -256,20 +256,7 @@ public class WfcInterface : MonoBehaviour
 
     public void Generate()
     {
-        int[,,] generatedIndexMap = model.Generate(outputSize.x, outputSize.y, outputSize.z); ;
-
-        string msg = "";
-        for (int i = 0; i < generatedIndexMap.GetLength(0); i++)
-        {
-            for (int j = 0; j < generatedIndexMap.GetLength(2); j++)
-            {
-                msg += generatedIndexMap[i, 0, j] + " ";
-            }
-            msg += "\n";
-        }
-        Debug.Log(msg);
-
-        lastMapGenerated = new Tilemap(generatedIndexMap);
+        lastMapGenerated = model.Generate(outputSize.x, outputSize.y, outputSize.z);
     }
 
 
@@ -295,18 +282,18 @@ public class WfcInterfaceEditor : Editor
         GUILayout.EndHorizontal();
 
         GUILayout.Space(20);
-        
-        obj = EditorGUILayout.ObjectField( "Serialized input map file:", obj, typeof(UnityEngine.Object), false);
+
+        obj = EditorGUILayout.ObjectField("Serialized input map file:", obj, typeof(UnityEngine.Object), false);
 
 
         GUILayout.BeginHorizontal();
-        
+
         if (GUILayout.Button("Load serialized input map") && obj)
         {
             t.LoadSerializedInputMap(AssetDatabase.GetAssetPath(obj));
-        }        
-        
-        if(GUILayout.Button("Serialize current input map"))
+        }
+
+        if (GUILayout.Button("Serialize current input map"))
         {
             t.SerializeInputMap();
         }

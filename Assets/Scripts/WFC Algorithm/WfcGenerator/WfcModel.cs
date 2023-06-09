@@ -21,7 +21,7 @@ namespace WFC_Model
             solver = new WfcSolver(inputReader);
         }
 
-        public int[,,] Generate(int outputX, int outputY, int outputZ)
+        public Tilemap Generate(int outputX, int outputY, int outputZ)
         {
             solver = new WfcSolver(inputReader, outputX, outputY, outputZ);
             return solver.Generate();
@@ -33,11 +33,6 @@ namespace WFC_Model
             {
                 solver.SetOutputSize(outputX, outputY, outputZ);
             }
-        }
-
-        public int[,,] Iterate()
-        {
-            return solver.Iterate();
         }
     }
 }

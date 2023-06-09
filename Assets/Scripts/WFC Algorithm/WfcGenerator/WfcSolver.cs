@@ -247,7 +247,7 @@ namespace WFC_Model
         }
 
 
-        public int[,,] Generate()
+        public Tilemap Generate()
         {
             int cellsToBeCollapsed = width * height * depth;
             collapsedCount = 0;
@@ -263,43 +263,36 @@ namespace WFC_Model
             return GetOutputTileIndexGrid();
         }
 
-        public int[,,] Iterate()
+        public Tilemap GetOutputTileIndexGrid()
         {
-            Observe();
-            wfcPropagation();
-            return GetOutputTileIndexGrid();
-        }
-
-        public int[,,] GetPatternGridOutOfOutputGrid()
-        {
-            int[,,] patternGrid = new int[width, height, depth];
+            Tilemap output = new Tilemap(width, height, depth);
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < depth; j++)
                 {
                     for (int k = 0; k < height; k++)
                     {
-                        patternGrid[i, k, j] = cellMap[i, k, j].GetCollapsedIndex();
+                        int patternIndex = cellMap[i, k, j].GetCollapsedIndex();
+                        int index = patternInfo[patternIndex].pattern[0, 0, 0];
+
+                        int tileId = index / 4;
+                        int rotation = index - tileId * 4;
+                        output.SetTile(new Tile(tileId, rotation),i, k, j);
                     }
                 }
             }
-            return patternGrid;
-        }
+            //for (int x = 0; x < width; x++)
+            //{
+            //    for (int z = 0; z < depth; z++)
+            //    {
+            //        int patternIndex = cellMap[x, 0, z].GetCollapsedIndex();
+            //        int index = patternInfo[patternIndex].pattern[0,0,0];
 
-        public int[,,] GetOutputTileIndexGrid()
-        {
-            int[,,] output = new int[width, height, width];
-
-            for (int x = 0; x < width; x++)
-            {
-                for (int z = 0; z < depth; z++)
-                {
-                    int patternIndex = cellMap[x, 0, z].GetCollapsedIndex();
-                    int[,,] pattern = patternInfo[patternIndex].pattern;
-                    int tile = pattern[0, 0, 0];
-                    output[x, 0, z] = tile;
-                }
-            }
+            //        int tileId = indexMap[i, k, j] / 4;
+            //        int rotation = indexMap[i, k, j] - tileId * 4;
+            //        output.SetTile(i, k, j, new Tile(tileId, rotation));
+            //    }
+            //}
             return output;
         }
     }
