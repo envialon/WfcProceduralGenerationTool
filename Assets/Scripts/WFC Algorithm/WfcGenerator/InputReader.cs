@@ -14,8 +14,6 @@ namespace WFC_Model
         private int height;
         private int mapSize;
         private int[,,] offsettedIndexGrid;
-        //must change
-        public int[,,] patternGrid;
         private PatternInfo[] patterns;
         private int totalPatterns = 0;
 
@@ -320,29 +318,6 @@ namespace WFC_Model
             this.inputTileMap = inputTileMap;
             this.mapSize = inputTileMap.width;
             this.height = inputTileMap.height;
-            this.patternGrid = new int[mapSize, 1, mapSize];
-        }
-
-        public int[,,] GetOutputTileIndexGrid()
-        {
-            int[,,] output = new int[mapSize, height, mapSize];
-
-            for (int x = 0; x < mapSize - patternSize; x++)
-            {
-                for (int z = 0; z < mapSize - patternSize; z++)
-                {
-                    int patternIndex = patternGrid[x, 0, z];
-                    int[,,] pattern = patterns[patternIndex].pattern;
-                    for (int i = 0; i < patternSize; i++)
-                    {
-                        for (int j = 0; j < patternSize; j++)
-                        {
-                            output[x + i, 0, z + j] = pattern[i, 0, j];
-                        }
-                    }
-                }
-            }
-            return output;
         }
 
         public string GetMatrixVisualization(int[,,] mat)

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using WFC_Model;
 
@@ -18,5 +16,4 @@ public class SerializableTilemap : ScriptableObject
     {
         return new Tilemap(tilemap);
     }
-
 }
