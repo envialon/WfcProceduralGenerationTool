@@ -18,6 +18,8 @@ namespace WFC_Model
             this.width = width;
             this.depth = depth;
             this.height = height;
+            yOffset = width;
+            zOffset = width * height;
         }
 
         public Tilemap(int mapSize = 10, int height = 1)
@@ -63,18 +65,18 @@ namespace WFC_Model
             if (x >= 0 && y >= 0 && z >= 0 && x < width
                 && z < depth && y < height)
             {
-                map[x + (y * width) + (z * width * height)] = tile;
+                map[x + (y * yOffset) + (z * zOffset)] = tile;
             }
         }
 
         public void RotateAt(int x, int y, int z)
         {
-            map[x + (y * width) + (z * width * height)].RotateClockwise();
+            map[x + (y * yOffset) + (z * zOffset)].RotateClockwise();
         }
 
         public Tile GetTile(int x, int y, int z)
         {
-            return map[x + (y * width) + (z * width * height)];
+            return map[x + (y * yOffset) + (z * zOffset)];
         }
 
         public int[,] Get2dPatternAt(int x, int y, int z, int patternSize)
@@ -88,7 +90,7 @@ namespace WFC_Model
                     {
                         output[i, j] = 0; continue;
                     }
-                    output[i, j] = map[(x + i) + (y * width) + (z + j * width * height)].id;
+                    output[i, j] = map[(x + i) + (y * yOffset) + (z + j * zOffset)].id;
 
                 }
             }
