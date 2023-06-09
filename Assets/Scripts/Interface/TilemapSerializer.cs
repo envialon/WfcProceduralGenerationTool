@@ -1,14 +1,19 @@
 using WFC_Model;
+using UnityEngine;
+using UnityEditor;
 
 public static class TilemapSerializer
 {
     public static void SerializeTilemap(Tilemap tilemap, string assetPath, string filename = "tilemap.asset")
     {
-        throw new System.NotImplementedException();
+        SerializableTilemap stm = ScriptableObject.CreateInstance<SerializableTilemap>();
+        stm.SetFromTilemap(tilemap);
+        AssetDatabase.CreateAsset(stm, assetPath + filename);
     }
 
     public static Tilemap DeserializeTilemap(string path)
     {
-        throw new System.NotImplementedException();
+        SerializableTilemap stm = AssetDatabase.LoadAssetAtPath<SerializableTilemap>(path);
+        return stm.GetTilemap();
     }
 }
