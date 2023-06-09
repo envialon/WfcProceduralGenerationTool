@@ -273,26 +273,15 @@ namespace WFC_Model
                     for (int k = 0; k < height; k++)
                     {
                         int patternIndex = cellMap[i, k, j].GetCollapsedIndex();
-                        int index = patternInfo[patternIndex].pattern[0, 0, 0];
+                        int encodedTileIndex = patternInfo[patternIndex].pattern[0, 0, 0];
 
-                        int tileId = index / 4;
-                        int rotation = index - tileId * 4;
+                        int tileId = encodedTileIndex / 4;
+                        int rotation = encodedTileIndex - tileId * 4;
+                        
                         output.SetTile(new Tile(tileId, rotation),i, k, j);
                     }
                 }
-            }
-            //for (int x = 0; x < width; x++)
-            //{
-            //    for (int z = 0; z < depth; z++)
-            //    {
-            //        int patternIndex = cellMap[x, 0, z].GetCollapsedIndex();
-            //        int index = patternInfo[patternIndex].pattern[0,0,0];
-
-            //        int tileId = indexMap[i, k, j] / 4;
-            //        int rotation = indexMap[i, k, j] - tileId * 4;
-            //        output.SetTile(i, k, j, new Tile(tileId, rotation));
-            //    }
-            //}
+            }        
             return output;
         }
     }
