@@ -258,8 +258,6 @@ public class WfcInterface : MonoBehaviour
     {
         lastMapGenerated = model.Generate(outputSize.x, outputSize.y, outputSize.z);
     }
-
-
 }
 
 [CustomEditor(typeof(WfcInterface))]
@@ -307,8 +305,7 @@ public class WfcInterfaceEditor : Editor
             t.Train();
         }
     }
-
-
+    
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
@@ -329,7 +326,7 @@ public class WfcInterfaceEditor : Editor
             t.Generate();
         }
     }
-
+    
     private void OnSceneGUI()
     {
         Event e = Event.current;

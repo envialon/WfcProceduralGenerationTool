@@ -9,7 +9,7 @@ namespace WFC_Model
         public int width;
         public int height;
         public int depth;
-        
+
         private Random random = new Random();
         public Cell[,,] cellMap;
 
@@ -18,7 +18,6 @@ namespace WFC_Model
         private int collapsedCount = 0;
 
         private Queue<RemovalUpdate> removalQueue;
-
 
         private int[,] InitialEnablerCount()
         {
@@ -51,7 +50,6 @@ namespace WFC_Model
                     for (int k = 0; k < height; k++)
                     {
                         cellMap[i, k, j] = new Cell(Enumerable.Range(0, patternInfo.Length).ToArray(), patternInfo, enablerCountTemplate);
-                        
                     }
                 }
             }
@@ -59,9 +57,8 @@ namespace WFC_Model
 
         public WfcSolver(InputReader inputReader, int width = -1, int height = -1, int depth = -1)
         {
-
-            this.width = width ;
-            this.height = height;// - (patternHeight - 1);
+            this.width = width;
+            this.height = height;
             this.depth = depth;
 
             this.patternInfo = inputReader.GetPatternInfo();
@@ -77,9 +74,8 @@ namespace WFC_Model
 
         public void SetOutputSize(int width, int height, int depth)
         {
-
             this.width = width;
-            this.height = height;// - (patternHeight - 1);
+            this.height = height;
             this.depth = depth;
 
             InitializeOutputGrid();
@@ -130,7 +126,6 @@ namespace WFC_Model
             UnityEngine.Debug.Log(msg);
         }
 
-
         private (Position, int) Observe()
         {
             // find cell with minimal entropy;
@@ -144,7 +139,7 @@ namespace WFC_Model
         {
             int[] candidatePatternIndices = cellMap[pos.x, pos.y, pos.z].possiblePatterns.ToArray();
             int numberOfCandidates = candidatePatternIndices.Length;
-            
+
 
             if (numberOfCandidates == 0)
             {
@@ -195,7 +190,6 @@ namespace WFC_Model
             return candidatePatternIndices[collapsedIndex];
         }
 
-
         private void RemoveUncompatiblePatternsInNeighbour(RemovalUpdate removalUpdate, Position neighbourCoord, int direction)
         {
             Cell neighbourCell = cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z];
@@ -208,13 +202,13 @@ namespace WFC_Model
 
                 //We must remove in the opossite direction from the pov of the neighbour cell.
                 neighbourEnablers[compatiblePattern, direction]--;
-                
+
                 if (neighbourEnablers[compatiblePattern, direction] == 0 &&
                     cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].possiblePatterns.Contains(compatiblePattern))
                 {
-                    
+
                     cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].RemovePattern(compatiblePattern, patternInfo);
-                    
+
                     //CHECK FOR NO MORE POSSIBLE TILES NOW
 
                     removalQueue.Enqueue(new RemovalUpdate(neighbourCoord, compatiblePattern));
@@ -236,16 +230,15 @@ namespace WFC_Model
                 for (int direction = 0; direction < numberOfDirections; direction++)
                 {
                     Position neighbourCoord = removalUpdate.position + Position.directions[direction];
-                    
+
                     if (!PositionIsValid(neighbourCoord) || cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].collapsed) continue;
 
                     RemoveUncompatiblePatternsInNeighbour(removalUpdate, neighbourCoord, direction);
-                    
+
                 }
             }
             UnityEngine.Debug.Log(msg);
         }
-
 
         public Tilemap Generate()
         {
@@ -273,15 +266,15 @@ namespace WFC_Model
                     for (int k = 0; k < height; k++)
                     {
                         int patternIndex = cellMap[i, k, j].GetCollapsedIndex();
-                        int encodedTileIndex = patternInfo[patternIndex].pattern[0, 0, 0];
+                        int encodedTileIndex = patternInfo[patternIndex].pattern[0];
 
                         int tileId = encodedTileIndex / 4;
                         int rotation = encodedTileIndex - tileId * 4;
-                        
-                        output.SetTile(new Tile(tileId, rotation),i, k, j);
+
+                        output.SetTile(new Tile(tileId, rotation), i, k, j);
                     }
                 }
-            }        
+            }
             return output;
         }
     }

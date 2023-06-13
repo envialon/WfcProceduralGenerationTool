@@ -35,8 +35,6 @@ namespace WFC_Model
         {
             return "{" + x + ", " + y + ", " + z + "}";
         }
-
-
     }
 
     public struct RemovalUpdate
@@ -121,6 +119,7 @@ namespace WFC_Model
                 sumOfRelativeFreqLog2 += freq * (float)Math.Log(freq, 2);
             }
         }
+
         private void CalculateEntrophy()
         {
             Random rand = new Random(Guid.NewGuid().GetHashCode());
@@ -143,8 +142,8 @@ namespace WFC_Model
         }
 
         public bool ContainsAnyZeroEnablerCount(int compatiblePattern)
-        {            
-            return  tileEnablerCountsByDirection[compatiblePattern, 0] == 0 ||
+        {
+            return tileEnablerCountsByDirection[compatiblePattern, 0] == 0 ||
                     tileEnablerCountsByDirection[compatiblePattern, 1] == 0 ||
                     tileEnablerCountsByDirection[compatiblePattern, 2] == 0 ||
                     tileEnablerCountsByDirection[compatiblePattern, 3] == 0;
@@ -161,11 +160,11 @@ namespace WFC_Model
         {
             return entrophy.ToString("0.0");
         }
-
     }
 
+
     /// <summary>
-    /// Contains all of the pattern information extracted from the input.
+    /// Contains all of the information necessary to define a pattern.
     /// </summary>
     public struct PatternInfo
     {
@@ -173,14 +172,20 @@ namespace WFC_Model
         public int frecuency;
         public float relativeFrecuency;
         public float relativeFrecuencyLog2;
-        public int[,,] pattern;
+        public int[] pattern;
+        public int patternSize;
+        public int patternHeight;
+
 
         public Dictionary<Direction, HashSet<int>> neigbourIndices;
 
-        public PatternInfo(int[,,] pattern, int patternId, int frecuency = 0)
+
+        public PatternInfo(int patternId, int[] pattern, int patternSize, int patternHeight, int frecuency = 0)
         {
             this.pattern = pattern;
             this.id = patternId;
+            this.patternHeight = patternHeight;
+            this.patternSize = patternSize;
             this.frecuency = frecuency;
             relativeFrecuency = 0;
             relativeFrecuencyLog2 = 0;
@@ -198,7 +203,6 @@ namespace WFC_Model
             patternInfo.frecuency++;
             return patternInfo;
         }
-
         public HashSet<int> GetCompatiblesInDirection(Direction direction)
         {
             return neigbourIndices[direction];
