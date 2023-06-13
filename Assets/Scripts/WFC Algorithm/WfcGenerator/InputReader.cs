@@ -27,7 +27,6 @@ namespace WFC_Model
 
 
 
-
         /// <summary>
         /// Deberemos transformar la información de tile y rotación a enteros puramente, acabaremos con 
         /// 4N índices únicos donde N es el tamaño de tileset.
@@ -47,6 +46,7 @@ namespace WFC_Model
                 }
             }
         }
+
 
         private int mod(int x, int y)
         {

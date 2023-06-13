@@ -14,6 +14,10 @@ public static class TilemapSerializer
     public static Tilemap DeserializeTilemap(string path)
     {
         SerializableTilemap stm = AssetDatabase.LoadAssetAtPath<SerializableTilemap>(path);
+        if (!stm)
+        {
+            throw new System.Exception("Tilemap could not be loaded from path: " + path);
+        }
         return stm.GetTilemap();
     }
 }

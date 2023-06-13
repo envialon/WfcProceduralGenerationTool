@@ -36,7 +36,7 @@ namespace WFC_Model
 
         public Tilemap(Tilemap other)
         {
-            InitializeParams(width, height, depth);
+            InitializeParams(other.width, other.height, other.depth);
             this.map = (Tile[])other.map.Clone();
         }
 

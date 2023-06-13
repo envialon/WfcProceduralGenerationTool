@@ -19,16 +19,6 @@ MonoBehaviour:
     map:
     - id: 0
       rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 5
-      rotation: 0
     - id: 5
       rotation: 0
     - id: 0
@@ -39,11 +29,21 @@ MonoBehaviour:
       rotation: 0
     - id: 5
       rotation: 0
+    - id: 5
+      rotation: 0
+    - id: 5
+      rotation: 0
     - id: 0
+      rotation: 0
+    - id: 5
       rotation: 0
     - id: 0
       rotation: 0
     - id: 0
+      rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 5
       rotation: 0
     - id: 0
       rotation: 0
