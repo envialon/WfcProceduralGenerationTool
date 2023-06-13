@@ -12,18 +12,23 @@ namespace WFC_Model
     /// </summary>
     public class InputReader
     {
-        public int patternSize = 2;
-        public int patternHeight = 1;
+        public int patternSize;
+        public int patternHeight;
         public Tilemap inputTileMap;
 
-        private int mapHeight = 1;
-        private int mapSize = 10;
+        private int mapHeight;
+        private int mapSize;
         private int[] offsettedIndexGrid;
         private PatternInfo[] patterns;
         private int totalPatterns = 0;
 
         public bool enablePatternReflection;
         public bool enablePatternRotations;
+
+        // yOffset and zOffset are the values we need to muliply by the y and z
+        // coordinates respectively to get the correct index in a pattern
+        private int yOffset;
+        private int zOffset;
 
 
 
@@ -41,7 +46,8 @@ namespace WFC_Model
                 {
                     for (int j = 0; j < mapSize; j++)
                     {
-                        offsettedIndexGrid[i + (k * mapHeight) + (j * mapHeight * mapSize)] = inputTileMap.GetTile(i, k, j).id * 4 + inputTileMap.GetTile(i, k, j).rotation;
+                        //not using yOffset and zOffset because we're mapping the indexMap, not a pattern.
+                        offsettedIndexGrid[i + (k * mapSize) + (j * mapHeight * mapSize)] = inputTileMap.GetTile(i, k, j).id * 4 + inputTileMap.GetTile(i, k, j).rotation;
                     }
                 }
             }
@@ -54,7 +60,8 @@ namespace WFC_Model
 
         private int GetOffsetedIndexGridAt(int x, int y, int z)
         {
-            return offsettedIndexGrid[mod(x, mapSize) + mod(y, mapHeight) * mapHeight + mod(z, mapSize) * mapHeight * mapSize];
+            //not using yOffset and zOffset because we're mapping the indexMap, not a pattern.
+            return offsettedIndexGrid[mod(x, mapSize) + mod(y, mapHeight) * mapSize + mod(z, mapSize) * mapHeight * mapSize];
         }
 
         private int[] Extract2DPatternAt(int x, int y)
@@ -64,7 +71,7 @@ namespace WFC_Model
             {
                 for (int j = 0; j < patternSize; j++)
                 {
-                    output[i + j * patternSize * patternHeight] = GetOffsetedIndexGridAt(x + i, 0, y + j);
+                    output[i + j * zOffset] = GetOffsetedIndexGridAt(x + i, 0, y + j);
                 }
             }
             return output;
@@ -83,7 +90,7 @@ namespace WFC_Model
             {
                 for (int z = 0; z < patternSize; z++)
                 {
-                    output[x + z * patternSize * patternHeight] = pattern[x + (patternSize - z - 1) * patternSize * patternHeight];
+                    output[x + z *zOffset] = pattern[x + (patternSize - z - 1) * zOffset];
                 }
             }
             return output;
@@ -96,7 +103,7 @@ namespace WFC_Model
             {
                 for (int z = 0; z < patternSize; z++)
                 {
-                    output[x + z * patternSize * patternHeight] = pattern[z + x * patternHeight * patternSize];
+                    output[x + z * zOffset] = pattern[z + x * zOffset];
                 }
             }
 
@@ -291,12 +298,16 @@ namespace WFC_Model
             PopulatePatternNeighbours();
         }
 
-        private void Initialize(Tilemap inputTileMap, int patternSize = 2)
+        private void Initialize(Tilemap inputTileMap, int patternSize = 2, int patternHeight = 1)
         {
             this.patternSize = patternSize;
             this.inputTileMap = inputTileMap;
             this.mapSize = inputTileMap.width;
             this.mapHeight = inputTileMap.height;
+            this.patternHeight = patternHeight;
+
+            yOffset = patternSize;
+            zOffset = patternSize * patternHeight;
         }
 
         public string GetMatrixVisualization(int[] mat, int maxX = 10, int maxY = 1, int maxZ = 10)
