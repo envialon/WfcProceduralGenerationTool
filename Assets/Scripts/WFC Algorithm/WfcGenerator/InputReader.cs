@@ -106,7 +106,7 @@ namespace WFC_Model
             {
                 for (int z = 0; z < patternSize; z++)
                 {
-                    output[x + z *zOffset] = pattern[x + (patternSize - z - 1) * zOffset];
+                    output[x + z * zOffset] = pattern[x + (patternSize - z - 1) * zOffset];
                 }
             }
             return output;
@@ -179,7 +179,7 @@ namespace WFC_Model
 
             for (int i = -patternSize; i <= mapSize + patternSize; i++)
             {
-                for (int j = -patternSize; j <= mapSize; j++)
+                for (int j = -patternSize; j <= mapSize + patternSize; j++)
                 {
                     int[] pattern = Extract2DPatternAt(i, j);
                     string patternHash = HashPattern(pattern);
@@ -282,7 +282,7 @@ namespace WFC_Model
                 }
             }
         }
-          
+
         public void Train2D(int patternSize = 2, Tilemap inputTileMap = null, bool enableReflection = true, bool enableRotation = true)
         {
             this.enablePatternReflection = enableReflection;
@@ -307,12 +307,42 @@ namespace WFC_Model
 
         private void FindOverlappingNeighbours3D()
         {
-            
+
         }
 
         private void ExtractUniquePatterns3D()
         {
-            
+            //usamos el diccionario para aprovechar el hasheo
+            Dictionary<string, PatternInfo> patternFrecuency = new Dictionary<string, PatternInfo>();
+            totalPatterns = 0;
+
+            for (int i = -patternSize; i <= mapSize + patternSize; i++)
+            {
+                for (int j = -patternSize; j <= mapSize; j++)
+                {
+                    int[] pattern = Extract2DPatternAt(i, j);
+                    string patternHash = HashPattern(pattern);
+                    if (!patternFrecuency.ContainsKey(HashPattern(pattern)))
+                    {
+                        patternFrecuency.Add(patternHash, new PatternInfo(patternFrecuency.Count, pattern, patternSize, patternHeight));
+                    }
+                    totalPatterns++;
+                    patternFrecuency[patternHash]++;
+                }
+            }
+
+            if (enablePatternReflection)
+            {
+                //Debug.Log("Reflection");
+                ReflectPatterns2D(patternFrecuency);
+            }
+            if (enablePatternRotations)
+            {
+                //Debug.Log("Rotation");
+                RotatePatterns2D(patternFrecuency);
+            }
+
+            patterns = patternFrecuency.Values.ToArray();
         }
 
         public void Train3D(int patternSize = 2, Tilemap inputTileMap = null, bool enableReflection = true, bool enableRotation = true, bool sandwitchPatterns = true)
@@ -320,7 +350,7 @@ namespace WFC_Model
             this.enablePatternReflection = enableReflection;
             this.enablePatternRotations = enableRotation;
             this.sandwitchPatterns = sandwitchPatterns;
-            
+
             if (inputTileMap is not null)
             {
                 Initialize(inputTileMap, patternSize);
@@ -338,14 +368,14 @@ namespace WFC_Model
             FindOverlappingNeighbours3D();
         }
 
-     
+
 
         public string GetMatrixVisualization(int[] mat, int maxX = 10, int maxY = 1, int maxZ = 10)
         {
             string[] converted = Array.ConvertAll(mat, x => x.ToString());
 
 
-            for (int i = maxX-1; i < maxX * maxZ + maxY; i += maxX)
+            for (int i = maxX - 1; i < maxX * maxZ + maxY; i += maxX)
             {
                 converted[i] += "\n";
             }
@@ -395,6 +425,6 @@ namespace WFC_Model
         {
             return patterns;
         }
-     
+
     }
 }
