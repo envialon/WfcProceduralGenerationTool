@@ -21,6 +21,12 @@ namespace WFC_Model
             solver = new WfcSolver(inputReader);
         }
 
+        public void Train3D(Tilemap inputTileMap, int patternSize = 2)
+        {
+            inputReader.Train3D(patternSize, inputTileMap, enablePatternReflection, enablePatternRotations);
+            solver = new WfcSolver(inputReader);
+        }
+
         public Tilemap Generate(int outputX, int outputY, int outputZ)
         {
             solver = new WfcSolver(inputReader, outputX, outputY, outputZ);

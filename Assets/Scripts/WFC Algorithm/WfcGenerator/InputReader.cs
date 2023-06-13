@@ -208,7 +208,6 @@ namespace WFC_Model
 
         private void UpdateFrecuencies()
         {
-
             for (int i = 0; i < patterns.Length; i++)
             {
                 patterns[i].UpdateFrecuencies(totalPatterns);
@@ -305,9 +304,122 @@ namespace WFC_Model
         }
 
 
+        private bool NorthNeighbour3D(in PatternInfo current, in PatternInfo candidate)
+        {
+            int[] currentGrid = current.pattern;
+            int[] candidateGrid = candidate.pattern;
+
+            for (int x = 0; x < patternSize; x++)
+            {
+                for (int y = 0; y < patternHeight; y++)
+                {
+                    for (int z = 1; z < patternSize; z++)
+                    {
+                        int a = currentGrid[x + y * yOffset + z * zOffset];
+                        int b = candidateGrid[x + y * yOffset + (z - 1) * zOffset];
+                        if (a != b)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+        private bool EastNeighbour3D(in PatternInfo current, in PatternInfo candidate)
+        {
+            int[] currentGrid = current.pattern;
+            int[] candidateGrid = candidate.pattern;
+
+            for (int x = 1; x < patternSize; x++)
+            {
+                for (int y = 0; y < patternHeight; y++)
+                {
+                    for (int z = 0; z < patternSize; z++)
+                    {
+                        int a = currentGrid[x + y * yOffset + z * zOffset];
+                        int b = candidateGrid[(x - 1) + y * yOffset + z * zOffset];
+                        if (a != b)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        //current implementation wasn't thought out just extrapolated from the other functions.
+        private bool UpperNeighbour3D(in PatternInfo current, in PatternInfo candidate)
+        {
+            int[] currentGrid = current.pattern;
+            int[] candidateGrid = candidate.pattern;
+
+            for (int x = 0; x < patternSize; x++)
+            {
+                for (int y = 1; y < patternHeight; y++)
+                {
+                    for (int z = 0; z < patternSize; z++)
+                    {
+                        int a = currentGrid[x + y * yOffset + z * zOffset];
+                        int b = candidateGrid[x + (y - 1) * yOffset + z * zOffset];
+                        if (a != b)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        private void CheckForNeighbourhood3D(int currentIndex, PatternInfo current, int candidateIndex, PatternInfo candidate)
+        {
+            if (NorthNeighbour3D(current, candidate))
+            {
+                candidate.neigbourIndices[Direction.south].Add(currentIndex);
+                current.neigbourIndices[Direction.north].Add(candidateIndex);
+            }
+            if (EastNeighbour3D(current, candidate))
+            {
+                candidate.neigbourIndices[Direction.west].Add(currentIndex);
+                current.neigbourIndices[Direction.east].Add(candidateIndex);
+            }
+            if (UpperNeighbour3D(current, candidate))
+            {
+                candidate.neigbourIndices[Direction.down].Add(currentIndex);
+                current.neigbourIndices[Direction.up].Add(candidateIndex);
+            }
+        }
+
         private void FindOverlappingNeighbours3D()
         {
+            int numberOfPatterns = patterns.Length;
+            for (int i = 0; i < numberOfPatterns; i++)
+            {
+                PatternInfo current = patterns[i];
+                for (int j = 0; j < numberOfPatterns; j++)
+                {
+                    PatternInfo candidate = patterns[j];
+                    CheckForNeighbourhood3D(i, current, j, candidate);
+                }
+            }
+        }
 
+        private int[] Extract3DPatternAt(int x, int y, int z)
+        {
+            int[] output = new int[patternSize * patternSize * patternHeight];
+            for (int i = 0; i < patternSize; i++)
+            {
+                for (int k = 0; k < patternHeight; k++)
+                {
+                    for (int j = 0; j < patternSize; j++)
+                    {
+                        output[i + k * yOffset + j * zOffset] = GetOffsetedIndexGridAt(x + i, y + k, z + j);
+                    }
+                }
+            }
+            return output;
         }
 
         private void ExtractUniquePatterns3D()
@@ -318,28 +430,32 @@ namespace WFC_Model
 
             for (int i = -patternSize; i <= mapSize + patternSize; i++)
             {
-                for (int j = -patternSize; j <= mapSize; j++)
+                for (int k = -patternHeight; k <= mapHeight + patternHeight; k++)
                 {
-                    int[] pattern = Extract2DPatternAt(i, j);
-                    string patternHash = HashPattern(pattern);
-                    if (!patternFrecuency.ContainsKey(HashPattern(pattern)))
+                    for (int j = -patternSize; j <= mapSize + patternSize; j++)
                     {
-                        patternFrecuency.Add(patternHash, new PatternInfo(patternFrecuency.Count, pattern, patternSize, patternHeight));
+                        int[] pattern = Extract3DPatternAt(i, k, j);
+                        string patternHash = HashPattern(pattern);
+                        if (!patternFrecuency.ContainsKey(HashPattern(pattern)))
+                        {
+                            patternFrecuency.Add(patternHash, new PatternInfo(patternFrecuency.Count, pattern, patternSize, patternHeight));
+                        }
+                        totalPatterns++;
+                        patternFrecuency[patternHash]++;
                     }
-                    totalPatterns++;
-                    patternFrecuency[patternHash]++;
                 }
+
             }
 
             if (enablePatternReflection)
             {
                 //Debug.Log("Reflection");
-                ReflectPatterns2D(patternFrecuency);
+                // ReflectPatterns2D(patternFrecuency);
             }
             if (enablePatternRotations)
             {
                 //Debug.Log("Rotation");
-                RotatePatterns2D(patternFrecuency);
+                // RotatePatterns2D(patternFrecuency);
             }
 
             patterns = patternFrecuency.Values.ToArray();
@@ -347,10 +463,6 @@ namespace WFC_Model
 
         public void Train3D(int patternSize = 2, Tilemap inputTileMap = null, bool enableReflection = true, bool enableRotation = true, bool sandwitchPatterns = true)
         {
-            this.enablePatternReflection = enableReflection;
-            this.enablePatternRotations = enableRotation;
-            this.sandwitchPatterns = sandwitchPatterns;
-
             if (inputTileMap is not null)
             {
                 Initialize(inputTileMap, patternSize);
@@ -361,6 +473,16 @@ namespace WFC_Model
             }
 
             patterns = new PatternInfo[0];
+
+            this.enablePatternReflection = enableReflection;
+            this.enablePatternRotations = enableRotation;
+            this.sandwitchPatterns = sandwitchPatterns;
+
+            patternHeight = patternSize;
+            if (this.sandwitchPatterns)
+            {
+                patternHeight = 2;
+            }
 
             PopulateIndexGrid();
             ExtractUniquePatterns3D();

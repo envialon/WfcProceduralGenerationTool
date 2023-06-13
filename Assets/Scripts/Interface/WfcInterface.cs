@@ -286,6 +286,12 @@ public class WfcInterface : MonoBehaviour
         Debug.Log(model.inputReader.GetPatternSummary());
     }
 
+    public void Train3D()
+    {
+        model.Train3D(inputMap, patternSize);
+        
+    }
+
     public void SerializeInputMap()
     {
         TilemapSerializer.SerializeTilemap(inputMap, inputMapSerializationPath);
@@ -347,6 +353,11 @@ public class WfcInterfaceEditor : Editor
         if (GUILayout.Button("Train"))
         {
             t.Train();
+        }
+
+        if (GUILayout.Button("Train3D"))
+        {
+            t.Train3D();
         }
     }
 

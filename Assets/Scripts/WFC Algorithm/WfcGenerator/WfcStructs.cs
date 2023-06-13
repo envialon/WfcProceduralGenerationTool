@@ -9,6 +9,8 @@ namespace WFC_Model
         east,
         west,
         north,
+        up,
+        down
     }
 
     public struct Position
@@ -194,7 +196,9 @@ namespace WFC_Model
                 { Direction.north, new HashSet<int>() },
                 { Direction.south, new HashSet<int>() },
                 { Direction.west, new HashSet<int>() },
-                { Direction.east, new HashSet<int>() }
+                { Direction.east, new HashSet<int>() },
+                { Direction.up, new HashSet<int>() },
+                {Direction.down, new HashSet<int>() }
             };
         }
 
