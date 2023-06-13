@@ -24,13 +24,29 @@ namespace WFC_Model
 
         public bool enablePatternReflection;
         public bool enablePatternRotations;
+        private bool sandwitchPatterns;
 
         // yOffset and zOffset are the values we need to muliply by the y and z
         // coordinates respectively to get the correct index in a pattern
         private int yOffset;
         private int zOffset;
 
+        private void Initialize(Tilemap inputTileMap, int patternSize = 2, int patternHeight = 1)
+        {
+            this.patternSize = patternSize;
+            this.inputTileMap = inputTileMap;
+            this.mapSize = inputTileMap.width;
+            this.mapHeight = inputTileMap.height;
+            this.patternHeight = patternHeight;
 
+            yOffset = patternSize;
+            zOffset = patternSize * patternHeight;
+        }
+
+        public InputReader(Tilemap inputTileMap, int patternSize = 2)
+        {
+            Initialize(inputTileMap, patternSize);
+        }
 
         /// <summary>
         /// Deberemos transformar la información de tile y rotación a enteros puramente, acabaremos con 
@@ -155,7 +171,7 @@ namespace WFC_Model
             }
         }
 
-        private void ExtractUniquePatterns()
+        private void ExtractUniquePatterns2D()
         {
             //usamos el diccionario para aprovechar el hasheo
             Dictionary<string, PatternInfo> patternFrecuency = new Dictionary<string, PatternInfo>();
@@ -253,7 +269,7 @@ namespace WFC_Model
             }
         }
 
-        private void FindOverlappingNeighbours()
+        private void FindOverlappingNeighbours2D()
         {
             int numberOfPatterns = patterns.Length;
             for (int i = 0; i < numberOfPatterns; i++)
@@ -266,18 +282,8 @@ namespace WFC_Model
                 }
             }
         }
-
-        private void PopulatePatternNeighbours()
-        {
-            FindOverlappingNeighbours();
-        }
-
-        public PatternInfo[] GetPatternInfo()
-        {
-            return patterns;
-        }
-
-        public void Train(int patternSize = 2, Tilemap inputTileMap = null, bool enableReflection = true, bool enableRotation = true)
+          
+        public void Train2D(int patternSize = 2, Tilemap inputTileMap = null, bool enableReflection = true, bool enableRotation = true)
         {
             this.enablePatternReflection = enableReflection;
             this.enablePatternRotations = enableRotation;
@@ -293,22 +299,46 @@ namespace WFC_Model
             patterns = new PatternInfo[0];
 
             PopulateIndexGrid();
-            ExtractUniquePatterns();
+            ExtractUniquePatterns2D();
             UpdateFrecuencies();
-            PopulatePatternNeighbours();
+            FindOverlappingNeighbours2D();
         }
 
-        private void Initialize(Tilemap inputTileMap, int patternSize = 2, int patternHeight = 1)
+
+        private void FindOverlappingNeighbours3D()
         {
-            this.patternSize = patternSize;
-            this.inputTileMap = inputTileMap;
-            this.mapSize = inputTileMap.width;
-            this.mapHeight = inputTileMap.height;
-            this.patternHeight = patternHeight;
-
-            yOffset = patternSize;
-            zOffset = patternSize * patternHeight;
+            
         }
+
+        private void ExtractUniquePatterns3D()
+        {
+            
+        }
+
+        public void Train3D(int patternSize = 2, Tilemap inputTileMap = null, bool enableReflection = true, bool enableRotation = true, bool sandwitchPatterns = true)
+        {
+            this.enablePatternReflection = enableReflection;
+            this.enablePatternRotations = enableRotation;
+            this.sandwitchPatterns = sandwitchPatterns;
+            
+            if (inputTileMap is not null)
+            {
+                Initialize(inputTileMap, patternSize);
+            }
+            if (this.inputTileMap is null)
+            {
+                throw new Exception("The InputReader doesn't have any data to read.");
+            }
+
+            patterns = new PatternInfo[0];
+
+            PopulateIndexGrid();
+            ExtractUniquePatterns3D();
+            UpdateFrecuencies();
+            FindOverlappingNeighbours3D();
+        }
+
+     
 
         public string GetMatrixVisualization(int[] mat, int maxX = 10, int maxY = 1, int maxZ = 10)
         {
@@ -361,10 +391,10 @@ namespace WFC_Model
 
             return messsage;
         }
-
-        public InputReader(Tilemap inputTileMap, int patternSize = 2)
+        public PatternInfo[] GetPatternInfo()
         {
-            Initialize(inputTileMap, patternSize);
+            return patterns;
         }
+     
     }
 }

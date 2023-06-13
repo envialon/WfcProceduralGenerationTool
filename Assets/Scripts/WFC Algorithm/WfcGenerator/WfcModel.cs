@@ -17,7 +17,7 @@ namespace WFC_Model
 
         public void Train(Tilemap inputTileMap, int patternSize = 2)
         {
-            inputReader.Train(patternSize, inputTileMap, enablePatternReflection, enablePatternRotations);
+            inputReader.Train2D(patternSize, inputTileMap, enablePatternReflection, enablePatternRotations);
             solver = new WfcSolver(inputReader);
         }
 
