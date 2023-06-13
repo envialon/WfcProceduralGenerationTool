@@ -218,7 +218,7 @@ namespace WFC_Model
 
         private void wfcPropagation()
         {
-            int numberOfDirections = Enum.GetValues(typeof(Direction)).Length;
+            int numberOfDirections = 4;//Enum.GetValues(typeof(Direction)).Length;
 
             string msg = "Propagation Function call:\n";
             while (removalQueue.Count > 0)
