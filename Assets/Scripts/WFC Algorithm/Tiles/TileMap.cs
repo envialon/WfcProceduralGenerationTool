@@ -11,8 +11,7 @@ namespace WFC_Model
 
         private int yOffset;
         private int zOffset;
-
-
+               
         private void InitializeParams(int width = 10, int height = 1, int depth = 10)
         {
             this.width = width;

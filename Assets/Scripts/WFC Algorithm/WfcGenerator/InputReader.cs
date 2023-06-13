@@ -47,7 +47,6 @@ namespace WFC_Model
             }
         }
 
-
         private int mod(int x, int y)
         {
             return x - y * (int)Math.Floor((double)x / y);

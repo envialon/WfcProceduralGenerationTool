@@ -279,9 +279,9 @@ MonoBehaviour:
   patternSize: 3
   inputMapSize: 4
   inputMapHeight: 1
+  selectedTile: 5
   outputSize: {x: 10, y: 1, z: 10}
   tileSet: {fileID: 11400000, guid: 43d87efc2f9a6014cb055b492a787204, type: 2}
-  selectedTile: 5
 --- !u!156049354 &1339589964
 Grid:
   m_ObjectHideFlags: 0

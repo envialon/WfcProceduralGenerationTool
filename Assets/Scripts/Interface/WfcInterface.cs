@@ -11,15 +11,22 @@ public class WfcInterface : MonoBehaviour
 
     public int patternSize = 2;
     private int patternSizeCheck = 0;
+
     public int inputMapSize = 10;
     private int inputMapSizeCheck = 0;
+
     public int inputMapHeight = 1;
     private int inputMapHeightCheck = 0;
 
+    public int selectedTile = 0;
+
     public Vector3Int outputSize = new Vector3Int(20, 1, 20);
     private Vector3Int outputSizeCheck = Vector3Int.zero;
+
+
+    public int selectedLayer = 0;
+
     public TileSet tileSet;
-    public int selectedTile = 0;
 
     private Grid grid;
     private BoxCollider boxCollider;
@@ -28,20 +35,36 @@ public class WfcInterface : MonoBehaviour
     private Tilemap inputMap;
     private Tilemap lastMapGenerated;
 
-    private void OnDrawGizmosSelected()
+    private void DrawMeshGizmos()
     {
         Vector3 pos = transform.position;
         for (int i = 0; i <= inputMapSize; i++)
         {
-            Gizmos.DrawLine(new Vector3(0, 0, i) + pos, new Vector3(inputMapSize, 0, i) + pos);
-            Gizmos.DrawLine(new Vector3(i, 0, 0) + pos, new Vector3(i, 0, inputMapSize) + pos);
+            Gizmos.DrawLine(new Vector3(0, selectedLayer, i) + pos, new Vector3(inputMapSize, selectedLayer, i) + pos);
+            Gizmos.DrawLine(new Vector3(i, selectedLayer, 0) + pos, new Vector3(i, selectedLayer, inputMapSize) + pos);
         }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        DrawMeshGizmos();
     }
 
     private void OnValidate()
     {
         ResizeInputMap();
         ResizeOutputMap();
+    }
+
+    private void RefreshCollider()
+    {
+        if (boxCollider is null)
+        {
+            boxCollider = gameObject.GetComponent<BoxCollider>();
+        }
+
+        boxCollider.size = new Vector3(inputMapSize, 0, inputMapSize);
+        boxCollider.center = new Vector3(inputMapSize / 2, selectedLayer, inputMapSize / 2);
     }
 
     private void ResizeInputMap()
@@ -51,18 +74,11 @@ public class WfcInterface : MonoBehaviour
             patternSizeCheck = patternSize;
             inputMapSizeCheck = inputMapSize;
             inputMapHeightCheck = inputMapHeight;
-            inputMap = new Tilemap(inputMapSize, inputMapHeight, patternSize);
+            inputMap = new Tilemap(inputMapSize, inputMapHeight, inputMapSize);
             model = new WfcModel(inputMap);
 
-            if (boxCollider is null)
-            {
-                boxCollider = gameObject.GetComponent<BoxCollider>();
-            }
-
-            boxCollider.size = new Vector3(inputMapSize, 0, inputMapSize);
-            boxCollider.center = new Vector3(inputMapSize / 2, 0, inputMapSize / 2);
+            RefreshCollider();
         }
-
     }
 
     private void ResizeOutputMap()
@@ -152,8 +168,11 @@ public class WfcInterface : MonoBehaviour
         {
             for (int j = 0; j < inputMapSize; j++)
             {
-                Vector3 tilePos = new Vector3(i, 0, j);
-                DrawTile(inputMap.GetTile(i, 0, j), tilePos, cam);
+                for (int k = 0; k < inputMapHeight; k++)
+                {
+                    Vector3 tilePos = new Vector3(i, k, j);
+                    DrawTile(inputMap.GetTile(i, k, j), tilePos, cam);
+                }
             }
         }
     }
@@ -176,21 +195,6 @@ public class WfcInterface : MonoBehaviour
 
                 DrawTile(tile, tilePos, cam);
             }
-        }
-    }
-
-    public void HandleKeyPress(KeyCode keycode)
-    {
-        switch (keycode)
-        {
-            case KeyCode.N:
-
-                selectedTile = Mathf.Abs((selectedTile - 1)) % tileSet.tiles.Count;
-                break;
-
-            case KeyCode.M:
-                selectedTile = (selectedTile + 1) % tileSet.tiles.Count;
-                break;
         }
     }
 
@@ -232,6 +236,44 @@ public class WfcInterface : MonoBehaviour
         }
     }
 
+    private void ChangeLayer(int layer)
+    {
+        if (layer != selectedLayer)
+        {
+            selectedLayer = layer;
+            RefreshCollider();
+        }
+    }
+
+    private int mod(int x, int y)
+    {
+        return x - y * (int)Mathf.Floor(x / y);
+    }
+
+    public void HandleKeyPress(KeyCode keycode)
+    {
+        switch (keycode)
+        {
+            case KeyCode.N:
+
+                selectedTile = Mathf.Abs((selectedTile - 1)) % tileSet.tiles.Count;
+                break;
+
+            case KeyCode.M:
+                selectedTile = (selectedTile + 1) % tileSet.tiles.Count;
+                break;
+
+            case KeyCode.K:
+                ChangeLayer(mod(selectedLayer + 1, inputMapHeight));
+                break;
+
+            case KeyCode.J:
+                ChangeLayer(Mathf.Abs(mod(selectedLayer - 1, inputMapHeight)));
+                break;
+        }
+    }
+
+
     public void Clear()
     {
         inputMap.Clear();
@@ -260,6 +302,8 @@ public class WfcInterface : MonoBehaviour
     }
 }
 
+
+#if UNITY_EDITOR
 [CustomEditor(typeof(WfcInterface))]
 public class WfcInterfaceEditor : Editor
 {
@@ -305,7 +349,7 @@ public class WfcInterfaceEditor : Editor
             t.Train();
         }
     }
-    
+
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
@@ -326,7 +370,7 @@ public class WfcInterfaceEditor : Editor
             t.Generate();
         }
     }
-    
+
     private void OnSceneGUI()
     {
         Event e = Event.current;
@@ -342,3 +386,4 @@ public class WfcInterfaceEditor : Editor
         HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
     }
 }
+#endif
