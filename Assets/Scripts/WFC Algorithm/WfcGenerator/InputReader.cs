@@ -18,7 +18,7 @@ namespace WFC_Model
 
         private int mapHeight;
         private int mapSize;
-        private int[] offsettedIndexGrid;
+        private int[] indexGrid;
         private PatternInfo[] patterns;
         private int totalPatterns = 0;
 
@@ -30,6 +30,12 @@ namespace WFC_Model
         // coordinates respectively to get the correct index in a pattern
         private int yOffset;
         private int zOffset;
+
+        private void CalculatePatternOffsets()
+        {
+            yOffset = patternSize;
+            zOffset = patternSize * patternHeight;
+        }
 
         private void Initialize(Tilemap inputTileMap, int patternSize = 2, int patternHeight = 1)
         {
@@ -54,7 +60,7 @@ namespace WFC_Model
         /// </summary>
         private void PopulateIndexGrid()
         {
-            offsettedIndexGrid = new int[inputTileMap.width * inputTileMap.height * inputTileMap.depth];
+            indexGrid = new int[inputTileMap.width * inputTileMap.height * inputTileMap.depth];
 
             for (int k = 0; k < mapHeight; k++)
             {
@@ -63,7 +69,7 @@ namespace WFC_Model
                     for (int j = 0; j < mapSize; j++)
                     {
                         //not using yOffset and zOffset because we're mapping the indexMap, not a pattern.
-                        offsettedIndexGrid[i + (k * mapSize) + (j * mapHeight * mapSize)] = inputTileMap.GetTile(i, k, j).id * 4 + inputTileMap.GetTile(i, k, j).rotation;
+                        indexGrid[i + (k * mapSize) + (j * mapHeight * mapSize)] = inputTileMap.GetTile(i, k, j).id * 4 + inputTileMap.GetTile(i, k, j).rotation;
                     }
                 }
             }
@@ -77,7 +83,7 @@ namespace WFC_Model
         private int GetOffsetedIndexGridAt(int x, int y, int z)
         {
             //not using yOffset and zOffset because we're mapping the indexMap, not a pattern.
-            return offsettedIndexGrid[mod(x, mapSize) + mod(y, mapHeight) * mapSize + mod(z, mapSize) * mapHeight * mapSize];
+            return indexGrid[mod(x, mapSize) + mod(y, mapHeight) * mapSize + mod(z, mapSize) * mapHeight * mapSize];
         }
 
         private int[] Extract2DPatternAt(int x, int y)
@@ -349,7 +355,7 @@ namespace WFC_Model
             return true;
         }
 
-        //current implementation wasn't thought out just extrapolated from the other functions.
+        //current implementation wasn't thought through, just extrapolated from the other examples.
         private bool UpperNeighbour3D(in PatternInfo current, in PatternInfo candidate)
         {
             int[] currentGrid = current.pattern;
@@ -409,13 +415,14 @@ namespace WFC_Model
         private int[] Extract3DPatternAt(int x, int y, int z)
         {
             int[] output = new int[patternSize * patternSize * patternHeight];
-            for (int i = 0; i < patternSize; i++)
+            for (int k = 0; k < patternHeight; k++)
             {
-                for (int k = 0; k < patternHeight; k++)
+                for (int i = 0; i < patternSize; i++)
                 {
                     for (int j = 0; j < patternSize; j++)
                     {
-                        output[i + k * yOffset + j * zOffset] = GetOffsetedIndexGridAt(x + i, y + k, z + j);
+                        int value = GetOffsetedIndexGridAt(x + i, y + k, z + j);
+                        output[i + k * yOffset + j * zOffset] = value;
                     }
                 }
             }
@@ -478,11 +485,14 @@ namespace WFC_Model
             this.enablePatternRotations = enableRotation;
             this.sandwitchPatterns = sandwitchPatterns;
 
+            this.patternSize = patternSize;
             patternHeight = patternSize;
             if (this.sandwitchPatterns)
             {
-                patternHeight = 2;
+                this.patternHeight = 2;
             }
+
+            CalculatePatternOffsets();
 
             PopulateIndexGrid();
             ExtractUniquePatterns3D();
@@ -526,7 +536,7 @@ namespace WFC_Model
         {
             const string spacer = "\n/////////////////////\n";
             string messsage = "";
-            messsage += "InputMap:\n" + GetMatrixVisualization(offsettedIndexGrid, mapSize, mapHeight, mapSize) + spacer + spacer;
+            messsage += "InputMap:\n" + GetMatrixVisualization(indexGrid, mapSize, mapHeight, mapSize) + spacer + spacer;
 
             messsage += "Pattern Info:\n" + spacer;
             foreach (PatternInfo pattern in patterns)

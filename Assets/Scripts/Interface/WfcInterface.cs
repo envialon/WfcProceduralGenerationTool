@@ -187,13 +187,15 @@ public class WfcInterface : MonoBehaviour
 
         for (int i = 0; i < outputX; i++)
         {
-            for (int j = 0; j < outputZ; j++)
+            for (int k = 0; k < outputY; k++)
             {
+                for (int j = 0; j < outputZ; j++)
+                {
+                    Vector3Int tilePos = startingPoint + new Vector3Int(i, k, j);
+                    Tile tile = lastMapGenerated.GetTile(i, k, j);
 
-                Vector3Int tilePos = startingPoint + new Vector3Int(i, 0, j);
-                Tile tile = lastMapGenerated.GetTile(i, 0, j);
-
-                DrawTile(tile, tilePos, cam);
+                    DrawTile(tile, tilePos, cam);
+                }
             }
         }
     }
