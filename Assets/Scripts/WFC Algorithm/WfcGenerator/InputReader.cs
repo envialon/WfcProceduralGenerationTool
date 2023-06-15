@@ -429,6 +429,85 @@ namespace WFC_Model
             return output;
         }
 
+        private int[] ReflectMatrix3D(in int[] pattern)
+        {
+            int[] output = new int[patternSize * patternSize * patternHeight];
+
+            for (int x = 0; x < patternSize; x++)
+            {
+                for (int y = 0; y < patternHeight; y++)
+                {
+                    for (int z = 0; z < patternSize; z++)
+                    {
+                        output[x + y * yOffset + z * zOffset] = pattern[x + y * yOffset + (patternSize - z - 1) * zOffset];
+                    }
+                }
+            }
+            return output;
+        }
+
+        private int[] RotateMatrix3D(in int[] pattern)
+        {
+            int[] output = new int[patternSize * patternSize * patternHeight];
+            for (int x = 0; x < patternSize; x++)
+            {
+                for (int y = 0; y < patternHeight; y++)
+                {
+                    for (int z = 0; z < patternSize; z++)
+                    {
+                        output[x + y * yOffset + z * zOffset] = pattern[z + y * yOffset + x * zOffset];
+                    }
+                }
+            }
+
+            return ReflectMatrix2D(in output);
+
+        }
+
+        private void RotatePatterns3D(Dictionary<string, PatternInfo> patternFrecuency)
+        {
+            PatternInfo[] patterns = patternFrecuency.Values.ToArray();
+            foreach (PatternInfo pattern in patterns)
+            {
+                int[] rotatedPattern;
+
+                for (int direction = 0; direction < 3; direction++)
+                {
+                    rotatedPattern = RotateMatrix3D(in pattern.pattern);
+                    string patternHash = HashPattern(rotatedPattern);
+                    if (!patternFrecuency.ContainsKey(patternHash))
+                    {
+                        totalPatterns++;
+                        patternFrecuency.Add(patternHash, new PatternInfo(patternFrecuency.Count,
+                                                                          rotatedPattern,
+                                                                          patternSize,
+                                                                          patternHeight,
+                                                                          pattern.frecuency));
+                    }
+                }
+            }
+        }
+
+        private void ReflectPatterns3D(Dictionary<string, PatternInfo> patternFrecuency)
+        {
+            PatternInfo[] patterns = patternFrecuency.Values.ToArray();
+            foreach (PatternInfo pattern in patterns)
+            {
+                //reflect it and check if its already in patternFrecuency, if not, add it
+                int[] reflectedPattern = ReflectMatrix3D(in pattern.pattern);
+                string reflectedPatternHash = HashPattern(reflectedPattern);
+                if (!patternFrecuency.ContainsKey(reflectedPatternHash))
+                {
+                    totalPatterns++;
+                    patternFrecuency.Add(reflectedPatternHash, new PatternInfo(patternFrecuency.Count,
+                                                                               reflectedPattern,
+                                                                               patternSize,
+                                                                               patternHeight,
+                                                                               pattern.frecuency));
+                }
+            }
+        }
+
         private void ExtractUniquePatterns3D()
         {
             //usamos el diccionario para aprovechar el hasheo
@@ -457,12 +536,12 @@ namespace WFC_Model
             if (enablePatternReflection)
             {
                 //Debug.Log("Reflection");
-                // ReflectPatterns2D(patternFrecuency);
+                ReflectPatterns3D(patternFrecuency);
             }
             if (enablePatternRotations)
             {
                 //Debug.Log("Rotation");
-                // RotatePatterns2D(patternFrecuency);
+                RotatePatterns3D(patternFrecuency);
             }
 
             patterns = patternFrecuency.Values.ToArray();

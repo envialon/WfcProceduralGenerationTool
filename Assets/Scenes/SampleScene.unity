@@ -279,8 +279,8 @@ MonoBehaviour:
   patternSize: 3
   inputMapSize: 4
   inputMapHeight: 2
-  selectedTile: 2
-  outputSize: {x: 20, y: 2, z: 20}
+  selectedTile: 1
+  outputSize: {x: 8, y: 5, z: 8}
   selectedLayer: 1
   tileSet: {fileID: 11400000, guid: 43d87efc2f9a6014cb055b492a787204, type: 2}
 --- !u!156049354 &1339589964
