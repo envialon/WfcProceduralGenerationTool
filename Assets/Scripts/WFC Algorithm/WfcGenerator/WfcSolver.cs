@@ -249,7 +249,7 @@ namespace WFC_Model
             while (collapsedCount < cellsToBeCollapsed)
             {
                 (Position candidatePosition, int collapsedPattern) = Observe();
-               // UnityEngine.Debug.Log($"Collapsed cell {candidatePosition} with pattern {collapsedPattern}");
+                // UnityEngine.Debug.Log($"Collapsed cell {candidatePosition} with pattern {collapsedPattern}");
                 wfcPropagation();
                 //PrintCellEntrophy();
             }
@@ -266,12 +266,8 @@ namespace WFC_Model
                     for (int k = 0; k < height; k++)
                     {
                         int patternIndex = cellMap[i, k, j].GetCollapsedPatternIndex();
-                        int collapsedTileIndex = patternInfo[patternIndex].pattern[0];
-
-                        int tileId = collapsedTileIndex / 4;
-                        int rotation = collapsedTileIndex - tileId * 4;
-                         rotation = (rotation + patternInfo[patternIndex].patternRotation) % 4;
-                        output.SetTile(new Tile(tileId, rotation), i, k, j);
+                        output.SetTile(new Tile(patternInfo[patternIndex].GetCollapsedIndex(), 
+                                                patternInfo[patternIndex].GetCollapsedRotation()), i, k, j);
                     }
                 }
             }

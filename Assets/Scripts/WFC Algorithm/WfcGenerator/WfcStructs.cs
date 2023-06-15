@@ -223,10 +223,12 @@ namespace WFC_Model
 
         public int GetCollapsedIndex()
         {
-            int id = pattern[0] / 4;
-            int originalRotation = pattern[0] - id * 4;
-            int rotation = (originalRotation + this.patternRotation) % 4;
-            return pattern[0];
+            return pattern[0] / 4;
+        }
+
+        public int GetCollapsedRotation()
+        {
+            return ((pattern[0] - (pattern[0] / 4) * 4) + patternRotation) % 4;
         }
 
     }
