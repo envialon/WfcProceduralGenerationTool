@@ -237,7 +237,7 @@ namespace WFC_Model
 
                 }
             }
-            UnityEngine.Debug.Log(msg);
+            //UnityEngine.Debug.Log(msg);
         }
 
         public Tilemap Generate()
@@ -249,9 +249,9 @@ namespace WFC_Model
             while (collapsedCount < cellsToBeCollapsed)
             {
                 (Position candidatePosition, int collapsedPattern) = Observe();
-                UnityEngine.Debug.Log($"Collapsed cell {candidatePosition} with pattern {collapsedPattern}");
+               // UnityEngine.Debug.Log($"Collapsed cell {candidatePosition} with pattern {collapsedPattern}");
                 wfcPropagation();
-                PrintCellEntrophy();
+                //PrintCellEntrophy();
             }
             return GetOutputTileIndexGrid();
         }
@@ -265,12 +265,12 @@ namespace WFC_Model
                 {
                     for (int k = 0; k < height; k++)
                     {
-                        int patternIndex = cellMap[i, k, j].GetCollapsedIndex();
-                        int encodedTileIndex = patternInfo[patternIndex].pattern[0];
+                        int patternIndex = cellMap[i, k, j].GetCollapsedPatternIndex();
+                        int collapsedTileIndex = patternInfo[patternIndex].pattern[0];
 
-                        int tileId = encodedTileIndex / 4;
-                        int rotation = encodedTileIndex - tileId * 4;
-
+                        int tileId = collapsedTileIndex / 4;
+                        int rotation = collapsedTileIndex - tileId * 4;
+                         rotation = (rotation + patternInfo[patternIndex].patternRotation) % 4;
                         output.SetTile(new Tile(tileId, rotation), i, k, j);
                     }
                 }

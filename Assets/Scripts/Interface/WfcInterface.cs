@@ -285,13 +285,13 @@ public class WfcInterface : MonoBehaviour
     public void Train()
     {
         model.Train(inputMap, patternSize);
-        Debug.Log(model.inputReader.GetPatternSummary());
+        //Debug.Log(model.inputReader.GetPatternSummary());
     }
 
     public void Train3D()
     {
         model.Train3D(inputMap, patternSize);
-        
+
     }
 
     public void SerializeInputMap()
@@ -306,7 +306,9 @@ public class WfcInterface : MonoBehaviour
 
     public void Generate()
     {
+        Debug.Log(inputMap);
         lastMapGenerated = model.Generate(outputSize.x, outputSize.y, outputSize.z);
+        Debug.Log(lastMapGenerated.ToString());
     }
 }
 

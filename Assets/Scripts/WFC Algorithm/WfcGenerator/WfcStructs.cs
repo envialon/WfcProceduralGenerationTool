@@ -90,7 +90,7 @@ namespace WFC_Model
             CalculateEntrophy();
         }
 
-        public int GetCollapsedIndex()
+        public int GetCollapsedPatternIndex()
         {
             return collapsedIndex;
         }
@@ -179,18 +179,19 @@ namespace WFC_Model
         public int[] pattern;
         public int patternSize;
         public int patternHeight;
-
+        public int patternRotation;
 
         public Dictionary<Direction, HashSet<int>> neigbourIndices;
 
 
-        public PatternInfo(int patternId, int[] pattern, int patternSize, int patternHeight, int frecuency = 0)
+        public PatternInfo(int patternId, int[] pattern, int patternSize, int patternHeight, int frecuency = 0, int patternRotation = 0)
         {
             this.pattern = pattern;
             this.id = patternId;
             this.patternHeight = patternHeight;
             this.patternSize = patternSize;
             this.frecuency = frecuency;
+            this.patternRotation = patternRotation;
             relativeFrecuency = 0;
             relativeFrecuencyLog2 = 0;
             neigbourIndices = new Dictionary<Direction, HashSet<int>>
@@ -213,22 +214,20 @@ namespace WFC_Model
         {
             return neigbourIndices[direction];
         }
-
-        public override int GetHashCode()
-        {
-            string digits = "";
-            foreach (int i in pattern)
-            {
-                digits += i;
-            }
-            int output = int.Parse(digits);
-            return int.Parse(digits);
-        }
-
+        
         internal void UpdateFrecuencies(float totalPatterns)
         {
             relativeFrecuency = frecuency / totalPatterns;
             relativeFrecuencyLog2 = (float)(Math.Log(relativeFrecuency, 2));
         }
+
+        public int GetCollapsedIndex()
+        {
+            int id = pattern[0] / 4;
+            int originalRotation = pattern[0] - id * 4;
+            int rotation = (originalRotation + this.patternRotation) % 4;
+            return pattern[0];
+        }
+
     }
 }

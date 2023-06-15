@@ -11,7 +11,7 @@ namespace WFC_Model
 
         private int yOffset;
         private int zOffset;
-               
+
         private void InitializeParams(int width = 10, int height = 1, int depth = 10)
         {
             this.width = width;
@@ -100,5 +100,25 @@ namespace WFC_Model
         {
             map = new Tile[width * height * depth];
         }
+
+        public override string ToString()
+        {
+
+            string output = "";
+            for (int i = 0; i < height; i++)
+            {
+                output += "Layer " + i + "\n";
+                for (int j = 0; j < depth; j++)
+                {
+                    for (int k = 0; k < width; k++)
+                    {
+                        output += map[k + (i * yOffset) + (j * zOffset)].id + " ";
+                    }
+                    output += "\n";
+                }
+            }
+            return output;
+        }
+
     }
 }

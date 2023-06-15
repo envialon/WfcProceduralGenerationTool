@@ -112,13 +112,16 @@ namespace WFC_Model
             {
                 for (int z = 0; z < patternSize; z++)
                 {
-                    output[x + z * zOffset] = pattern[x + (patternSize - z - 1) * zOffset];
+                    int candidateIndex = pattern[x + (patternSize - z - 1) * zOffset];
+                    //rotate the tile index 180 degrees
+
+                    output[x + z * zOffset] = candidateIndex;
                 }
             }
             return output;
         }
 
-        private int[] RotateMatrix2D(in int[] pattern)
+        private int[] RotateMatrix90degrees2D(in int[] pattern)
         {
             int[] output = new int[patternSize * patternSize * patternHeight];
             for (int x = 0; x < patternSize; x++)
@@ -140,9 +143,9 @@ namespace WFC_Model
             {
                 int[] rotatedPattern;
 
-                for (int direction = 0; direction < 3; direction++)
+                for (int direction = 1; direction < 4; direction++)
                 {
-                    rotatedPattern = RotateMatrix2D(in pattern.pattern);
+                    rotatedPattern = RotateMatrix90degrees2D(in pattern.pattern);
                     string patternHash = HashPattern(rotatedPattern);
                     if (!patternFrecuency.ContainsKey(patternHash))
                     {
@@ -151,7 +154,8 @@ namespace WFC_Model
                                                                           rotatedPattern,
                                                                           patternSize,
                                                                           patternHeight,
-                                                                          pattern.frecuency));
+                                                                          pattern.frecuency,
+                                                                          direction));
                     }
                 }
             }
@@ -200,12 +204,12 @@ namespace WFC_Model
 
             if (enablePatternReflection)
             {
-                //Debug.Log("Reflection");
+                Debug.Log("Reflection");
                 ReflectPatterns2D(patternFrecuency);
             }
             if (enablePatternRotations)
             {
-                //Debug.Log("Rotation");
+                Debug.Log("Rotation");
                 RotatePatterns2D(patternFrecuency);
             }
 
@@ -220,7 +224,7 @@ namespace WFC_Model
             }
         }
 
-        private bool EastNeighbour2D(in PatternInfo current, in PatternInfo candidate)
+        private bool WestNeighbour2D(in PatternInfo current, in PatternInfo candidate)
         {
             int[] currentGrid = current.pattern;
             int[] candidateGrid = candidate.pattern;
@@ -267,10 +271,10 @@ namespace WFC_Model
                 candidate.neigbourIndices[Direction.south].Add(currentIndex);
                 current.neigbourIndices[Direction.north].Add(candidateIndex);
             }
-            if (EastNeighbour2D(current, candidate))
+            if (WestNeighbour2D(current, candidate))
             {
-                candidate.neigbourIndices[Direction.west].Add(currentIndex);
-                current.neigbourIndices[Direction.east].Add(candidateIndex);
+                candidate.neigbourIndices[Direction.east].Add(currentIndex);
+                current.neigbourIndices[Direction.west].Add(candidateIndex);
             }
         }
 
