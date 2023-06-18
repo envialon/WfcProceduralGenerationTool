@@ -1,3 +1,5 @@
+using System;
+
 namespace WFC_Model
 {
     public class WfcModel
@@ -39,6 +41,11 @@ namespace WFC_Model
             {
                 solver.SetOutputSize(outputX, outputY, outputZ);
             }
+        }
+
+        public int GetNumberOfPatterns()
+        {
+            return inputReader.GetPatternInfo().Length;
         }
     }
 }

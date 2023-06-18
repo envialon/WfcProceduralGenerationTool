@@ -1,0 +1,120 @@
+Tilemap: Rooms
+Input dimensions: { 10, 1, 10}
+Pattern size: 3
+Trained with reflections: False
+Trained with rotations: False
+Output size: (5, 5, 5)
+Training Time: 8
+GenerationTime: 697
+
+
+Tilemap: Rooms
+Input dimensions: { 10, 1, 10}
+Pattern size: 3
+Trained with reflections: True
+Trained with rotations: False
+Output size: (5, 5, 5)
+Training Time: 13
+GenerationTime: 9493
+
+
+Tilemap: Rooms
+Input dimensions: { 10, 1, 10}
+Pattern size: 3
+Trained with reflections: False
+Trained with rotations: True
+Output size: (5, 5, 5)
+Training Time: 6
+GenerationTime: 684
+
+
+Tilemap: Rooms
+Input dimensions: { 10, 1, 10}
+Pattern size: 3
+Trained with reflections: True
+Trained with rotations: True
+Output size: (5, 5, 5)
+Training Time: 10
+GenerationTime: 8981
+
+
+Tilemap: ElevationMap
+Input dimensions: { 8, 2, 8}
+Pattern size: 3
+Trained with reflections: False
+Trained with rotations: False
+Output size: (5, 5, 5)
+Training Time: 1
+GenerationTime: 40
+
+
+Tilemap: ElevationMap
+Input dimensions: { 8, 2, 8}
+Pattern size: 3
+Trained with reflections: True
+Trained with rotations: False
+Output size: (5, 5, 5)
+Training Time: 2
+GenerationTime: 207
+
+
+Tilemap: ElevationMap
+Input dimensions: { 8, 2, 8}
+Pattern size: 3
+Trained with reflections: False
+Trained with rotations: True
+Output size: (5, 5, 5)
+Training Time: 1
+GenerationTime: 37
+
+
+Tilemap: ElevationMap
+Input dimensions: { 8, 2, 8}
+Pattern size: 3
+Trained with reflections: True
+Trained with rotations: True
+Output size: (5, 5, 5)
+Training Time: 2
+GenerationTime: 207
+
+
+Tilemap: BinaryYLayer
+Input dimensions: { 4, 2, 4}
+Pattern size: 3
+Trained with reflections: False
+Trained with rotations: False
+Output size: (5, 5, 5)
+Training Time: 0
+GenerationTime: 2
+
+
+Tilemap: BinaryYLayer
+Input dimensions: { 4, 2, 4}
+Pattern size: 3
+Trained with reflections: True
+Trained with rotations: False
+Output size: (5, 5, 5)
+Training Time: 0
+GenerationTime: 2
+
+
+Tilemap: BinaryYLayer
+Input dimensions: { 4, 2, 4}
+Pattern size: 3
+Trained with reflections: False
+Trained with rotations: True
+Output size: (5, 5, 5)
+Training Time: 0
+GenerationTime: 2
+
+
+Tilemap: BinaryYLayer
+Input dimensions: { 4, 2, 4}
+Pattern size: 3
+Trained with reflections: True
+Trained with rotations: True
+Output size: (5, 5, 5)
+Training Time: 0
+GenerationTime: 4
+
+

@@ -204,12 +204,12 @@ namespace WFC_Model
 
             if (enablePatternReflection)
             {
-                Debug.Log("Reflection");
+                //Debug.Log("Reflection");
                 ReflectPatterns2D(patternFrecuency);
             }
             if (enablePatternRotations)
             {
-                Debug.Log("Rotation");
+               // Debug.Log("Rotation");
                 RotatePatterns2D(patternFrecuency);
             }
 

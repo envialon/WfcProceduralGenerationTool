@@ -123,7 +123,7 @@ namespace WFC_Model
                 }
                 msg += "\n";
             }
-            UnityEngine.Debug.Log(msg);
+            //UnityEngine.Debug.Log(msg);
         }
 
         private (Position, int) Observe()
@@ -216,7 +216,7 @@ namespace WFC_Model
             }
         }
 
-        private void wfcPropagation()
+        private void Propagate()
         {
             int numberOfDirections = Enum.GetValues(typeof(Direction)).Length;
 
@@ -234,7 +234,6 @@ namespace WFC_Model
                     if (!PositionIsValid(neighbourCoord) || cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].collapsed) continue;
 
                     RemoveUncompatiblePatternsInNeighbour(removalUpdate, neighbourCoord, direction);
-
                 }
             }
             //UnityEngine.Debug.Log(msg);
@@ -245,12 +244,12 @@ namespace WFC_Model
             int cellsToBeCollapsed = width * height * depth;
             collapsedCount = 0;
 
-            PrintCellEntrophy();
+            //PrintCellEntrophy();
             while (collapsedCount < cellsToBeCollapsed)
             {
                 (Position candidatePosition, int collapsedPattern) = Observe();
                 // UnityEngine.Debug.Log($"Collapsed cell {candidatePosition} with pattern {collapsedPattern}");
-                wfcPropagation();
+                Propagate();
                 //PrintCellEntrophy();
             }
             return GetOutputTileIndexGrid();
