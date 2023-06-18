@@ -118,7 +118,7 @@ public class PerformanceTester : MonoBehaviour
         model.enablePatternReflection = enableReflections;
         model.enablePatternRotations = enableRotations;
         model.Train3D(tm, patternSize);
-        
+
         int numberOfPatterns = model.GetNumberOfPatterns();
         long averageTrainingTime = 0;
         long averageGenerationTime = 0;
@@ -129,7 +129,7 @@ public class PerformanceTester : MonoBehaviour
             model.enablePatternReflection = enableReflections;
             model.enablePatternRotations = enableRotations;
 
-            stopwatch = new Stopwatch();            
+            stopwatch = new Stopwatch();
             stopwatch.Start();
             model.Train3D(tm, patternSize);
             stopwatch.Stop();
@@ -151,8 +151,9 @@ public class PerformanceTester : MonoBehaviour
         summary += enableRotations + "\t";
         summary += enableReflections + "\t";
         summary += numberOfTests + "\t";
-        summary += averageTrainingTime + "\t";
-        summary += averageGenerationTime + "\t";
+        summary += outputSize.ToString() + "\t";
+        summary += (averageTrainingTime / 1000f) + "\t";
+        summary += (averageGenerationTime / 1000f) + "\t";
         return summary + "\n";
     }
 
@@ -163,39 +164,34 @@ public class PerformanceTester : MonoBehaviour
 
     public void TestAllNTimes()
     {
-        const int numberOfTests = 5;
-        int[] sizeMultipliers = { 1, 2, 3, 4, 5 };
+        const int numberOfTests = 1;
+        Vector3Int[] sizes = {
+            new Vector3Int(5, 5, 5),
+            new Vector3Int(10,10,10)
+        };
 
         string summary = GetHeader();
-        for (int i = 0; i < sizeMultipliers.Length; i++)
+        for (int i = 0; i < sizes.Length; i++)
         {
             foreach (SerializableTilemap stm in tilemapsToTest)
             {
                 summary += TestTilemapNTimes(stm,
-                                             new Vector3Int(outputSize.x * sizeMultipliers[i],
-                                                            outputSize.y * sizeMultipliers[i],
-                                                            outputSize.z * sizeMultipliers[i]),
+                                             sizes[i],
                                              patternSize,
                                              numberOfTests,
                                              false, false);
                 summary += TestTilemapNTimes(stm,
-                                            new Vector3Int(outputSize.x * sizeMultipliers[i],
-                                                           outputSize.y * sizeMultipliers[i],
-                                                           outputSize.z * sizeMultipliers[i]),
+                                            sizes[i],
                                             patternSize,
                                             numberOfTests,
                                             false, true);
                 summary += TestTilemapNTimes(stm,
-                                            new Vector3Int(outputSize.x * sizeMultipliers[i],
-                                                           outputSize.y * sizeMultipliers[i],
-                                                           outputSize.z * sizeMultipliers[i]),
+                                            sizes[i],
                                             patternSize,
                                             numberOfTests,
                                             true, false);
                 summary += TestTilemapNTimes(stm,
-                                            new Vector3Int(outputSize.x * sizeMultipliers[i],
-                                                           outputSize.y * sizeMultipliers[i],
-                                                           outputSize.z * sizeMultipliers[i]),
+                                            sizes[i],
                                             patternSize,
                                             numberOfTests,
                                             true, true);

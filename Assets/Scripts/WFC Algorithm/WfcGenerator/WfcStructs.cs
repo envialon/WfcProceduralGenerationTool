@@ -92,7 +92,7 @@ namespace WFC_Model
 
         public int GetCollapsedPatternIndex()
         {
-            //TO FIX
+            //TO FIX?¿
             return collapsedIndex == -1 ? 0 : collapsedIndex;
         }
 
