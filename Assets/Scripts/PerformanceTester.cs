@@ -21,7 +21,7 @@ public class PerformanceTester : MonoBehaviour
     private List<List<long>> generationTimeTable = new List<List<long>>();
 
     private int patternSize = 3;
-    private Vector3Int outputSize = new Vector3Int(10, 3, 10);
+    private Vector3Int outputSize = new Vector3Int(5, 5, 5);
 
     private void TestTilemap(int tilemapIndex, string name, bool enableRotations, bool enableReflections)
     {
@@ -110,26 +110,32 @@ public class PerformanceTester : MonoBehaviour
 
     public string TestTilemapNTimes(SerializableTilemap stm, Vector3Int outputSize, int patternSize, int numberOfTests, bool enableRotations, bool enableReflections)
     {
-        Stopwatch stopwatch = new Stopwatch();
         Tilemap tm = stm.GetTilemap();
+
+        Stopwatch stopwatch;
 
         model = new WfcModel(tm);
         model.enablePatternReflection = enableReflections;
         model.enablePatternRotations = enableRotations;
         model.Train3D(tm, patternSize);
-
+        
         int numberOfPatterns = model.GetNumberOfPatterns();
         long averageTrainingTime = 0;
         long averageGenerationTime = 0;
 
         for (int i = 0; i < numberOfTests; i++)
         {
-            stopwatch.Start();
-            model.Train(tm, patternSize);
-            stopwatch.Stop();
+            model = new WfcModel(tm);
+            model.enablePatternReflection = enableReflections;
+            model.enablePatternRotations = enableRotations;
 
+            stopwatch = new Stopwatch();            
+            stopwatch.Start();
+            model.Train3D(tm, patternSize);
+            stopwatch.Stop();
             averageTrainingTime += stopwatch.ElapsedMilliseconds;
 
+            stopwatch = new Stopwatch();
             stopwatch.Start();
             model.Generate(outputSize.x, outputSize.y, outputSize.z);
             stopwatch.Stop();
@@ -152,13 +158,13 @@ public class PerformanceTester : MonoBehaviour
 
     private string GetHeader()
     {
-        return "Tilemap\tNumberOfPatterns\tEnableRotation\tEnableReflection\tNumberOfTests\tAverageTrainingTime\tAverageGenerationTime\n";
+        return "Tilemap\tNumberOfPatterns\tEnableRotation\tEnableReflection\tNumberOfTests\tOutputSize\tAverageTrainingTime\tAverageGenerationTime\n";
     }
 
     public void TestAllNTimes()
     {
         const int numberOfTests = 5;
-        int[] sizeMultipliers = { 1 };
+        int[] sizeMultipliers = { 1, 2, 3, 4, 5 };
 
         string summary = GetHeader();
         for (int i = 0; i < sizeMultipliers.Length; i++)
@@ -166,14 +172,37 @@ public class PerformanceTester : MonoBehaviour
             foreach (SerializableTilemap stm in tilemapsToTest)
             {
                 summary += TestTilemapNTimes(stm,
-                                             new Vector3Int(outputSize.x * sizeMultipliers[i], 
+                                             new Vector3Int(outputSize.x * sizeMultipliers[i],
                                                             outputSize.y * sizeMultipliers[i],
-                                                            outputSize.z * sizeMultipliers[i]),                                                                 
-                                             patternSize,                                                                
-                                             numberOfTests,                                                                 
+                                                            outputSize.z * sizeMultipliers[i]),
+                                             patternSize,
+                                             numberOfTests,
                                              false, false);
+                summary += TestTilemapNTimes(stm,
+                                            new Vector3Int(outputSize.x * sizeMultipliers[i],
+                                                           outputSize.y * sizeMultipliers[i],
+                                                           outputSize.z * sizeMultipliers[i]),
+                                            patternSize,
+                                            numberOfTests,
+                                            false, true);
+                summary += TestTilemapNTimes(stm,
+                                            new Vector3Int(outputSize.x * sizeMultipliers[i],
+                                                           outputSize.y * sizeMultipliers[i],
+                                                           outputSize.z * sizeMultipliers[i]),
+                                            patternSize,
+                                            numberOfTests,
+                                            true, false);
+                summary += TestTilemapNTimes(stm,
+                                            new Vector3Int(outputSize.x * sizeMultipliers[i],
+                                                           outputSize.y * sizeMultipliers[i],
+                                                           outputSize.z * sizeMultipliers[i]),
+                                            patternSize,
+                                            numberOfTests,
+                                            true, true);
             }
         }
+
+        UnityEngine.Debug.Log(summary);
     }
 
 }
@@ -185,7 +214,10 @@ public class PerformanceTesterEditor : Editor
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
-
+        if (GUILayout.Button("Test all tilemaps once"))
+        {
+            ((PerformanceTester)target).TestAllTilemapsOnce();
+        }
         if (GUILayout.Button("Test all tilemaps n times"))
         {
             ((PerformanceTester)target).TestAllNTimes();

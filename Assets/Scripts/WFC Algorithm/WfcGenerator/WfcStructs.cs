@@ -92,7 +92,8 @@ namespace WFC_Model
 
         public int GetCollapsedPatternIndex()
         {
-            return collapsedIndex;
+            //TO FIX
+            return collapsedIndex == -1 ? 0 : collapsedIndex;
         }
 
         public void CollapseOn(int patternToCollapse)
@@ -214,7 +215,7 @@ namespace WFC_Model
         {
             return neigbourIndices[direction];
         }
-        
+
         internal void UpdateFrecuencies(float totalPatterns)
         {
             relativeFrecuency = frecuency / totalPatterns;

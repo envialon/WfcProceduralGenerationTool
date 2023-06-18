@@ -265,8 +265,9 @@ namespace WFC_Model
                     for (int k = 0; k < height; k++)
                     {
                         int patternIndex = cellMap[i, k, j].GetCollapsedPatternIndex();
-                        output.SetTile(new Tile(patternInfo[patternIndex].GetCollapsedIndex(), 
-                                                patternInfo[patternIndex].GetCollapsedRotation()), i, k, j);
+                        int collapsedIndex = patternInfo[patternIndex].GetCollapsedIndex();
+                        int collapsedRotation = patternInfo[patternIndex].GetCollapsedRotation();
+                        output.SetTile(new Tile(collapsedIndex, collapsedRotation), i, k, j);
                     }
                 }
             }
