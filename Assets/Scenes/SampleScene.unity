@@ -294,8 +294,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 4, y: 0, z: 4}
-  m_Center: {x: 2, y: 1, z: 2}
+  m_Size: {x: 15, y: 0, z: 15}
+  m_Center: {x: 7.5, y: 1, z: 7.5}
 --- !u!4 &1339589962
 Transform:
   m_ObjectHideFlags: 0
@@ -324,7 +324,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   patternSize: 3
-  inputMapSize: 4
+  inputMapSize: 15
   inputMapHeight: 2
   selectedTile: 1
   outputSize: {x: 8, y: 5, z: 8}

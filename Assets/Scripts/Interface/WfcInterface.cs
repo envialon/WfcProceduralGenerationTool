@@ -65,6 +65,11 @@ public class WfcInterface : MonoBehaviour
 
         boxCollider.size = new Vector3(inputMapSize, 0, inputMapSize);
         boxCollider.center = new Vector3(inputMapSize / 2, selectedLayer, inputMapSize / 2);
+
+        if (inputMapSize % 2 != 0)
+        {
+            boxCollider.center += new Vector3(.5f, 0, .5f);
+        }
     }
 
     private void ResizeInputMap()
