@@ -311,6 +311,8 @@ namespace WFC_Model
             ExtractUniquePatterns2D();
             UpdateFrecuencies();
             FindOverlappingNeighbours2D();
+
+            Debug.Log(GetPatternSummary());
         }
 
 
@@ -336,7 +338,7 @@ namespace WFC_Model
             }
             return true;
         }
-        private bool EastNeighbour3D(in PatternInfo current, in PatternInfo candidate)
+        private bool WestNeighbour3D(in PatternInfo current, in PatternInfo candidate)
         {
             int[] currentGrid = current.pattern;
             int[] candidateGrid = candidate.pattern;
@@ -359,7 +361,6 @@ namespace WFC_Model
             return true;
         }
 
-        //current implementation wasn't thought through, just extrapolated from the other examples.
         private bool UpperNeighbour3D(in PatternInfo current, in PatternInfo candidate)
         {
             int[] currentGrid = current.pattern;
@@ -390,10 +391,10 @@ namespace WFC_Model
                 candidate.neigbourIndices[Direction.south].Add(currentIndex);
                 current.neigbourIndices[Direction.north].Add(candidateIndex);
             }
-            if (EastNeighbour3D(current, candidate))
+            if (WestNeighbour3D(current, candidate))
             {
-                candidate.neigbourIndices[Direction.west].Add(currentIndex);
-                current.neigbourIndices[Direction.east].Add(candidateIndex);
+                candidate.neigbourIndices[Direction.east].Add(currentIndex);
+                current.neigbourIndices[Direction.west].Add(candidateIndex);
             }
             if (UpperNeighbour3D(current, candidate))
             {
@@ -450,7 +451,7 @@ namespace WFC_Model
             return output;
         }
 
-        private int[] RotateMatrix3D(in int[] pattern)
+        private int[] RotateMatrix90Degrees3D(in int[] pattern)
         {
             int[] output = new int[patternSize * patternSize * patternHeight];
             for (int x = 0; x < patternSize; x++)
@@ -475,9 +476,9 @@ namespace WFC_Model
             {
                 int[] rotatedPattern;
 
-                for (int direction = 0; direction < 3; direction++)
+                for (int direction = 1; direction < 4; direction++)
                 {
-                    rotatedPattern = RotateMatrix3D(in pattern.pattern);
+                    rotatedPattern = RotateMatrix90Degrees3D(in pattern.pattern);
                     string patternHash = HashPattern(rotatedPattern);
                     if (!patternFrecuency.ContainsKey(patternHash))
                     {
@@ -486,7 +487,8 @@ namespace WFC_Model
                                                                           rotatedPattern,
                                                                           patternSize,
                                                                           patternHeight,
-                                                                          pattern.frecuency));
+                                                                          pattern.frecuency,
+                                                                          direction));
                     }
                 }
             }
@@ -574,6 +576,10 @@ namespace WFC_Model
             {
                 this.patternHeight = 2;
             }
+            if(inputTileMap.height == 1)
+            {
+                this.patternHeight = 1;
+            }
 
             CalculatePatternOffsets();
 
@@ -581,6 +587,8 @@ namespace WFC_Model
             ExtractUniquePatterns3D();
             UpdateFrecuencies();
             FindOverlappingNeighbours3D();
+            
+            Debug.Log(GetPatternSummary());
         }
 
 

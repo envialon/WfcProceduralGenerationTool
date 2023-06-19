@@ -294,8 +294,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 15, y: 0, z: 15}
-  m_Center: {x: 7.5, y: 1, z: 7.5}
+  m_Size: {x: 4, y: 0, z: 4}
+  m_Center: {x: 2, y: 0, z: 2}
 --- !u!4 &1339589962
 Transform:
   m_ObjectHideFlags: 0
@@ -324,11 +324,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   patternSize: 3
-  inputMapSize: 15
-  inputMapHeight: 2
-  selectedTile: 5
-  outputSize: {x: 8, y: 5, z: 8}
-  selectedLayer: 1
+  inputMapSize: 4
+  inputMapHeight: 1
+  selectedTile: 4
+  outputSize: {x: 8, y: 1, z: 8}
+  selectedLayer: 0
   tileSet: {fileID: 11400000, guid: 43d87efc2f9a6014cb055b492a787204, type: 2}
 --- !u!156049354 &1339589964
 Grid:

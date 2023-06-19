@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
 namespace WFC_Model
 {
+    
     public class WfcSolver
     {
         public int width;
@@ -239,6 +239,7 @@ namespace WFC_Model
             //UnityEngine.Debug.Log(msg);
         }
 
+        
         public Tilemap Generate()
         {
             int cellsToBeCollapsed = width * height * depth;

@@ -9,7 +9,7 @@ namespace WFC_Model
         public InputReader inputReader;
         public WfcSolver solver;
 
-        public bool enablePatternReflection = true;
+        public bool enablePatternReflection = false;
         public bool enablePatternRotations = true;
 
         public WfcModel(Tilemap data)
