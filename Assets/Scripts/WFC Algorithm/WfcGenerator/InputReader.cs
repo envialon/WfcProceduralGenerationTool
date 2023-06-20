@@ -53,11 +53,7 @@ namespace WFC_Model
         {
             Initialize(inputTileMap, patternSize);
         }
-
-        /// <summary>
-        /// Deberemos transformar la información de tile y rotación a enteros puramente, acabaremos con 
-        /// 4N índices únicos donde N es el tamaño de tileset.
-        /// </summary>
+        
         private void PopulateIndexGrid()
         {
             indexGrid = new int[inputTileMap.width * inputTileMap.height * inputTileMap.depth];
