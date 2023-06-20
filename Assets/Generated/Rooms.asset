@@ -67,13 +67,13 @@ MonoBehaviour:
       rotation: 1
     - id: 3
       rotation: 1
-    - id: 4
+    - id: 1
       rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
+    - id: 3
+      rotation: 1
+    - id: 3
+      rotation: 1
+    - id: 2
       rotation: 0
     - id: 0
       rotation: 0
@@ -93,27 +93,7 @@ MonoBehaviour:
       rotation: 0
     - id: 0
       rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
     - id: 3
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 3
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
       rotation: 0
     - id: 0
       rotation: 0
@@ -131,10 +111,30 @@ MonoBehaviour:
       rotation: 0
     - id: 0
       rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 3
+      rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 4
+      rotation: 2
+    - id: 1
+      rotation: 0
+    - id: 1
+      rotation: 0
+    - id: 4
+      rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 3
+      rotation: 0
+    - id: 0
+      rotation: 0
     - id: 2
       rotation: 1
-    - id: 4
-      rotation: 1
+    - id: 1
+      rotation: 0
     - id: 2
       rotation: 0
     - id: 4

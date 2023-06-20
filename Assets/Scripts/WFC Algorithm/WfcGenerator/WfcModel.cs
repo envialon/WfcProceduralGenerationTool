@@ -16,16 +16,10 @@ namespace WFC_Model
         {
             inputReader = new InputReader(data, patternSize);
         }
-
+        
         public void Train(Tilemap inputTileMap, int patternSize = 2)
         {
-            inputReader.Train2D(patternSize, inputTileMap, enablePatternReflection, enablePatternRotations);
-            solver = new WfcSolver(inputReader);
-        }
-
-        public void Train3D(Tilemap inputTileMap, int patternSize = 2)
-        {
-            inputReader.Train3D(patternSize, inputTileMap, enablePatternReflection, enablePatternRotations);
+            inputReader.Train(patternSize, inputTileMap, enablePatternReflection, enablePatternRotations);
             solver = new WfcSolver(inputReader);
         }
 

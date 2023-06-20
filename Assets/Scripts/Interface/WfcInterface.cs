@@ -10,7 +10,6 @@ public class WfcInterface : MonoBehaviour
     private const string inputMapSerializationPath = "Assets/Generated/";
 
     public int patternSize = 2;
-    private int patternSizeCheck = 0;
 
     public int inputMapSize = 10;
     private int inputMapSizeCheck = 0;
@@ -74,9 +73,8 @@ public class WfcInterface : MonoBehaviour
 
     private void ResizeInputMap()
     {
-        if (patternSize != patternSizeCheck || inputMapSize != inputMapSizeCheck || inputMapHeight != inputMapHeightCheck)
+        if (inputMapSize != inputMapSizeCheck || inputMapHeight != inputMapHeightCheck)
         {
-            patternSizeCheck = patternSize;
             inputMapSizeCheck = inputMapSize;
             inputMapHeightCheck = inputMapHeight;
             inputMap = new Tilemap(inputMapSize, inputMapHeight, inputMapSize);
@@ -295,7 +293,7 @@ public class WfcInterface : MonoBehaviour
 
     public void Train3D()
     {
-        model.Train3D(inputMap, patternSize);
+        model.Train(inputMap, patternSize);
 
     }
 
@@ -306,10 +304,10 @@ public class WfcInterface : MonoBehaviour
 
     public void LoadSerializedInputMap(string path)
     {
-
         inputMap = TilemapSerializer.DeserializeTilemap(path);
         inputMapSize = inputMap.depth;
         inputMapHeight = inputMap.height;
+        RefreshCollider();
     }
 
     public void Generate()
@@ -366,11 +364,7 @@ public class WfcInterfaceEditor : Editor
         {
             t.Train();
         }
-
-        if (GUILayout.Button("Train3D"))
-        {
-            t.Train3D();
-        }
+    
     }
 
     public override void OnInspectorGUI()

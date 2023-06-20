@@ -102,119 +102,7 @@ namespace WFC_Model
         private string HashPattern(int[] pattern)
         {
             return string.Join(".", pattern);
-        }
-
-        private int[] ReflectMatrix2D(in int[] pattern)
-        {
-            int[] output = new int[patternSize * patternSize * patternHeight];
-
-            for (int x = 0; x < patternSize; x++)
-            {
-                for (int z = 0; z < patternSize; z++)
-                {
-                    int candidateIndex = pattern[x + (patternSize - z - 1) * zOffset];
-                    //rotate the tile index 180 degrees
-
-                    output[x + z * zOffset] = candidateIndex;
-                }
-            }
-            return output;
-        }
-
-        private int[] RotateMatrix90degrees2D(in int[] pattern)
-        {
-            int[] output = new int[patternSize * patternSize * patternHeight];
-            for (int x = 0; x < patternSize; x++)
-            {
-                for (int z = 0; z < patternSize; z++)
-                {
-                    output[x + z * zOffset] = pattern[z + x * zOffset];
-                }
-            }
-
-            return ReflectMatrix2D(in output);
-
-        }
-
-        private void RotatePatterns2D(Dictionary<string, PatternInfo> patternFrecuency)
-        {
-            PatternInfo[] patterns = patternFrecuency.Values.ToArray();
-            foreach (PatternInfo pattern in patterns)
-            {
-                int[] rotatedPattern;
-
-                for (int direction = 1; direction < 4; direction++)
-                {
-                    rotatedPattern = RotateMatrix90degrees2D(in pattern.pattern);
-                    string patternHash = HashPattern(rotatedPattern);
-                    if (!patternFrecuency.ContainsKey(patternHash))
-                    {
-                        totalPatterns++;
-                        patternFrecuency.Add(patternHash, new PatternInfo(patternFrecuency.Count,
-                                                                          rotatedPattern,
-                                                                          patternSize,
-                                                                          patternHeight,
-                                                                          pattern.frecuency,
-                                                                          direction));
-                    }
-                }
-            }
-        }
-
-        private void ReflectPatterns2D(Dictionary<string, PatternInfo> patternFrecuency)
-        {
-            PatternInfo[] patterns = patternFrecuency.Values.ToArray();
-            foreach (PatternInfo pattern in patterns)
-            {
-                //reflect it and check if its already in patternFrecuency, if not, add it
-                int[] reflectedPattern = ReflectMatrix2D(in pattern.pattern);
-                string reflectedPatternHash = HashPattern(reflectedPattern);
-                if (!patternFrecuency.ContainsKey(reflectedPatternHash))
-                {
-                    totalPatterns++;
-                    patternFrecuency.Add(reflectedPatternHash, new PatternInfo(patternFrecuency.Count,
-                                                                               reflectedPattern,
-                                                                               patternSize,
-                                                                               patternHeight,
-                                                                               pattern.frecuency));
-                }
-            }
-        }
-
-        private void ExtractUniquePatterns2D()
-        {
-            //usamos el diccionario para aprovechar el hasheo
-            Dictionary<string, PatternInfo> patternFrecuency = new Dictionary<string, PatternInfo>();
-            totalPatterns = 0;
-
-            for (int i = -patternSize; i <= mapSize + patternSize; i++)
-            {
-                for (int j = -patternSize; j <= mapSize + patternSize; j++)
-                {
-                    int[] pattern = Extract2DPatternAt(i, j);
-                    string patternHash = HashPattern(pattern);
-                    if (!patternFrecuency.ContainsKey(HashPattern(pattern)))
-                    {
-                        patternFrecuency.Add(patternHash, new PatternInfo(patternFrecuency.Count, pattern, patternSize, patternHeight));
-                    }
-                    totalPatterns++;
-                    patternFrecuency[patternHash]++;
-                }
-            }
-
-            if (enablePatternReflection)
-            {
-                //Debug.Log("Reflection");
-                ReflectPatterns2D(patternFrecuency);
-            }
-            if (enablePatternRotations)
-            {
-               // Debug.Log("Rotation");
-                RotatePatterns2D(patternFrecuency);
-            }
-
-            patterns = patternFrecuency.Values.ToArray();
-        }
+        }  
 
         private void UpdateFrecuencies()
         {
@@ -223,99 +111,7 @@ namespace WFC_Model
                 patterns[i].UpdateFrecuencies(totalPatterns);
             }
         }
-
-        private bool WestNeighbour2D(in PatternInfo current, in PatternInfo candidate)
-        {
-            int[] currentGrid = current.pattern;
-            int[] candidateGrid = candidate.pattern;
-
-            for (int x = 1; x < patternSize; x++)
-            {
-                for (int z = 0; z < patternSize; z++)
-                {
-                    int a = currentGrid[x + z * patternHeight * patternSize];
-                    int b = candidateGrid[(x - 1) + z * patternHeight * patternSize];
-                    if (a != b)
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-
-        private bool NorthNeighbour2D(in PatternInfo current, in PatternInfo candidate)
-        {
-            int[] currentGrid = current.pattern;
-            int[] candidateGrid = candidate.pattern;
-
-            for (int x = 0; x < patternSize; x++)
-            {
-                for (int z = 1; z < patternSize; z++)
-                {
-                    int a = currentGrid[x + z * patternSize * patternHeight];
-                    int b = candidateGrid[x + (z - 1) * patternSize * patternHeight];
-                    if (a != b)
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-
-        private void CheckForNeighbourhood2D(int currentIndex, PatternInfo current, int candidateIndex, PatternInfo candidate)
-        {
-            if (NorthNeighbour2D(current, candidate))
-            {
-                candidate.neigbourIndices[Direction.south].Add(currentIndex);
-                current.neigbourIndices[Direction.north].Add(candidateIndex);
-            }
-            if (WestNeighbour2D(current, candidate))
-            {
-                candidate.neigbourIndices[Direction.east].Add(currentIndex);
-                current.neigbourIndices[Direction.west].Add(candidateIndex);
-            }
-        }
-
-        private void FindOverlappingNeighbours2D()
-        {
-            int numberOfPatterns = patterns.Length;
-            for (int i = 0; i < numberOfPatterns; i++)
-            {
-                PatternInfo current = patterns[i];
-                for (int j = 0; j < numberOfPatterns; j++)
-                {
-                    PatternInfo candidate = patterns[j];
-                    CheckForNeighbourhood2D(i, current, j, candidate);
-                }
-            }
-        }
-
-        public void Train2D(int patternSize = 2, Tilemap inputTileMap = null, bool enableReflection = true, bool enableRotation = true)
-        {
-            this.enablePatternReflection = enableReflection;
-            this.enablePatternRotations = enableRotation;
-            if (inputTileMap is not null)
-            {
-                Initialize(inputTileMap, patternSize);
-            }
-            if (this.inputTileMap is null)
-            {
-                throw new Exception("The InputReader doesn't have any data to read.");
-            }
-
-            patterns = new PatternInfo[0];
-
-            PopulateIndexGrid();
-            ExtractUniquePatterns2D();
-            UpdateFrecuencies();
-            FindOverlappingNeighbours2D();
-
-            Debug.Log(GetPatternSummary());
-        }
-
-
+         
         private bool NorthNeighbour3D(in PatternInfo current, in PatternInfo candidate)
         {
             int[] currentGrid = current.pattern;
@@ -465,7 +261,7 @@ namespace WFC_Model
                 }
             }
 
-            return ReflectMatrix2D(in output);
+            return ReflectMatrix3D(in output);
 
         }
 
@@ -520,6 +316,8 @@ namespace WFC_Model
             Dictionary<string, PatternInfo> patternFrecuency = new Dictionary<string, PatternInfo>();
             totalPatterns = 0;
 
+
+
             for (int i = -patternSize; i <= mapSize + patternSize; i++)
             {
                 for (int k = -patternHeight; k <= mapHeight + patternHeight; k++)
@@ -553,7 +351,7 @@ namespace WFC_Model
             patterns = patternFrecuency.Values.ToArray();
         }
 
-        public void Train3D(int patternSize = 2, Tilemap inputTileMap = null, bool enableReflection = true, bool enableRotation = true, bool sandwitchPatterns = true)
+        public void Train(int patternSize = 2, Tilemap inputTileMap = null, bool enableReflection = true, bool enableRotation = true, bool sandwitchPatterns = true)
         {
             if (inputTileMap is not null)
             {
