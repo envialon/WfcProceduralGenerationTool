@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c8e5fa640236c645bfbc930b046b736, type: 3}
+  m_Name: IslandTileSet
+  m_EditorClassIdentifier: 
+  tiles:
+  - mesh: {fileID: 0}
+    material: {fileID: 0}
+  - mesh: {fileID: -1388485733357891733, guid: d64ec7ea789d13b4886090b1c896ce20, type: 3}
+    material: {fileID: 2100000, guid: 26d349362434bac498e9d8775552dd26, type: 2}
+  - mesh: {fileID: -1388485733357891733, guid: d64ec7ea789d13b4886090b1c896ce20, type: 3}
+    material: {fileID: 2100000, guid: 2aa66e922dda3e54b93098785dcca5c5, type: 2}
+  - mesh: {fileID: -1388485733357891733, guid: d64ec7ea789d13b4886090b1c896ce20, type: 3}
+    material: {fileID: 2100000, guid: 7742f2f55717b7a45954e738407e74f6, type: 2}
+  - mesh: {fileID: -234795621409544537, guid: 35f11f908a505c349930c0870c0f2087, type: 3}
+    material: {fileID: 2100000, guid: bfe7412e1389c1242ba9a0a265b0f5b6, type: 2}
+  - mesh: {fileID: -6742930239559620008, guid: b4824698b49b263418f7b2c3834c5d8e, type: 3}
+    material: {fileID: 2100000, guid: bfe7412e1389c1242ba9a0a265b0f5b6, type: 2}
+  - mesh: {fileID: 2119453186842651304, guid: 6e7234975f3675644945a977a11483cc, type: 3}
+    material: {fileID: 2100000, guid: bfe7412e1389c1242ba9a0a265b0f5b6, type: 2}
