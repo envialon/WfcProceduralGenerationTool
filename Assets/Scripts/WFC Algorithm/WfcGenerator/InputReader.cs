@@ -102,7 +102,7 @@ namespace WFC_Model
         private string HashPattern(int[] pattern)
         {
             return string.Join(".", pattern);
-        }  
+        }
 
         private void UpdateFrecuencies()
         {
@@ -111,7 +111,7 @@ namespace WFC_Model
                 patterns[i].UpdateFrecuencies(totalPatterns);
             }
         }
-         
+
         private bool NorthNeighbour3D(in PatternInfo current, in PatternInfo candidate)
         {
             int[] currentGrid = current.pattern;
@@ -230,7 +230,7 @@ namespace WFC_Model
             return output;
         }
 
-        private int[] ReflectMatrix3D(in int[] pattern)
+        private int[] ReflectMatrix(in int[] pattern)
         {
             int[] output = new int[patternSize * patternSize * patternHeight];
 
@@ -247,7 +247,7 @@ namespace WFC_Model
             return output;
         }
 
-        private int[] RotateMatrix90Degrees3D(in int[] pattern)
+        private int[] RotateMatrix(in int[] pattern)
         {
             int[] output = new int[patternSize * patternSize * patternHeight];
             for (int x = 0; x < patternSize; x++)
@@ -261,8 +261,21 @@ namespace WFC_Model
                 }
             }
 
-            return ReflectMatrix3D(in output);
+            return ReflectMatrix(in output);
+        }
 
+        private void RotateIndividualTiles(ref int[] pattern)
+        {
+            int patternLength = pattern.Length;
+            for (int i = 0; i < patternLength; i++)
+            {
+                if (pattern[i] != 0)
+                {
+                    int tileIndex = pattern[i] / 4;
+                    int originalRotation = ((pattern[i] - (tileIndex) * 4)) % 4;
+                    pattern[i] = tileIndex * 4 + (originalRotation + 1) % 4;
+                }
+            }
         }
 
         private void RotatePatterns3D(Dictionary<string, PatternInfo> patternFrecuency)
@@ -270,11 +283,12 @@ namespace WFC_Model
             PatternInfo[] patterns = patternFrecuency.Values.ToArray();
             foreach (PatternInfo pattern in patterns)
             {
-                int[] rotatedPattern;
+                int[] rotatedPattern = pattern.pattern;
 
                 for (int direction = 1; direction < 4; direction++)
                 {
-                    rotatedPattern = RotateMatrix90Degrees3D(in pattern.pattern);
+                    rotatedPattern = RotateMatrix(in rotatedPattern);
+                    RotateIndividualTiles(ref rotatedPattern);
                     string patternHash = HashPattern(rotatedPattern);
                     if (!patternFrecuency.ContainsKey(patternHash))
                     {
@@ -290,13 +304,19 @@ namespace WFC_Model
             }
         }
 
+        private void ReflectIndividualTiles(ref int[] pattern)
+        {
+
+        }
+
         private void ReflectPatterns3D(Dictionary<string, PatternInfo> patternFrecuency)
         {
             PatternInfo[] patterns = patternFrecuency.Values.ToArray();
             foreach (PatternInfo pattern in patterns)
             {
                 //reflect it and check if its already in patternFrecuency, if not, add it
-                int[] reflectedPattern = ReflectMatrix3D(in pattern.pattern);
+                int[] reflectedPattern = ReflectMatrix(in pattern.pattern);
+                ReflectIndividualTiles(ref reflectedPattern);
                 string reflectedPatternHash = HashPattern(reflectedPattern);
                 if (!patternFrecuency.ContainsKey(reflectedPatternHash))
                 {
@@ -374,7 +394,7 @@ namespace WFC_Model
             {
                 this.patternHeight = 2;
             }
-            if(inputTileMap.height == 1)
+            if (inputTileMap.height == 1)
             {
                 this.patternHeight = 1;
             }
@@ -384,7 +404,7 @@ namespace WFC_Model
             PopulateIndexGrid();
             ExtractUniquePatterns3D();
             UpdateFrecuencies();
-            FindOverlappingNeighbours3D();            
+            FindOverlappingNeighbours3D();
         }
 
 

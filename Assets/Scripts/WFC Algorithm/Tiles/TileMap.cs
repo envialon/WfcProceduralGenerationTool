@@ -112,7 +112,7 @@ namespace WFC_Model
                 {
                     for (int k = 0; k < width; k++)
                     {
-                        output += map[k + (i * yOffset) + (j * zOffset)].id + " ";
+                        output += map[k + (i * yOffset) + (j * zOffset)].id +  " ";
                     }
                     output += "\n";
                 }

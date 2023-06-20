@@ -229,7 +229,12 @@ namespace WFC_Model
 
         public int GetCollapsedRotation()
         {
-            return ((pattern[0] - (pattern[0] / 4) * 4) + patternRotation) % 4;
+            return ((pattern[0] - (pattern[0] / 4) * 4)) % 4;
+        }
+
+        public override string ToString()
+        {
+            return string.Join(".", pattern);
         }
 
     }
