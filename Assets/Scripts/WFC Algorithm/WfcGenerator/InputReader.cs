@@ -384,9 +384,7 @@ namespace WFC_Model
             PopulateIndexGrid();
             ExtractUniquePatterns3D();
             UpdateFrecuencies();
-            FindOverlappingNeighbours3D();
-            
-            Debug.Log(GetPatternSummary());
+            FindOverlappingNeighbours3D();            
         }
 
 

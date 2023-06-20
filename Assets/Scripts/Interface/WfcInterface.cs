@@ -288,7 +288,7 @@ public class WfcInterface : MonoBehaviour
     public void Train()
     {
         model.Train(inputMap, patternSize);
-        //Debug.Log(model.inputReader.GetPatternSummary());
+        Debug.Log(model.inputReader.GetPatternSummary());
     }
 
     public void Train3D()

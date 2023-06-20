@@ -11,6 +11,9 @@ namespace WFC_Model
 
         public bool enablePatternReflection = false;
         public bool enablePatternRotations = true;
+        public bool sandwichPatterns = true;
+        public bool horizontalPeriodicInput= true;
+        public bool verticalPeriodicInput = true;
 
         public WfcModel(Tilemap data)
         {
