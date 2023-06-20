@@ -222,15 +222,10 @@ namespace WFC_Model
             relativeFrecuencyLog2 = (float)(Math.Log(relativeFrecuency, 2));
         }
 
-        public int GetCollapsedIndex()
+        public int GetEncodedTileIndex()
         {
-            return pattern[0] / 4;
-        }
-
-        public int GetCollapsedRotation()
-        {
-            return ((pattern[0] - (pattern[0] / 4) * 4)) % 4;
-        }
+            return pattern[0];
+        } 
 
         public override string ToString()
         {

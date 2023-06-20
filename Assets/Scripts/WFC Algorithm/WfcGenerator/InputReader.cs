@@ -69,34 +69,42 @@ namespace WFC_Model
                     for (int j = 0; j < mapSize; j++)
                     {
                         //not using yOffset and zOffset because we're mapping the indexMap, not a pattern.
-                        indexGrid[i + (k * mapSize) + (j * mapHeight * mapSize)] = inputTileMap.GetTile(i, k, j).id * 4 + inputTileMap.GetTile(i, k, j).rotation;
+                        indexGrid[i + (k * mapSize) + (j * mapHeight * mapSize)] = EncodeTile(inputTileMap.GetTile(i, k, j).id,
+                                                                                              inputTileMap.GetTile(i, k, j).rotation);
                     }
                 }
             }
         }
 
-        private int mod(int x, int y)
+        private static int mod(int x, int y)
         {
             return x - y * (int)Math.Floor((double)x / y);
+        }
+
+        public static int EncodeTile(int id, int rotation, bool isReflected = false)
+        {
+            return id * 4 + mod(rotation, 4);
+        }
+
+        public static int DecodeTileId(int encodedTile)
+        {
+            return encodedTile / 4;
+        }
+
+        public static int DecodeTileRotation(int encodedTile)
+        {
+            return ((encodedTile - (encodedTile / 4) * 4)) % 4;
+        }
+        public static Tile DecodeTile(int encodedTile)
+        {
+            return new Tile(DecodeTileId(encodedTile), DecodeTileRotation(encodedTile));
+
         }
 
         private int GetOffsetedIndexGridAt(int x, int y, int z)
         {
             //not using yOffset and zOffset because we're mapping the indexMap, not a pattern.
             return indexGrid[mod(x, mapSize) + mod(y, mapHeight) * mapSize + mod(z, mapSize) * mapHeight * mapSize];
-        }
-
-        private int[] Extract2DPatternAt(int x, int y)
-        {
-            int[] output = new int[patternSize * patternSize * patternHeight];
-            for (int i = 0; i < patternSize; i++)
-            {
-                for (int j = 0; j < patternSize; j++)
-                {
-                    output[i + j * zOffset] = GetOffsetedIndexGridAt(x + i, 0, y + j);
-                }
-            }
-            return output;
         }
 
         private string HashPattern(int[] pattern)
@@ -271,9 +279,9 @@ namespace WFC_Model
             {
                 if (pattern[i] != 0)
                 {
-                    int tileIndex = pattern[i] / 4;
-                    int originalRotation = ((pattern[i] - (tileIndex) * 4)) % 4;
-                    pattern[i] = tileIndex * 4 + (originalRotation + 1) % 4;
+                    int tileIndex = DecodeTileId(pattern[i]);
+                    int originalRotation = DecodeTileRotation(pattern[i]);
+                    pattern[i] = EncodeTile(tileIndex, (originalRotation + 1));
                 }
             }
         }
