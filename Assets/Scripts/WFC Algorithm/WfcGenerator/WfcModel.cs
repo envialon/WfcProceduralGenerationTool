@@ -22,7 +22,13 @@ namespace WFC_Model
         
         public void Train(Tilemap inputTileMap, int patternSize = 2)
         {
-            inputReader.Train(patternSize, inputTileMap, enablePatternReflection, enablePatternRotations);
+            inputReader.Train(patternSize, inputTileMap, 
+                              enablePatternReflection,
+                              enablePatternRotations,
+                              sandwichPatterns,
+                              horizontalPeriodicInput,
+                              verticalPeriodicInput);
+            
             solver = new WfcSolver(inputReader);
         }
 

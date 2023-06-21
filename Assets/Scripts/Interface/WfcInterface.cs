@@ -339,6 +339,15 @@ public class WfcInterfaceEditor : Editor
         t.model.enablePatternRotations = EditorGUILayout.Toggle("Enable pattern rotation", t.model.enablePatternRotations);
         GUILayout.EndHorizontal();
 
+        GUILayout.BeginHorizontal();
+        t.model.sandwichPatterns = EditorGUILayout.Toggle("Sandwich patterns", t.model.sandwichPatterns);
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        t.model.horizontalPeriodicInput = EditorGUILayout.Toggle("Horizontal periodic input", t.model.horizontalPeriodicInput);
+        t.model.verticalPeriodicInput = EditorGUILayout.Toggle("Vertical periodic input", t.model.verticalPeriodicInput);
+        GUILayout.EndHorizontal();
+
         GUILayout.Space(20);
 
         obj = EditorGUILayout.ObjectField("Serialized input map file:", obj, typeof(UnityEngine.Object), false);

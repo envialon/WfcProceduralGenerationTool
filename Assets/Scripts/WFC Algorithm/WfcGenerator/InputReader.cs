@@ -22,10 +22,6 @@ namespace WFC_Model
         private PatternInfo[] patterns;
         private int totalPatterns = 0;
 
-        public bool enablePatternReflection;
-        public bool enablePatternRotations;
-        private bool sandwitchPatterns;
-
         // yOffset and zOffset are the values we need to muliply by the y and z
         // coordinates respectively to get the correct index in a pattern
         private int yOffset;
@@ -53,7 +49,7 @@ namespace WFC_Model
         {
             Initialize(inputTileMap, patternSize);
         }
-        
+
         private void PopulateIndexGrid()
         {
             indexGrid = new int[inputTileMap.width * inputTileMap.height * inputTileMap.depth];
@@ -94,7 +90,6 @@ namespace WFC_Model
         public static Tile DecodeTile(int encodedTile)
         {
             return new Tile(DecodeTileId(encodedTile), DecodeTileRotation(encodedTile));
-
         }
 
         private int GetOffsetedIndexGridAt(int x, int y, int z)
@@ -102,6 +97,7 @@ namespace WFC_Model
             //not using yOffset and zOffset because we're mapping the indexMap, not a pattern.
             return indexGrid[mod(x, mapSize) + mod(y, mapHeight) * mapSize + mod(z, mapSize) * mapHeight * mapSize];
         }
+
 
         private string HashPattern(int[] pattern)
         {
@@ -310,7 +306,7 @@ namespace WFC_Model
 
         private void ReflectIndividualTiles(ref int[] pattern)
         {
-
+            // not completely supported for directional tiles right now.
         }
 
         private void ReflectPatterns3D(Dictionary<string, PatternInfo> patternFrecuency)
@@ -334,19 +330,25 @@ namespace WFC_Model
             }
         }
 
-        private void ExtractUniquePatterns3D()
+        private void ExtractUniquePatterns3D(bool enablePatternReflection, bool enablePatternRotation, bool horizontalPeriodic, bool verticalPeriodic)
         {
             //usamos el diccionario para aprovechar el hasheo
             Dictionary<string, PatternInfo> patternFrecuency = new Dictionary<string, PatternInfo>();
             totalPatterns = 0;
 
 
+            int horizontalStart = (horizontalPeriodic) ? -patternSize : 0;
+            int horizontalEnd = (horizontalPeriodic) ? mapSize + patternSize : mapSize - patternSize;
 
-            for (int i = -patternSize; i <= mapSize + patternSize; i++)
+            int verticalStart = (verticalPeriodic) ? -patternHeight : 0;
+            int verticalEnd = (verticalPeriodic) ? mapHeight + patternHeight : mapHeight - patternHeight;
+
+
+            for (int i = horizontalStart; i <= horizontalEnd; i++)
             {
-                for (int k = -patternHeight; k <= mapHeight + patternHeight; k++)
+                for (int k = verticalStart; k <= verticalEnd; k++)
                 {
-                    for (int j = -patternSize; j <= mapSize + patternSize; j++)
+                    for (int j = horizontalStart; j <= horizontalEnd; j++)
                     {
                         int[] pattern = Extract3DPatternAt(i, k, j);
                         string patternHash = HashPattern(pattern);
@@ -366,7 +368,7 @@ namespace WFC_Model
                 //Debug.Log("Reflection");
                 ReflectPatterns3D(patternFrecuency);
             }
-            if (enablePatternRotations)
+            if (enablePatternRotation)
             {
                 //Debug.Log("Rotation");
                 RotatePatterns3D(patternFrecuency);
@@ -375,7 +377,9 @@ namespace WFC_Model
             patterns = patternFrecuency.Values.ToArray();
         }
 
-        public void Train(int patternSize = 2, Tilemap inputTileMap = null, bool enableReflection = true, bool enableRotation = true, bool sandwitchPatterns = true)
+        public void Train(int patternSize = 2, Tilemap inputTileMap = null, bool enableReflection = true,
+                                                bool enableRotation = true, bool sandwitchPatterns = true,
+                                                bool horizontalPeriodic = true, bool verticalPeriodic = true)
         {
             if (inputTileMap is not null)
             {
@@ -388,13 +392,10 @@ namespace WFC_Model
 
             patterns = new PatternInfo[0];
 
-            this.enablePatternReflection = enableReflection;
-            this.enablePatternRotations = enableRotation;
-            this.sandwitchPatterns = sandwitchPatterns;
-
             this.patternSize = patternSize;
             patternHeight = patternSize;
-            if (this.sandwitchPatterns)
+
+            if (sandwitchPatterns)
             {
                 this.patternHeight = 2;
             }
@@ -406,7 +407,7 @@ namespace WFC_Model
             CalculatePatternOffsets();
 
             PopulateIndexGrid();
-            ExtractUniquePatterns3D();
+            ExtractUniquePatterns3D(enableReflection, enableRotation, horizontalPeriodic, verticalPeriodic);
             UpdateFrecuencies();
             FindOverlappingNeighbours3D();
         }
@@ -446,10 +447,10 @@ namespace WFC_Model
         public string GetPatternSummary()
         {
             const string spacer = "\n/////////////////////\n";
-            string messsage = "";
-            messsage += "InputMap:\n" + GetMatrixVisualization(indexGrid, mapSize, mapHeight, mapSize) + spacer + spacer;
-
-            messsage += "Pattern Info:\n" + spacer;
+            string message = "";
+            message += "InputMap:\n" + GetMatrixVisualization(indexGrid, mapSize, mapHeight, mapSize) + spacer + spacer;
+            message += "Number of unique patterns: " + patterns.Length + "\n";
+            message += "Pattern Info:\n" + spacer;
             foreach (PatternInfo pattern in patterns)
             {
                 string patternMessage = "Pattern " + pattern.id + ":\n";
@@ -459,10 +460,10 @@ namespace WFC_Model
                 patternMessage += "Neigbours:\n" + GetNeighboursVisualization(pattern.neigbourIndices) + "\n";
 
 
-                messsage += patternMessage + spacer;
+                message += patternMessage + spacer;
             }
 
-            return messsage;
+            return message;
         }
         public PatternInfo[] GetPatternInfo()
         {

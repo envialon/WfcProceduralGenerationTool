@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 namespace WFC_Model
 {
-    
+    // depht or wide mode 
     public class WfcSolver
     {
         public int width;
@@ -239,7 +239,13 @@ namespace WFC_Model
             //UnityEngine.Debug.Log(msg);
         }
 
-        
+        public void ManualCollapse(Position pos, int encodedTile)
+        {
+            //get all possible patterns that place that tile
+            //remove all of the patterns that don't place that tile
+            //propagate
+        }
+
         public Tilemap Generate()
         {
             int cellsToBeCollapsed = width * height * depth;
