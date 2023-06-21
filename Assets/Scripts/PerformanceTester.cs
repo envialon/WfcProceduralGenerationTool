@@ -20,8 +20,10 @@ public class PerformanceTester : MonoBehaviour
     private List<List<long>> trainingTimeTable = new List<List<long>>();
     private List<List<long>> generationTimeTable = new List<List<long>>();
 
-    private int patternSize = 3;
+    private int patternSize = 2;
     private Vector3Int outputSize = new Vector3Int(5, 5, 5);
+
+    public string summary;
 
     private void TestTilemap(int tilemapIndex, string name, bool enableRotations, bool enableReflections)
     {
@@ -63,6 +65,14 @@ public class PerformanceTester : MonoBehaviour
             AssetDatabase.Refresh();
         }
     }
+
+    private void SerializeSummary()
+    {
+        string path = "Assets/Logs/Summary.txt";
+        System.IO.File.WriteAllText(path, summary);
+        AssetDatabase.Refresh();
+    }
+
 
     private string TableToString(List<List<long>> table)
     {
@@ -147,6 +157,7 @@ public class PerformanceTester : MonoBehaviour
         averageTrainingTime = averageTrainingTime / numberOfTests;
 
         string summary = stm.name + "\t";
+        summary += patternSize + "\t";
         summary += numberOfPatterns + "\t";
         summary += enableRotations + "\t";
         summary += enableReflections + "\t";
@@ -159,7 +170,7 @@ public class PerformanceTester : MonoBehaviour
 
     private string GetHeader()
     {
-        return "Tilemap\tNumberOfPatterns\tEnableRotation\tEnableReflection\tNumberOfTests\tOutputSize\tAverageTrainingTime\tAverageGenerationTime\n";
+        return "Tilemap\tPatternSize\tNumberOfPatterns\tEnableRotation\tEnableReflection\tNumberOfTests\tOutputSize\tAverageTrainingTime\tAverageGenerationTime\n";
     }
 
     public void TestAllNTimes()
@@ -167,10 +178,15 @@ public class PerformanceTester : MonoBehaviour
         const int numberOfTests = 1;
         Vector3Int[] sizes = {
             new Vector3Int(5, 5, 5),
-            new Vector3Int(10,10,10)
+            new Vector3Int(10,10,10), 
+            new Vector3Int(11, 11, 11),
+            new Vector3Int(12, 12, 12),
+            new Vector3Int(13, 13, 13),
+            new Vector3Int(14, 14, 14),
+            new Vector3Int(15, 15, 15),
         };
 
-        string summary = GetHeader();
+        summary = GetHeader();
         for (int i = 0; i < sizes.Length; i++)
         {
             foreach (SerializableTilemap stm in tilemapsToTest)
@@ -198,6 +214,7 @@ public class PerformanceTester : MonoBehaviour
             }
         }
 
+        SerializeSummary();
         UnityEngine.Debug.Log(summary);
     }
 
