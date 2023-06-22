@@ -11,11 +11,16 @@ namespace WFC_Model
         public int depth;
 
         private Random random = new Random();
-        public Cell[,,] cellMap;
+        public Cell[] cellMap;
+
+
 
         private PatternInfo[] patternInfo;
         private int numberOfPatterns;
         private int collapsedCount = 0;
+
+        private int yOffset;
+        private int zOffset;
 
         private Queue<RemovalUpdate> removalQueue;
 
@@ -42,14 +47,17 @@ namespace WFC_Model
         {
             int[,] enablerCountTemplate = InitialEnablerCount();
 
-            cellMap = new Cell[width, height, depth];
-            for (int i = 0; i < width; i++)
+            yOffset = width;
+            zOffset = width * height;
+
+            cellMap = new Cell[width * height * depth];
+            for (int x = 0; x < width; x++)
             {
-                for (int j = 0; j < depth; j++)
+                for (int z = 0; z < depth; z++)
                 {
-                    for (int k = 0; k < height; k++)
+                    for (int y = 0; y < height; y++)
                     {
-                        cellMap[i, k, j] = new Cell(Enumerable.Range(0, patternInfo.Length).ToArray(), patternInfo, enablerCountTemplate);
+                        cellMap[x + y * yOffset + z * zOffset] = new Cell(Enumerable.Range(0, patternInfo.Length).ToArray(), patternInfo, enablerCountTemplate);
                     }
                 }
             }
@@ -91,17 +99,17 @@ namespace WFC_Model
             float minEntropy = float.MaxValue;
             Position pos = new Position();
             //for now, lineal search, must optimize later
-            for (int i = 0; i < width; i++)
+            for (int x = 0; x < width; x++)
             {
-                for (int j = 0; j < depth; j++)
+                for (int z = 0; z < depth; z++)
                 {
-                    for (int k = 0; k < height; k++)
+                    for (int y = 0; y < height; y++)
                     {
-                        if (!cellMap[i, k, j].collapsed &&
-                            minEntropy > cellMap[i, k, j].entrophy)
+                        if (!cellMap[x + y * yOffset + z * zOffset].collapsed &&
+                            minEntropy > cellMap[x + y * yOffset + z * zOffset].entrophy)
                         {
-                            minEntropy = cellMap[i, k, j].entrophy;
-                            pos = new Position(i, k, j);
+                            minEntropy = cellMap[x + y * yOffset + z * zOffset].entrophy;
+                            pos = new Position(x, y, z);
                         }
                     }
                 }
@@ -112,13 +120,13 @@ namespace WFC_Model
         private void PrintCellEntrophy()
         {
             string msg = "";
-            for (int i = 0; i < width; i++)
+            for (int x = 0; x < width; x++)
             {
-                for (int j = 0; j < depth; j++)
+                for (int z = 0; z < depth; z++)
                 {
-                    for (int k = 0; k < height; k++)
+                    for (int y = 0; y < height; y++)
                     {
-                        msg += cellMap[i, k, j].ToString() + " ";
+                        msg += cellMap[x + y * yOffset + z * zOffset].ToString() + " ";
                     }
                 }
                 msg += "\n";
@@ -133,25 +141,25 @@ namespace WFC_Model
             int collapsedPattern = CollapseBasedOnPatternFrecuency(candidatePosition);
             return (candidatePosition, collapsedPattern);
         }
-                
+
         //we can optimize this:
         private int CollapseBasedOnPatternFrecuency(Position pos)
         {
-            int[] candidatePatternIndices = cellMap[pos.x, pos.y, pos.z].possiblePatterns.ToArray();
+            int[] candidatePatternIndices = cellMap[pos.x + pos.y * yOffset + pos.z * zOffset].possiblePatterns.ToArray();
             int numberOfCandidates = candidatePatternIndices.Length;
 
 
             if (numberOfCandidates == 0)
             {
                 collapsedCount++;
-                cellMap[pos.x, pos.y, pos.z].CollapseOn(0);
+                cellMap[pos.x + pos.y * yOffset + pos.z * zOffset].CollapseOn(0);
                 return 0;
             }
 
             if (numberOfCandidates == 1)
             {
                 collapsedCount++;
-                cellMap[pos.x, pos.y, pos.z].CollapseOn(candidatePatternIndices[0]);
+                cellMap[pos.x + pos.y * yOffset + pos.z * zOffset].CollapseOn(candidatePatternIndices[0]);
                 return candidatePatternIndices[0];
             }
 
@@ -186,14 +194,13 @@ namespace WFC_Model
 
             collapsedCount++;
 
-            cellMap[pos.x, pos.y, pos.z].CollapseOn(candidatePatternIndices[collapsedIndex]);
+            cellMap[pos.x + pos.y * yOffset + pos.z * zOffset].CollapseOn(candidatePatternIndices[collapsedIndex]);
             return candidatePatternIndices[collapsedIndex];
         }
 
         private void RemoveUncompatiblePatternsInNeighbour(RemovalUpdate removalUpdate, Position neighbourCoord, int direction)
         {
-            Cell neighbourCell = cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z];
-            int[,] neighbourEnablers = cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].tileEnablerCountsByDirection;
+            int[,] neighbourEnablers = cellMap[neighbourCoord.x + neighbourCoord.y * yOffset + neighbourCoord.z * zOffset].tileEnablerCountsByDirection;
             HashSet<int> compatiblePatterns = patternInfo[removalUpdate.patternIndex].GetCompatiblesInDirection((Direction)direction);
 
             foreach (int compatiblePattern in compatiblePatterns)
@@ -204,16 +211,16 @@ namespace WFC_Model
                 neighbourEnablers[compatiblePattern, direction]--;
 
                 if (neighbourEnablers[compatiblePattern, direction] == 0 &&
-                    cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].possiblePatterns.Contains(compatiblePattern))
+                    cellMap[neighbourCoord.x + neighbourCoord.y * yOffset + neighbourCoord.z * zOffset].possiblePatterns.Contains(compatiblePattern))
                 {
 
-                    cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].RemovePattern(compatiblePattern, patternInfo);
+                    cellMap[neighbourCoord.x + neighbourCoord.y * yOffset + neighbourCoord.z * zOffset].RemovePattern(compatiblePattern, patternInfo);
 
                     // collapse cell when only one pattern is left
-                    if (cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].possiblePatterns.Count == 1)
+                    if (cellMap[neighbourCoord.x + neighbourCoord.y * yOffset + neighbourCoord.z * zOffset].possiblePatterns.Count == 1)
                     {
-                        int lastPattern = cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].possiblePatterns.ToArray()[0];
-                        cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].CollapseOn(lastPattern);
+                        int lastPattern = cellMap[neighbourCoord.x + neighbourCoord.y * yOffset + neighbourCoord.z * zOffset].possiblePatterns.ToArray()[0];
+                        cellMap[neighbourCoord.x + neighbourCoord.y * yOffset + neighbourCoord.z * zOffset].CollapseOn(lastPattern);
                         collapsedCount++;
                     }
 
@@ -237,7 +244,7 @@ namespace WFC_Model
                 {
                     Position neighbourCoord = removalUpdate.position + Position.directions[direction];
 
-                    if (!PositionIsValid(neighbourCoord) || cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].collapsed) continue;
+                    if (!PositionIsValid(neighbourCoord) || cellMap[neighbourCoord.x + neighbourCoord.y * yOffset + neighbourCoord.z * zOffset].collapsed) continue;
 
                     RemoveUncompatiblePatternsInNeighbour(removalUpdate, neighbourCoord, direction);
                 }
@@ -271,15 +278,15 @@ namespace WFC_Model
         public Tilemap GetOutputTileIndexGrid()
         {
             Tilemap output = new Tilemap(width, height, depth);
-            for (int i = 0; i < width; i++)
+            for (int x = 0; x < width; x++)
             {
-                for (int j = 0; j < depth; j++)
+                for (int z = 0; z < depth; z++)
                 {
-                    for (int k = 0; k < height; k++)
+                    for (int y = 0; y < height; y++)
                     {
-                        int patternIndex = cellMap[i, k, j].GetCollapsedPatternIndex();
+                        int patternIndex = cellMap[x + y * yOffset + z * zOffset].GetCollapsedPatternIndex();
                         output.SetTile(InputReader.DecodeTile(patternInfo[patternIndex].GetEncodedTileIndex()),
-                                       i, k, j);
+                                       x, y, z);
                     }
                 }
             }
