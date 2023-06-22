@@ -96,10 +96,9 @@ namespace WFC_Model
 
         public void CollapseOn(int patternToCollapse)
         {
-            possiblePatterns.RemoveWhere(x => x != patternToCollapse);
+            // possiblePatterns.RemoveWhere(x => x != patternToCollapse);
             entrophy = 0;
-            collapsed = true;
-            collapsedIndex = patternToCollapse;
+            collapsed = true;            
             collapsedIndex = patternToCollapse;
         }
 

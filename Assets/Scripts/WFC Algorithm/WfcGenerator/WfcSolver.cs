@@ -133,7 +133,7 @@ namespace WFC_Model
             int collapsedPattern = CollapseBasedOnPatternFrecuency(candidatePosition);
             return (candidatePosition, collapsedPattern);
         }
-
+                
         //we can optimize this:
         private int CollapseBasedOnPatternFrecuency(Position pos)
         {
@@ -209,7 +209,13 @@ namespace WFC_Model
 
                     cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].RemovePattern(compatiblePattern, patternInfo);
 
-                    //CHECK FOR NO MORE POSSIBLE TILES NOW
+                    // collapse cell when only one pattern is left
+                    if (cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].possiblePatterns.Count == 1)
+                    {
+                        int lastPattern = cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].possiblePatterns.ToArray()[0];
+                        cellMap[neighbourCoord.x, neighbourCoord.y, neighbourCoord.z].CollapseOn(lastPattern);
+                        collapsedCount++;
+                    }
 
                     removalQueue.Enqueue(new RemovalUpdate(neighbourCoord, compatiblePattern));
                 }
