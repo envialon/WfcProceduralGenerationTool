@@ -70,7 +70,7 @@ namespace WFC_Model
         float sumOfRelativeFreqLog2;
         int collapsedIndex;
 
-        public Cell(int[] possiblePatterns, PatternInfo[] patternInfo, int[,] tileEnablerTemplate, int collapsedValue = -1)
+        public Cell(int[] possiblePatterns, in PatternInfo[] patternInfo, in int[,] tileEnablerTemplate, int collapsedValue = -1)
         {
             this.possiblePatterns = new HashSet<int>(possiblePatterns);
             sumOfRelativeFreq = 0;
@@ -80,10 +80,8 @@ namespace WFC_Model
             collapsed = false;
             for (int i = 0; i < possiblePatterns.Length; i++)
             {
-                float freq = patternInfo[possiblePatterns[i]].relativeFrecuency;
-                sumOfRelativeFreq += freq;
-                //im doing it different from the rust resource, might be an error:
-                sumOfRelativeFreqLog2 += freq * (float)Math.Log(freq, 2);
+                sumOfRelativeFreq += patternInfo[possiblePatterns[i]].relativeFrecuency;
+                sumOfRelativeFreqLog2 += patternInfo[possiblePatterns[i]].freqTimesFreqLog2;
             }
             tileEnablerCountsByDirection = new int[tileEnablerTemplate.GetLength(0), tileEnablerTemplate.GetLength(1)];
             Buffer.BlockCopy(tileEnablerTemplate, 0, tileEnablerCountsByDirection, 0, tileEnablerCountsByDirection.Length * sizeof(int));
@@ -105,25 +103,11 @@ namespace WFC_Model
             collapsedIndex = patternToCollapse;
         }
 
-        private void CalculateSumOfRelativeFrecuencies(PatternInfo[] patternInfo)
+        private void UpdateFrequencies(int removedPatternIndex, in PatternInfo[] patternInfo)
         {
-            sumOfRelativeFreq = 0;
-            foreach (int i in possiblePatterns)
-            {
-                float freq = patternInfo[i].relativeFrecuency;
-                sumOfRelativeFreq += freq;
-            }
-        }
-
-        private void CalculateSumOfPatternLogWeights(PatternInfo[] patternInfo)
-        {
-            sumOfRelativeFreqLog2 = 0;
-            foreach (int i in possiblePatterns)
-            {
-                float freq = patternInfo[i].relativeFrecuency;
-                sumOfRelativeFreqLog2 += freq * (float)Math.Log(freq, 2);
-            }
-        }
+            sumOfRelativeFreq -= patternInfo[removedPatternIndex].relativeFrecuency;
+            sumOfRelativeFreqLog2 -= patternInfo[removedPatternIndex].freqTimesFreqLog2;
+        }      
 
         private void CalculateEntrophy()
         {
@@ -131,17 +115,12 @@ namespace WFC_Model
             entrophy = (float)(Math.Log(sumOfRelativeFreq, 2) - (sumOfRelativeFreqLog2 / sumOfRelativeFreq) + (rand.NextDouble() * 0.001f));
         }
 
-        public void RemovePattern(int patternIndex, PatternInfo[] patternInfo)
+        public void RemovePattern(int patternIndex, in PatternInfo[] patternInfo)
         {
             if (possiblePatterns.Contains(patternIndex))
             {
                 possiblePatterns.Remove(patternIndex);
-                //float freq = patternInfo[patternIndex].relativeFrecuency;
-                //sumOfRelativeFreq -= freq;
-                //sumOfPatternLogWeights -= patternInfo[patternIndex].relativeFrecuencyLog2; // might be worth to cach freq * log(freq,2) somewhere
-
-                CalculateSumOfRelativeFrecuencies(patternInfo);
-                CalculateSumOfPatternLogWeights(patternInfo);
+                UpdateFrequencies(patternIndex, patternInfo);
                 CalculateEntrophy();
             }
         }
@@ -177,6 +156,7 @@ namespace WFC_Model
         public int frecuency;
         public float relativeFrecuency;
         public float relativeFrecuencyLog2;
+        public float freqTimesFreqLog2;
         public int[] pattern;
         public int patternSize;
         public int patternHeight;
@@ -195,6 +175,7 @@ namespace WFC_Model
             this.patternRotation = patternRotation;
             relativeFrecuency = 0;
             relativeFrecuencyLog2 = 0;
+            freqTimesFreqLog2 = 0;
             neigbourIndices = new Dictionary<Direction, HashSet<int>>
             {
                 { Direction.north, new HashSet<int>() },
@@ -202,7 +183,7 @@ namespace WFC_Model
                 { Direction.west, new HashSet<int>() },
                 { Direction.east, new HashSet<int>() },
                 { Direction.up, new HashSet<int>() },
-                {Direction.down, new HashSet<int>() }
+                { Direction.down, new HashSet<int>() }
             };
         }
 
@@ -220,12 +201,13 @@ namespace WFC_Model
         {
             relativeFrecuency = frecuency / totalPatterns;
             relativeFrecuencyLog2 = (float)(Math.Log(relativeFrecuency, 2));
+            freqTimesFreqLog2 = relativeFrecuency * relativeFrecuencyLog2;
         }
 
         public int GetEncodedTileIndex()
         {
             return pattern[0];
-        } 
+        }
 
         public override string ToString()
         {

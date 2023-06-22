@@ -187,30 +187,32 @@ public class PerformanceTester : MonoBehaviour
         };
 
         summary = GetHeader();
-        for (int i = 0; i < sizes.Length; i++)
-        {
-            foreach (SerializableTilemap stm in tilemapsToTest)
+        for(int j =0; patternSize < 4; patternSize++) {
+            for (int i = 0; i < sizes.Length; i++)
             {
-                summary += TestTilemapNTimes(stm,
-                                             sizes[i],
-                                             patternSize,
-                                             numberOfTests,
-                                             false, false);
-                summary += TestTilemapNTimes(stm,
-                                            sizes[i],
-                                            patternSize,
-                                            numberOfTests,
-                                            false, true);
-                summary += TestTilemapNTimes(stm,
-                                            sizes[i],
-                                            patternSize,
-                                            numberOfTests,
-                                            true, false);
-                summary += TestTilemapNTimes(stm,
-                                            sizes[i],
-                                            patternSize,
-                                            numberOfTests,
-                                            true, true);
+                foreach (SerializableTilemap stm in tilemapsToTest)
+                {
+                    summary += TestTilemapNTimes(stm,
+                                                 sizes[i],
+                                                 patternSize,
+                                                 numberOfTests,
+                                                 false, false);
+                    summary += TestTilemapNTimes(stm,
+                                                sizes[i],
+                                                patternSize,
+                                                numberOfTests,
+                                                false, true);
+                    summary += TestTilemapNTimes(stm,
+                                                sizes[i],
+                                                patternSize,
+                                                numberOfTests,
+                                                true, false);
+                    summary += TestTilemapNTimes(stm,
+                                                sizes[i],
+                                                patternSize,
+                                                numberOfTests,
+                                                true, true);
+                }
             }
         }
 

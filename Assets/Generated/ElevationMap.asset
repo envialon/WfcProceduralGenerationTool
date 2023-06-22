@@ -15,7 +15,7 @@ MonoBehaviour:
   tilemap:
     width: 8
     depth: 8
-    height: 2
+    height: 1
     map:
     - id: 0
       rotation: 0
@@ -27,9 +27,9 @@ MonoBehaviour:
       rotation: 0
     - id: 0
       rotation: 0
-    - id: 1
+    - id: 3
       rotation: 0
-    - id: 1
+    - id: 3
       rotation: 0
     - id: 0
       rotation: 0
@@ -39,111 +39,9 @@ MonoBehaviour:
       rotation: 0
     - id: 0
       rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 1
-      rotation: 0
-    - id: 1
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 1
-      rotation: 0
-    - id: 1
-      rotation: 0
-    - id: 1
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
+    - id: 3
       rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 1
-      rotation: 0
-    - id: 1
-      rotation: 0
-    - id: 1
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
+    - id: 3
       rotation: 0
     - id: 0
       rotation: 0
@@ -151,40 +49,18 @@ MonoBehaviour:
       rotation: 0
     - id: 0
       rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 1
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
+    - id: 3
       rotation: 0
-    - id: 0
+    - id: 3
       rotation: 0
-    - id: 0
+    - id: 3
       rotation: 0
     - id: 0
       rotation: 0
     - id: 0
       rotation: 0
     - id: 0
-      rotation: 0
-    - id: 1
-      rotation: 0
-    - id: 1
       rotation: 0
-    - id: 1
-      rotation: 0
     - id: 0
       rotation: 0
     - id: 0
@@ -201,23 +77,21 @@ MonoBehaviour:
       rotation: 0
     - id: 0
       rotation: 0
-    - id: 0
+    - id: 3
       rotation: 0
-    - id: 0
+    - id: 3
       rotation: 0
     - id: 0
       rotation: 0
     - id: 0
-      rotation: 0
-    - id: 1
       rotation: 0
     - id: 0
       rotation: 0
     - id: 0
       rotation: 0
-    - id: 0
+    - id: 3
       rotation: 0
-    - id: 0
+    - id: 3
       rotation: 0
     - id: 0
       rotation: 0
@@ -225,11 +99,11 @@ MonoBehaviour:
       rotation: 0
     - id: 0
       rotation: 0
-    - id: 0
+    - id: 3
       rotation: 0
-    - id: 0
+    - id: 3
       rotation: 0
-    - id: 0
+    - id: 3
       rotation: 0
     - id: 0
       rotation: 0
@@ -239,7 +113,7 @@ MonoBehaviour:
       rotation: 0
     - id: 0
       rotation: 0
-    - id: 0
+    - id: 3
       rotation: 0
     - id: 0
       rotation: 0
@@ -255,8 +129,6 @@ MonoBehaviour:
       rotation: 0
     - id: 0
       rotation: 0
-    - id: 1
-      rotation: 0
     - id: 0
       rotation: 0
     - id: 0
@@ -271,5 +143,5 @@ MonoBehaviour:
       rotation: 0
     - id: 0
       rotation: 0
-    - id: 0
+    - id: 3
       rotation: 0
