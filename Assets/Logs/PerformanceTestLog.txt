@@ -1,0 +1,40 @@
+Tilemap: ElevationMap
+Input dimensions: { 8, 1, 8}
+Pattern size: 2
+Trained with reflections: False
+Trained with rotations: False
+Output size: (5, 5, 5)
+Training Time: 2
+GenerationTime: 15
+
+
+Tilemap: ElevationMap
+Input dimensions: { 8, 1, 8}
+Pattern size: 2
+Trained with reflections: True
+Trained with rotations: False
+Output size: (5, 5, 5)
+Training Time: 10
+GenerationTime: 88
+
+
+Tilemap: ElevationMap
+Input dimensions: { 8, 1, 8}
+Pattern size: 2
+Trained with reflections: False
+Trained with rotations: True
+Output size: (5, 5, 5)
+Training Time: 2
+GenerationTime: 8
+
+
+Tilemap: ElevationMap
+Input dimensions: { 8, 1, 8}
+Pattern size: 2
+Trained with reflections: True
+Trained with rotations: True
+Output size: (5, 5, 5)
+Training Time: 3
+GenerationTime: 58
+
+

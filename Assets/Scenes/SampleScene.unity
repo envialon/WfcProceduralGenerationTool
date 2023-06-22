@@ -352,11 +352,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e363aba9cef72140bd56513a684440e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  patternSize: 2
+  patternSize: 3
   inputMapSize: 10
-  inputMapHeight: 3
+  inputMapHeight: 1
   selectedTile: 3
-  outputSize: {x: 8, y: 2, z: 8}
+  outputSize: {x: 20, y: 1, z: 20}
   selectedLayer: 1
   tileSet: {fileID: 11400000, guid: e6ef6a49b8ab6d242a58b8cba0362832, type: 2}
 --- !u!156049354 &1339589964

@@ -43,23 +43,19 @@ namespace WFC_Model
 
     public struct RemovalUpdate
     {
-        public int patternIndex;
+        public HashSet<int> patternIndicesRemoved;
         public Position position;
 
-        public RemovalUpdate(Position position, int patternIndex)
+        public RemovalUpdate(Position position, HashSet<int> patternIndicesRemoved)
         {
-            this.patternIndex = patternIndex;
+            this.patternIndicesRemoved = patternIndicesRemoved;
             this.position = position;
-        }
-
-        public override string ToString()
-        {
-            return position.ToString() + ", " + patternIndex;
         }
     }
 
     public class Cell : IComparable
     {
+        public Position position;
         public HashSet<int> possiblePatterns;
         //first index is the pattern, second is the direction
         public int[,] tileEnablerCountsByDirection;
@@ -70,8 +66,9 @@ namespace WFC_Model
         float sumOfRelativeFreqLog2;
         int collapsedIndex;
 
-        public Cell(int[] possiblePatterns, in PatternInfo[] patternInfo, in int[,] tileEnablerTemplate, int collapsedValue = -1)
+        public Cell(Position pos, int[] possiblePatterns, in PatternInfo[] patternInfo, in int[,] tileEnablerTemplate, int collapsedValue = -1)
         {
+            this.position = pos;
             this.possiblePatterns = new HashSet<int>(possiblePatterns);
             sumOfRelativeFreq = 0;
             sumOfRelativeFreqLog2 = 0;
@@ -96,8 +93,8 @@ namespace WFC_Model
 
         public void CollapseOn(int patternToCollapse)
         {
-            entrophy = 0;
-            collapsed = true;            
+            entrophy = float.MaxValue;
+            collapsed = true;
             collapsedIndex = patternToCollapse;
         }
 
@@ -105,7 +102,7 @@ namespace WFC_Model
         {
             sumOfRelativeFreq -= patternInfo[removedPatternIndex].relativeFrecuency;
             sumOfRelativeFreqLog2 -= patternInfo[removedPatternIndex].freqTimesFreqLog2;
-        }      
+        }
 
         private void CalculateEntrophy()
         {
