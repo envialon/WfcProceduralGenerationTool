@@ -101,16 +101,7 @@ namespace WFC_Model
         {
             int lessEntrophyIndex = uncollapsedCellIndices.Aggregate((current, next) => cellMap[current].entrophy <= cellMap[next].entrophy ? current : next);
 
-            Cell linq = cellMap[lessEntrophyIndex];
-
-            Cell minCell = cellMap.Min();
-
-            if (minCell.entrophy != linq.entrophy)
-            {
-                throw new Exception();
-            }
-
-            return minCell.position;
+            return cellMap[lessEntrophyIndex].position;
         }
 
         private void CollapseCell(int cellIndex, int patternToCollapse)
@@ -227,36 +218,37 @@ namespace WFC_Model
             int neighbourCellIndex = neighbourCoord.x + neighbourCoord.y * yOffset + neighbourCoord.z * zOffset;
             int[,] neighbourEnablers = cellMap[neighbourCellIndex].tileEnablerCountsByDirection;
 
-
+            List<int> preCalculated = new List<int>();
 
             foreach (int patternIndex in removalUpdate.patternIndicesRemoved)
             {
-                HashSet<int> compatiblePatterns = patternInfo[patternIndex].GetCompatiblesInDirection((Direction)direction);
+                preCalculated.AddRange(patternInfo[patternIndex].GetCompatiblesInDirection((Direction)direction));
+            }
 
 
 
-                foreach (int compatiblePattern in compatiblePatterns)
+            foreach (int compatiblePattern in preCalculated)
+            {
+                int oppositeDirection = (direction + 2) % 4;
+
+                neighbourEnablers[compatiblePattern, direction]--;
+
+                if (neighbourEnablers[compatiblePattern, direction] == 0 &&
+                    cellMap[neighbourCellIndex].possiblePatterns.Contains(compatiblePattern))
                 {
-                    int oppositeDirection = (direction + 2) % 4;
 
-                    neighbourEnablers[compatiblePattern, direction]--;
+                    cellMap[neighbourCellIndex].RemovePattern(compatiblePattern, patternInfo);
 
-                    if (neighbourEnablers[compatiblePattern, direction] == 0 &&
-                        cellMap[neighbourCellIndex].possiblePatterns.Contains(compatiblePattern))
+                    // collapse cell when only one pattern is left
+                    if (cellMap[neighbourCellIndex].possiblePatterns.Count == 1)
                     {
-
-                        cellMap[neighbourCellIndex].RemovePattern(compatiblePattern, patternInfo);
-
-                        // collapse cell when only one pattern is left
-                        if (cellMap[neighbourCellIndex].possiblePatterns.Count == 1)
-                        {
-                            int lastPattern = cellMap[neighbourCellIndex].possiblePatterns.ToArray()[0];
-                            CollapseCell(neighbourCellIndex, lastPattern);
-                        }
-                        AddRemovalUpdate(neighbourCoord, compatiblePattern);
+                        int lastPattern = cellMap[neighbourCellIndex].possiblePatterns.ToArray()[0];
+                        CollapseCell(neighbourCellIndex, lastPattern);
                     }
+                    AddRemovalUpdate(neighbourCoord, compatiblePattern);
                 }
             }
+
         }
 
 

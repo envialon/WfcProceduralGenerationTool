@@ -187,7 +187,7 @@ public class PerformanceTester : MonoBehaviour
         };
 
         summary = GetHeader();
-        for(int j =0; patternSize < 4; patternSize++) {
+        for(patternSize =2; patternSize < 3; patternSize++) {
             for (int i = 0; i < sizes.Length; i++)
             {
                 foreach (SerializableTilemap stm in tilemapsToTest)
@@ -219,7 +219,7 @@ public class PerformanceTester : MonoBehaviour
         SerializeSummary();
         UnityEngine.Debug.Log(summary);
     }
-
+    
 }
 
 #if UNITY_EDITOR 
