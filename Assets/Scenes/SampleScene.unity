@@ -168,9 +168,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tilemapsToTest:
-  - {fileID: 11400000, guid: 7d0c445edade56b4fbe45cecf9a1e566, type: 2}
+  - {fileID: 11400000, guid: 9b5e9823ccf46d045ba42f3db8aed77f, type: 2}
   serializeLog: 1
-  summary: "Tilemap\tPatternSize\tNumberOfPatterns\tEnableRotation\tEnableReflection\tNumberOfTests\tOutputSize\tAverageTrainingTime\tAverageGenerationTime\n"
+  summary: "Tilemap\tPatternSize\tNumberOfPatterns\tEnableRotation\tEnableReflection\tNumberOfTests\tOutputSize\tAverageTrainingTime\tAverageGenerationTime\nRooms\t2\t54\tFalse\tFalse\t1\t(5,
+    5, 5)\t0.004\t0.053\t\nRooms\t2\t86\tFalse\tTrue\t1\t(5, 5, 5)\t0.006\t0.106\t\nRooms\t2\t155\tTrue\tFalse\t1\t(5,
+    5, 5)\t0.011\t0.225\t\nRooms\t2\t255\tTrue\tTrue\t1\t(5, 5, 5)\t0.057\t0.461\t\nRooms\t2\t54\tFalse\tFalse\t1\t(10,
+    10, 10)\t0.004\t0.525\t\nRooms\t2\t86\tFalse\tTrue\t1\t(10, 10, 10)\t0.006\t0.924\t\nRooms\t2\t155\tTrue\tFalse\t1\t(10,
+    10, 10)\t0.038\t2.09\t\nRooms\t2\t255\tTrue\tTrue\t1\t(10, 10, 10)\t0.036\t4.458\t\nRooms\t2\t54\tFalse\tFalse\t1\t(11,
+    11, 11)\t0.004\t0.791\t\nRooms\t2\t86\tFalse\tTrue\t1\t(11, 11, 11)\t0.006\t1.366\t\nRooms\t2\t155\tTrue\tFalse\t1\t(11,
+    11, 11)\t0.011\t3.027\t\nRooms\t2\t255\tTrue\tTrue\t1\t(11, 11, 11)\t0.04\t5.974\t\nRooms\t2\t54\tFalse\tFalse\t1\t(12,
+    12, 12)\t0.004\t1.001\t\nRooms\t2\t86\tFalse\tTrue\t1\t(12, 12, 12)\t0.006\t1.709\t\nRooms\t2\t155\tTrue\tFalse\t1\t(12,
+    12, 12)\t0.02\t3.817\t\nRooms\t2\t255\tTrue\tTrue\t1\t(12, 12, 12)\t0.035\t7.454\t\nRooms\t2\t54\tFalse\tFalse\t1\t(13,
+    13, 13)\t0.005\t1.209\t\nRooms\t2\t86\tFalse\tTrue\t1\t(13, 13, 13)\t0.006\t2.104\t\nRooms\t2\t155\tTrue\tFalse\t1\t(13,
+    13, 13)\t0.012\t4.428\t\nRooms\t2\t255\tTrue\tTrue\t1\t(13, 13, 13)\t0.035\t9.123\t\nRooms\t2\t54\tFalse\tFalse\t1\t(14,
+    14, 14)\t0.004\t1.512\t\nRooms\t2\t86\tFalse\tTrue\t1\t(14, 14, 14)\t0.006\t2.65\t\nRooms\t2\t155\tTrue\tFalse\t1\t(14,
+    14, 14)\t0.022\t5.555\t\nRooms\t2\t255\tTrue\tTrue\t1\t(14, 14, 14)\t0.034\t11.576\t\nRooms\t2\t54\tFalse\tFalse\t1\t(15,
+    15, 15)\t0.004\t1.92\t\nRooms\t2\t86\tFalse\tTrue\t1\t(15, 15, 15)\t0.006\t3.302\t\nRooms\t2\t155\tTrue\tFalse\t1\t(15,
+    15, 15)\t0.014\t6.921\t\nRooms\t2\t255\tTrue\tTrue\t1\t(15, 15, 15)\t0.035\t14.237\t\nRooms\t3\t94\tFalse\tFalse\t1\t(5,
+    5, 5)\t0.011\t0.103\t\nRooms\t3\t168\tFalse\tTrue\t1\t(5, 5, 5)\t0.018\t0.216\t\nRooms\t3\t357\tTrue\tFalse\t1\t(5,
+    5, 5)\t0.057\t0.785\t\nRooms\t3\t645\tTrue\tTrue\t1\t(5, 5, 5)\t0.207\t2.211\t\nRooms\t3\t94\tFalse\tFalse\t1\t(10,
+    10, 10)\t0.02\t0.742\t\nRooms\t3\t168\tFalse\tTrue\t1\t(10, 10, 10)\t0.03\t2.292\t\nRooms\t3\t357\tTrue\tFalse\t1\t(10,
+    10, 10)\t0.098\t6.93\t\nRooms\t3\t645\tTrue\tTrue\t1\t(10, 10, 10)\t0.264\t18.262\t\nRooms\t3\t94\tFalse\tFalse\t1\t(11,
+    11, 11)\t0.011\t1.551\t\nRooms\t3\t168\tFalse\tTrue\t1\t(11, 11, 11)\t0.017\t3.116\t\nRooms\t3\t357\tTrue\tFalse\t1\t(11,
+    11, 11)\t0.094\t9.432\t\nRooms\t3\t645\tTrue\tTrue\t1\t(11, 11, 11)\t0.228\t24.188\t\nRooms\t3\t94\tFalse\tFalse\t1\t(12,
+    12, 12)\t0.023\t1.98\t\nRooms\t3\t168\tFalse\tTrue\t1\t(12, 12, 12)\t0.028\t4.194\t\nRooms\t3\t357\tTrue\tFalse\t1\t(12,
+    12, 12)\t0.09\t12.36\t\nRooms\t3\t645\tTrue\tTrue\t1\t(12, 12, 12)\t0.242\t31.687\t\nRooms\t3\t94\tFalse\tFalse\t1\t(13,
+    13, 13)\t0.011\t2.623\t\nRooms\t3\t168\tFalse\tTrue\t1\t(13, 13, 13)\t0.018\t5.359\t\nRooms\t3\t357\tTrue\tFalse\t1\t(13,
+    13, 13)\t0.062\t16.102\t\nRooms\t3\t645\tTrue\tTrue\t1\t(13, 13, 13)\t0.21\t40.348\t\nRooms\t3\t94\tFalse\tFalse\t1\t(14,
+    14, 14)\t0.012\t3.441\t\nRooms\t3\t168\tFalse\tTrue\t1\t(14, 14, 14)\t0.047\t6.904\t\nRooms\t3\t357\tTrue\tFalse\t1\t(14,
+    14, 14)\t0.083\t20.133\t\nRooms\t3\t645\tTrue\tTrue\t1\t(14, 14, 14)\t0.269\t43.786\t\nRooms\t3\t94\tFalse\tFalse\t1\t(15,
+    15, 15)\t0.013\t4.253\t\nRooms\t3\t168\tFalse\tTrue\t1\t(15, 15, 15)\t0.019\t8.764\t\nRooms\t3\t357\tTrue\tFalse\t1\t(15,
+    15, 15)\t0.058\t25.227\t\nRooms\t3\t645\tTrue\tTrue\t1\t(15, 15, 15)\t0.242\t66.418\t\n"
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -295,8 +323,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 8, y: 0, z: 8}
-  m_Center: {x: 4, y: 1, z: 4}
+  m_Size: {x: 10, y: 0, z: 10}
+  m_Center: {x: 5, y: 1, z: 5}
 --- !u!4 &1339589962
 Transform:
   m_ObjectHideFlags: 0
@@ -325,10 +353,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   patternSize: 2
-  inputMapSize: 8
+  inputMapSize: 10
   inputMapHeight: 1
   selectedTile: 3
-  outputSize: {x: 40, y: 1, z: 40}
+  outputSize: {x: 20, y: 1, z: 20}
   selectedLayer: 1
   tileSet: {fileID: 11400000, guid: 43d87efc2f9a6014cb055b492a787204, type: 2}
 --- !u!156049354 &1339589964

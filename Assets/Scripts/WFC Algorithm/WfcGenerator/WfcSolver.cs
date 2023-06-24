@@ -11,7 +11,7 @@ namespace WFC_Model
         public int depth;
 
         private Random random = new Random();
-        public Cell[] cellMap;
+        public Cell[] cellMap;        
 
         public List<int> uncollapsedCellIndices;
 
@@ -43,7 +43,41 @@ namespace WFC_Model
             return result;
         }
 
-        private void InitializeOutputGrid()
+        private int[,] CustomTileEnablerCount(int[] possiblePatterns)
+        {
+            int numberOfDirections = Enum.GetValues(typeof(Direction)).Length;
+            int[,] result = new int[numberOfPatterns, numberOfDirections];
+            
+
+            for (int patternIndex = 0; patternIndex < possiblePatterns.Length; patternIndex++)
+            {
+                for(int direction = 0; direction < numberOfDirections; direction++)
+                {
+                    
+                }
+            }
+
+        }
+
+
+        private Cell InitializedCellWithTile(int encodedTile, Position pos)
+        {
+            HashSet<int> possiblePatternIndexes = new HashSet<int>();
+            for (int i = 0; i < patternInfo.Length; i++)
+            {
+                if (patternInfo[i].GetEncodedTileIndex() == encodedTile)
+                {
+                    possiblePatternIndexes.Add(i);
+                }
+            }
+
+            
+            Cell output = new Cell(pos, possiblePatternIndexes.ToArray(), patternInfo, CustomTileEnablerCount());
+
+            return output;
+        }
+
+        private void InitializeOutputGrid(Tilemap incompleteMap = null)
         {
             int[,] enablerCountTemplate = InitialEnablerCount();
 
@@ -57,7 +91,14 @@ namespace WFC_Model
                 {
                     for (int y = 0; y < height; y++)
                     {
-                        cellMap[x + y * yOffset + z * zOffset] = new Cell(new Position(x, y, z), Enumerable.Range(0, patternInfo.Length).ToArray(), patternInfo, enablerCountTemplate);
+                        if (incompleteMap is not null)
+                        {
+                            cellMap[x + y * yOffset + z * zOffset] = InitializedCellWithTile(incompleteMap.GetEncodedTileAt(x,y,z), new Position(x,y,z));
+                        }
+                        else
+                        {
+                            cellMap[x + y * yOffset + z * zOffset] = new Cell(new Position(x, y, z), Enumerable.Range(0, patternInfo.Length).ToArray(), patternInfo, enablerCountTemplate);
+                        }
                     }
                 }
             }
@@ -135,13 +176,13 @@ namespace WFC_Model
             int collapsedPattern = CollapseBasedOnPatternFrecuency(candidatePosition);
             return (candidatePosition, collapsedPattern);
         }
-        
+
         private int CollapseBasedOnPatternFrecuency(Position pos)
         {
             int cellIndex = pos.x + pos.y * yOffset + pos.z * zOffset;
 
             int[] candidatePatternIndices = cellMap[pos.x + pos.y * yOffset + pos.z * zOffset].possiblePatterns.ToArray();
-            int numberOfCandidates = candidatePatternIndices.Length;                 
+            int numberOfCandidates = candidatePatternIndices.Length;
 
             float[] candidateFrecuencies = new float[numberOfCandidates];
             float sumOfFrecuencies = 0;
@@ -150,7 +191,7 @@ namespace WFC_Model
                 candidateFrecuencies[i] = patternInfo[candidatePatternIndices[i]].relativeFrecuency;
                 sumOfFrecuencies += candidateFrecuencies[i];
             }
-            
+
             int collapsedIndex = -1;
             double randomValue = random.NextDouble();
             randomValue = randomValue * (sumOfFrecuencies);
@@ -266,13 +307,30 @@ namespace WFC_Model
             //Add to the propagation dictionary, 
         }
 
+
+        public Tilemap Generate(Tilemap incompleteMap)
+        {
+            InitializeOutputGrid(incompleteMap);
+
+            int cellsToBeCollapsed = width * height * depth;
+            collapsedCount = 0;
+
+            if(removalDictionary.Count != 0) Propagate();
+
+            while (collapsedCount < cellsToBeCollapsed)
+            {
+                Observe();
+                Propagate();
+            }
+            return GetOutputTileIndexGrid();
+        }
+
         public Tilemap Generate()
         {
             int cellsToBeCollapsed = width * height * depth;
             collapsedCount = 0;
 
-            if (removalDictionary.Count > 0) Propagate();
-            
+
             while (collapsedCount < cellsToBeCollapsed)
             {
                 Observe();

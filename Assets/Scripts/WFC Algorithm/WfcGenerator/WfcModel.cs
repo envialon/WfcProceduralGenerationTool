@@ -15,6 +15,8 @@ namespace WFC_Model
         public bool horizontalPeriodicInput= true;
         public bool verticalPeriodicInput = true;
 
+        public bool dephtFirstPropagation = false;
+        
         public WfcModel(Tilemap data)
         {
             inputReader = new InputReader(data, patternSize);

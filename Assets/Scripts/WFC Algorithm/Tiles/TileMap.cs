@@ -73,6 +73,11 @@ namespace WFC_Model
             map[x + (y * yOffset) + (z * zOffset)].RotateClockwise();
         }
 
+        public int GetEncodedTileAt(int x, int y, int z)
+        {
+            return InputReader.EncodeTile(map[x + (y * yOffset) + (z * zOffset)].id, map[x + (y * yOffset) + (z * zOffset)].rotation);
+        }
+
         public Tile GetTile(int x, int y, int z)
         {
             return map[x + (y * yOffset) + (z * zOffset)];
