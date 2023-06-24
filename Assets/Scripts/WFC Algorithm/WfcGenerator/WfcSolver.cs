@@ -198,14 +198,14 @@ namespace WFC_Model
             int neighbourCellIndex = neighbourCoord.x + neighbourCoord.y * yOffset + neighbourCoord.z * zOffset;
             int[,] neighbourEnablers = cellMap[neighbourCellIndex].tileEnablerCountsByDirection;
 
-            List<int> preCalculated = new List<int>();
+            List<int> compatiblePatternsToRemove = new List<int>();
 
             foreach (int patternIndex in removalUpdate.patternIndicesRemoved)
             {
-                preCalculated.AddRange(patternInfo[patternIndex].GetCompatiblesInDirection((Direction)direction));
+                compatiblePatternsToRemove.AddRange(patternInfo[patternIndex].GetCompatiblesInDirection((Direction)direction));
             }
 
-            foreach (int compatiblePattern in preCalculated)
+            foreach (int compatiblePattern in compatiblePatternsToRemove)
             {
                 //  int oppositeDirection = (direction + 2) % 4;
 
@@ -272,14 +272,11 @@ namespace WFC_Model
             collapsedCount = 0;
 
             if (removalDictionary.Count > 0) Propagate();
-
-            //PrintCellEntrophy();
+            
             while (collapsedCount < cellsToBeCollapsed)
             {
-                (Position candidatePosition, int collapsedPattern) = Observe();
-                // UnityEngine.Debug.Log($"Collapsed cell {candidatePosition} with pattern {collapsedPattern}");
+                Observe();
                 Propagate();
-                //PrintCellEntrophy();
             }
             return GetOutputTileIndexGrid();
         }

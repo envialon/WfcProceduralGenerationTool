@@ -53,7 +53,7 @@ namespace WFC_Model
         }
     }
 
-    public class Cell : IComparable
+    public struct Cell : IComparable<Cell>
     {
         public Position position;
         public HashSet<int> possiblePatterns;
@@ -128,17 +128,19 @@ namespace WFC_Model
                     tileEnablerCountsByDirection[compatiblePattern, 3] == 0;
         }
 
-        int IComparable.CompareTo(object o)
-        {
-            Cell other = o as Cell;
-            if (entrophy < other.entrophy) return -1;
-            if (entrophy == other.entrophy) return 0;
-            return 1;
-        }
+
         public override string ToString()
         {
             return entrophy.ToString("0.0");
         }
+
+        public int CompareTo(Cell other)
+        {
+            if (entrophy < other.entrophy) return -1;
+            if (entrophy == other.entrophy) return 0;
+            return 1;
+        }
+
     }
 
 
