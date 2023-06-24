@@ -135,25 +135,13 @@ namespace WFC_Model
             int collapsedPattern = CollapseBasedOnPatternFrecuency(candidatePosition);
             return (candidatePosition, collapsedPattern);
         }
-
-        //we can optimize this:
+        
         private int CollapseBasedOnPatternFrecuency(Position pos)
         {
-            int[] candidatePatternIndices = cellMap[pos.x + pos.y * yOffset + pos.z * zOffset].possiblePatterns.ToArray();
-            int numberOfCandidates = candidatePatternIndices.Length;
-
             int cellIndex = pos.x + pos.y * yOffset + pos.z * zOffset;
-            if (numberOfCandidates == 0)
-            {
-                CollapseCell(cellIndex, 0);
-                return 0;
-            }
 
-            if (numberOfCandidates == 1)
-            {
-                CollapseCell(cellIndex, candidatePatternIndices[0]);
-                return candidatePatternIndices[0];
-            }
+            int[] candidatePatternIndices = cellMap[pos.x + pos.y * yOffset + pos.z * zOffset].possiblePatterns.ToArray();
+            int numberOfCandidates = candidatePatternIndices.Length;                 
 
             float[] candidateFrecuencies = new float[numberOfCandidates];
             float sumOfFrecuencies = 0;
@@ -162,27 +150,24 @@ namespace WFC_Model
                 candidateFrecuencies[i] = patternInfo[candidatePatternIndices[i]].relativeFrecuency;
                 sumOfFrecuencies += candidateFrecuencies[i];
             }
-
+            
             int collapsedIndex = -1;
-
             double randomValue = random.NextDouble();
             randomValue = randomValue * (sumOfFrecuencies);
+
             for (int i = 0; i < numberOfCandidates; i++)
             {
-                if (collapsedIndex < 0)
+                if (randomValue < candidateFrecuencies[i])
                 {
-                    if (randomValue > candidateFrecuencies[i])
-                    {
-                        randomValue -= candidateFrecuencies[i];
-                        AddRemovalUpdate(pos, candidatePatternIndices[i]);
-                    }
-                    else { collapsedIndex = i; }
+                    collapsedIndex = i;
+                    break;
                 }
-                else
-                {
-                    AddRemovalUpdate(pos, candidatePatternIndices[i]);
-                }
+                randomValue -= candidateFrecuencies[i];
             }
+
+
+            AddRemovalUpdate(pos, cellMap[cellIndex].possiblePatterns);
+            removalDictionary[pos].Remove(candidatePatternIndices[collapsedIndex]);
 
             CollapseCell(cellIndex, candidatePatternIndices[collapsedIndex]);
             return candidatePatternIndices[collapsedIndex];
@@ -190,26 +175,21 @@ namespace WFC_Model
 
         private void AddRemovalUpdate(Position pos, HashSet<int> patternsRemoved)
         {
-            if (removalDictionary.ContainsKey(pos))
+            if (!removalDictionary.ContainsKey(pos))
             {
-                removalDictionary[pos].UnionWith(patternsRemoved);
+                removalDictionary.Add(pos, new HashSet<int>(patternsRemoved));
             }
-            else
-            {
-                removalDictionary.Add(pos, patternsRemoved);
-            }
+
+            removalDictionary[pos].UnionWith(patternsRemoved);
         }
 
         private void AddRemovalUpdate(Position pos, int patternRemoved)
         {
-            if (removalDictionary.ContainsKey(pos))
+            if (!removalDictionary.ContainsKey(pos))
             {
-                removalDictionary[pos].Add(patternRemoved);
+                removalDictionary.Add(pos, new HashSet<int>());
             }
-            else
-            {
-                removalDictionary.Add(pos, new HashSet<int> { patternRemoved });
-            }
+            removalDictionary[pos].Add(patternRemoved);
         }
 
 
@@ -225,11 +205,9 @@ namespace WFC_Model
                 preCalculated.AddRange(patternInfo[patternIndex].GetCompatiblesInDirection((Direction)direction));
             }
 
-
-
             foreach (int compatiblePattern in preCalculated)
             {
-                int oppositeDirection = (direction + 2) % 4;
+                //  int oppositeDirection = (direction + 2) % 4;
 
                 neighbourEnablers[compatiblePattern, direction]--;
 
@@ -245,6 +223,7 @@ namespace WFC_Model
                         int lastPattern = cellMap[neighbourCellIndex].possiblePatterns.ToArray()[0];
                         CollapseCell(neighbourCellIndex, lastPattern);
                     }
+
                     AddRemovalUpdate(neighbourCoord, compatiblePattern);
                 }
             }
@@ -284,13 +263,15 @@ namespace WFC_Model
         {
             //get all possible patterns that place that tile
             //remove all of the patterns that don't place that tile
-            //propagate
+            //Add to the propagation dictionary, 
         }
 
         public Tilemap Generate()
         {
             int cellsToBeCollapsed = width * height * depth;
             collapsedCount = 0;
+
+            if (removalDictionary.Count > 0) Propagate();
 
             //PrintCellEntrophy();
             while (collapsedCount < cellsToBeCollapsed)
