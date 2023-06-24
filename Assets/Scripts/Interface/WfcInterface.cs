@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using WFC_Model;
+using UnityEditor.Experimental.GraphView;
 
 [ExecuteAlways]
 [RequireComponent(typeof(Grid))]
@@ -22,8 +23,11 @@ public class WfcInterface : MonoBehaviour
     public Vector3Int outputSize = new Vector3Int(20, 1, 20);
     private Vector3Int outputSizeCheck = Vector3Int.zero;
 
+    private Vector3Int startingPoint;
 
     public int selectedLayer = 0;
+
+    public bool selectOutputMap = false;
 
     public TileSet tileSet;
 
@@ -34,7 +38,25 @@ public class WfcInterface : MonoBehaviour
     private Tilemap inputMap;
     private Tilemap lastMapGenerated;
 
-    private void DrawMeshGizmos()
+
+
+    private void DrawOutputMeshGizmos()
+    {
+        Vector3 pos = transform.position;
+        for (int i = 0; i <= outputSize.x; i++)
+        {
+            for (int j = 0; j <= outputSize.z; j++)
+            {
+
+                Gizmos.DrawLine(new Vector3(startingPoint.x, selectedLayer, i + startingPoint.z) + pos, new Vector3(outputSize.x + startingPoint.x, selectedLayer, i + startingPoint.z) + pos);
+                Gizmos.DrawLine(new Vector3(i + startingPoint.x, selectedLayer, startingPoint.z) + pos, new Vector3(i + startingPoint.x, selectedLayer, outputSize.z + startingPoint.z) + pos);
+
+            }
+        }
+    }
+
+
+    private void DrawInputMeshGizmos()
     {
         Vector3 pos = transform.position;
         for (int i = 0; i <= inputMapSize; i++)
@@ -46,7 +68,11 @@ public class WfcInterface : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        DrawMeshGizmos();
+        if (selectOutputMap) { DrawOutputMeshGizmos(); }
+        else
+        {
+            DrawInputMeshGizmos();
+        }
     }
 
     private void OnValidate()
@@ -62,14 +88,24 @@ public class WfcInterface : MonoBehaviour
             boxCollider = gameObject.GetComponent<BoxCollider>();
         }
 
-        boxCollider.size = new Vector3(inputMapSize, 0, inputMapSize);
-        boxCollider.center = new Vector3(inputMapSize / 2, selectedLayer, inputMapSize / 2);
+        if (selectOutputMap)
+        {
+            boxCollider.size = new Vector3(outputSize.x, 0, outputSize.z);
+            boxCollider.center = new Vector3((outputSize.x / 2) + startingPoint.x, selectedLayer, (outputSize.z / 2) + startingPoint.z);
+        }
+        else
+        {
+            boxCollider.size = new Vector3(inputMapSize, 0, inputMapSize);
+            boxCollider.center = new Vector3(inputMapSize / 2, selectedLayer, inputMapSize / 2);
+        }
 
         if (inputMapSize % 2 != 0)
         {
             boxCollider.center += new Vector3(.5f, 0, .5f);
         }
     }
+
+
 
     private void ResizeInputMap()
     {
@@ -89,6 +125,7 @@ public class WfcInterface : MonoBehaviour
         if (outputSizeCheck != outputSize && model is not null)
         {
             model.SetOutputSize(outputSize.x, outputSize.y, outputSize.z);
+            startingPoint = new Vector3Int(inputMapSize + 1, 0, -outputSize.z / 2);
         }
     }
 
@@ -186,7 +223,6 @@ public class WfcInterface : MonoBehaviour
         int outputY = lastMapGenerated.height;
         int outputZ = lastMapGenerated.depth;
 
-        Vector3Int startingPoint = new Vector3Int(inputMapSize + 1, 0, -outputZ / 2);
 
         for (int i = 0; i < outputX; i++)
         {
@@ -205,17 +241,51 @@ public class WfcInterface : MonoBehaviour
 
     private void DeleteTile(Vector3Int pos)
     {
-        inputMap.SetTile(new Tile(0, 0), pos.x, pos.y, pos.z);
+        if (selectOutputMap)
+        {
+            lastMapGenerated.SetTile(new Tile(0, 0), pos.x, pos.y, pos.z);
+        }
+        else
+        {
+            inputMap.SetTile(new Tile(0, 0), pos.x, pos.y, pos.z);
+        }
     }
 
     private void PlaceTile(Vector3Int pos)
     {
-        inputMap.SetTile(new Tile(selectedTile, 0), pos.x, pos.y, pos.z);
+        if (selectOutputMap)
+        {
+            lastMapGenerated.SetTile(new Tile(selectedTile, 0), pos.x, pos.y, pos.z);
+        }
+        else
+        {
+            inputMap.SetTile(new Tile(selectedTile, 0), pos.x, pos.y, pos.z);
+        }
     }
 
     private void RotateTile(Vector3Int pos)
     {
-        inputMap.RotateAt(pos.x, pos.y, pos.z);
+        if (selectOutputMap)
+        {
+            lastMapGenerated.RotateAt(pos.x, pos.y, pos.z);
+        }
+        else
+        {
+            inputMap.RotateAt(pos.x, pos.y, pos.z);
+        }
+    }
+
+    private Vector3Int GetCellCoords(Vector3 hitPoint)
+    {
+        Vector3Int output = grid.WorldToCell(hitPoint);
+
+        if (selectOutputMap)
+        {
+            output -= startingPoint;
+        }
+
+        return output;
+
     }
 
     public void HandleClick(Vector3 mousePosition, int mouseButton)
@@ -223,7 +293,7 @@ public class WfcInterface : MonoBehaviour
         Ray ray = HandleUtility.GUIPointToWorldRay(mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
         {
-            Vector3Int cellPosition = grid.WorldToCell(hit.point);
+            Vector3Int cellPosition = GetCellCoords(hit.point);
 
             //Debug.Log("Hit at: " + hit.point + " Corresponds to cell " + cellPosition);
             if (mouseButton == 1)
@@ -255,12 +325,21 @@ public class WfcInterface : MonoBehaviour
         return x - y * (int)Mathf.Floor(x / y);
     }
 
+    private void AlternateBetweenInputAndOutputMap()
+    {
+        selectOutputMap = !selectOutputMap;
+        RefreshCollider();
+    }
+
     public void HandleKeyPress(KeyCode keycode)
     {
         switch (keycode)
         {
-            case KeyCode.N:
+            case KeyCode.O:
+                AlternateBetweenInputAndOutputMap();
+                break;
 
+            case KeyCode.N:
                 selectedTile = Mathf.Abs((selectedTile - 1)) % tileSet.tiles.Count;
                 break;
 
@@ -294,7 +373,6 @@ public class WfcInterface : MonoBehaviour
     public void Train3D()
     {
         model.Train(inputMap, patternSize);
-
     }
 
     public void SerializeInputMap()
@@ -316,6 +394,12 @@ public class WfcInterface : MonoBehaviour
         lastMapGenerated = model.Generate(outputSize.x, outputSize.y, outputSize.z);
         Debug.Log(lastMapGenerated.ToString());
     }
+
+    public void CompleteOutputMap()
+    {
+        lastMapGenerated = model.Generate(lastMapGenerated);
+    }
+
 }
 
 
@@ -373,7 +457,7 @@ public class WfcInterfaceEditor : Editor
         {
             t.Train();
         }
-    
+
     }
 
     public override void OnInspectorGUI()
@@ -394,6 +478,10 @@ public class WfcInterfaceEditor : Editor
         if (GUILayout.Button("Generate"))
         {
             t.Generate();
+        }
+        if (GUILayout.Button("Generate from incomplete output"))
+        {
+            t.CompleteOutputMap();
         }
     }
 

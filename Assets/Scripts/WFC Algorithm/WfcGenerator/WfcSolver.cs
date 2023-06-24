@@ -53,10 +53,15 @@ namespace WFC_Model
             {
                 for(int direction = 0; direction < numberOfDirections; direction++)
                 {
-                    
+                    HashSet<int> compatibles = patternInfo[possiblePatterns[patternIndex]].GetCompatiblesInDirection((Direction)direction);
+                    foreach (int compatible in compatibles)
+                    {
+                        result[compatible, direction] += 1;
+                    }
                 }
             }
 
+            return result;
         }
 
 
@@ -69,10 +74,8 @@ namespace WFC_Model
                 {
                     possiblePatternIndexes.Add(i);
                 }
-            }
-
-            
-            Cell output = new Cell(pos, possiblePatternIndexes.ToArray(), patternInfo, CustomTileEnablerCount());
+            }            
+            Cell output = new Cell(pos, possiblePatternIndexes.ToArray(), patternInfo, CustomTileEnablerCount(possiblePatternIndexes.ToArray()));
 
             return output;
         }
