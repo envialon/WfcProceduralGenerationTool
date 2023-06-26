@@ -289,6 +289,20 @@ public class WfcInterface : MonoBehaviour
 
     }
 
+    private Tile GetClickedOnTile(int x, int y , int z)
+    {
+        Tilemap tm;
+        if(selectOutputMap)
+        {
+            tm = lastMapGenerated;
+        }
+        else
+        {
+            tm = inputMap;
+        }
+        return tm.GetTile(x, y,z);
+    }
+
     public void HandleClick(Vector3 mousePosition, int mouseButton)
     {
         Ray ray = HandleUtility.GUIPointToWorldRay(mousePosition);
@@ -296,12 +310,14 @@ public class WfcInterface : MonoBehaviour
         {
             Vector3Int cellPosition = GetCellCoords(hit.point);
 
+            Debug.Log(cellPosition);
+
             //Debug.Log("Hit at: " + hit.point + " Corresponds to cell " + cellPosition);
             if (mouseButton == 1)
             {
                 DeleteTile(cellPosition);
             }
-            else if (selectedTile == inputMap.GetTile(cellPosition.x, cellPosition.y, cellPosition.z).id)
+            else if (selectedTile == GetClickedOnTile(cellPosition.x, cellPosition.y, cellPosition.z).id)
             {
                 RotateTile(cellPosition);
             }
