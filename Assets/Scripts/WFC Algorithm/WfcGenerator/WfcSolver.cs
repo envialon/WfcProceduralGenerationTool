@@ -43,28 +43,6 @@ namespace WFC_Model
             return result;
         }
 
-        //private int[,] CustomTileEnablerCount(int[] possiblePatterns)
-        //{
-        //    int numberOfDirections = Enum.GetValues(typeof(Direction)).Length;
-        //    int[,] result = new int[numberOfPatterns, numberOfDirections];
-
-
-        //    for (int patternIndex = 0; patternIndex < possiblePatterns.Length; patternIndex++)
-        //    {
-        //        for (int direction = 0; direction < numberOfDirections; direction++)
-        //        {
-        //            HashSet<int> compatibles = patternInfo[possiblePatterns[patternIndex]].GetCompatiblesInDirection((Direction)direction);
-        //            foreach (int compatible in compatibles)
-        //            {
-        //                result[compatible, direction] += 1;
-        //            }
-        //        }
-        //    }
-
-        //    return result;
-        //}
-
-
         private void RemoveBasedOnEncodedTile(int cellIndex, int encodedTile)
         {
             Position CellPos = cellMap[cellIndex].position;
@@ -86,20 +64,6 @@ namespace WFC_Model
             return;
         }
 
-        private void ProcessIncompleteMap(Tilemap incompleteMap)
-        {
-
-            for (int cellIndex = 0; cellIndex < incompleteMap.map.Length; cellIndex++)
-            {
-                if (incompleteMap.map[cellIndex].id != 0)
-                {
-                    RemoveBasedOnEncodedTile(cellIndex, InputReader.EncodeTile(incompleteMap.map[cellIndex].id, incompleteMap.map[cellIndex].rotation));
-                }
-            }
-        }
-
-       
-
         private void InitializeOutputGrid(Tilemap incompleteMap = null)
         {
             int[,] enablerCountTemplate = InitialEnablerCount();
@@ -114,8 +78,12 @@ namespace WFC_Model
                 {
                     for (int y = 0; y < height; y++)
                     {
-                        cellMap[x + y * yOffset + z * zOffset] = new Cell(new Position(x, y, z), Enumerable.Range(0, patternInfo.Length).ToArray(), patternInfo, enablerCountTemplate);
-
+                        int cellIndex = x + y * yOffset + z * zOffset;
+                        cellMap[cellIndex] = new Cell(new Position(x, y, z), Enumerable.Range(0, patternInfo.Length).ToArray(), patternInfo, enablerCountTemplate);
+                        if (incompleteMap is not null && incompleteMap.GetEncodedTileAt(x, y, z) != 0)
+                        {
+                            RemoveBasedOnEncodedTile(cellIndex, incompleteMap.GetEncodedTileAt(x, y, z));
+                        }
                     }
                 }
             }
@@ -167,24 +135,6 @@ namespace WFC_Model
             cellMap[cellIndex].CollapseOn(patternToCollapse);
             collapsedCount++;
         }
-
-        private void PrintCellEntrophy()
-        {
-            string msg = "";
-            for (int x = 0; x < width; x++)
-            {
-                for (int z = 0; z < depth; z++)
-                {
-                    for (int y = 0; y < height; y++)
-                    {
-                        msg += cellMap[x + y * yOffset + z * zOffset].ToString() + " ";
-                    }
-                }
-                msg += "\n";
-            }
-            //UnityEngine.Debug.Log(msg);
-        }
-
 
         private (Position, int) Observe()
         {
@@ -325,7 +275,7 @@ namespace WFC_Model
             int cellsToBeCollapsed = width * height * depth;
             collapsedCount = 0;
 
-            ProcessIncompleteMap(incompleteMap);
+           // ProcessIncompleteMap(incompleteMap);
             if (removalDictionary.Count != 0) Propagate();
 
             while (collapsedCount < cellsToBeCollapsed)

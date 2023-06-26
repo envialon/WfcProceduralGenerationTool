@@ -38,8 +38,6 @@ public class WfcInterface : MonoBehaviour
     private Tilemap inputMap;
     private Tilemap lastMapGenerated;
 
-
-
     private void DrawOutputMeshGizmos()
     {
         Vector3 pos = transform.position;
@@ -54,7 +52,6 @@ public class WfcInterface : MonoBehaviour
             }
         }
     }
-
 
     private void DrawInputMeshGizmos()
     {
@@ -104,8 +101,6 @@ public class WfcInterface : MonoBehaviour
             boxCollider.center += new Vector3(.5f, 0, .5f);
         }
     }
-
-
 
     private void ResizeInputMap()
     {
@@ -289,10 +284,10 @@ public class WfcInterface : MonoBehaviour
 
     }
 
-    private Tile GetClickedOnTile(int x, int y , int z)
+    private Tile GetClickedOnTile(int x, int y, int z)
     {
         Tilemap tm;
-        if(selectOutputMap)
+        if (selectOutputMap)
         {
             tm = lastMapGenerated;
         }
@@ -300,7 +295,7 @@ public class WfcInterface : MonoBehaviour
         {
             tm = inputMap;
         }
-        return tm.GetTile(x, y,z);
+        return tm.GetTile(x, y, z);
     }
 
     public void HandleClick(Vector3 mousePosition, int mouseButton)
