@@ -144,6 +144,7 @@ public class WfcInterface : MonoBehaviour
     private void Initialize()
     {
         inputMap = new Tilemap(inputMapSize, inputMapHeight);
+        lastMapGenerated = new Tilemap(outputSize.x, outputSize.y, outputSize.z);
         model = new WfcModel(inputMap);
 
         grid = GetComponent<Grid>();
@@ -364,6 +365,11 @@ public class WfcInterface : MonoBehaviour
         if (lastMapGenerated is not null) lastMapGenerated.Clear();
     }
 
+    public void ClearOutputMap()
+    {
+        lastMapGenerated.Clear();
+    }
+
     public void Train()
     {
         model.Train(inputMap, patternSize);
@@ -377,12 +383,13 @@ public class WfcInterface : MonoBehaviour
 
     public void SerializeInputMap()
     {
-        TilemapSerializer.SerializeTilemap(inputMap, inputMapSerializationPath);
+        TilemapSerializer.SerializeTilemap(inputMap, tileSet, inputMapSerializationPath);
     }
 
     public void LoadSerializedInputMap(string path)
     {
         inputMap = TilemapSerializer.DeserializeTilemap(path);
+        tileSet = TilemapSerializer.DeserializeTileSet(path);
         inputMapSize = inputMap.depth;
         inputMapHeight = inputMap.height;
         RefreshCollider();
@@ -469,6 +476,11 @@ public class WfcInterfaceEditor : Editor
         if (GUILayout.Button("Clear"))
         {
             t.Clear();
+        }
+
+        if (GUILayout.Button("Clear outputMap"))
+        {
+            t.ClearOutputMap();
         }
 
         GUILayout.Space(20);

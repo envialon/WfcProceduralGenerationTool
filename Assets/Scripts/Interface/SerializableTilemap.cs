@@ -7,7 +7,10 @@ public class SerializableTilemap : ScriptableObject
     [SerializeField]
     public Tilemap tilemap;
 
-    public void SetFromTilemap(Tilemap tm)
+    [SerializeField]
+    public TileSet tileSet;
+
+    public void SetFromTilemap(Tilemap tm, TileSet tileSet)
     {
         this.tilemap = new Tilemap(tm);
     }
@@ -15,5 +18,10 @@ public class SerializableTilemap : ScriptableObject
     public Tilemap GetTilemap()
     {
         return new Tilemap(tilemap);
+    }
+
+    public TileSet GetTileSet()
+    {
+        return tileSet;
     }
 }
