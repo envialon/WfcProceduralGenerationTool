@@ -203,11 +203,11 @@ MonoBehaviour:
       rotation: 0
     - id: 4
       rotation: 2
-    - id: 2
+    - id: 7
       rotation: 0
-    - id: 2
+    - id: 7
       rotation: 0
-    - id: 2
+    - id: 7
       rotation: 0
     - id: 4
       rotation: 0
@@ -265,9 +265,9 @@ MonoBehaviour:
       rotation: 2
     - id: 6
       rotation: 3
-    - id: 2
+    - id: 7
       rotation: 0
-    - id: 2
+    - id: 7
       rotation: 0
     - id: 6
       rotation: 1
@@ -325,9 +325,9 @@ MonoBehaviour:
       rotation: 1
     - id: 4
       rotation: 2
-    - id: 2
+    - id: 7
       rotation: 0
-    - id: 2
+    - id: 7
       rotation: 0
     - id: 6
       rotation: 0
@@ -385,7 +385,7 @@ MonoBehaviour:
       rotation: 0
     - id: 4
       rotation: 2
-    - id: 2
+    - id: 7
       rotation: 0
     - id: 6
       rotation: 0
@@ -453,67 +453,67 @@ MonoBehaviour:
       rotation: 0
     - id: 2
       rotation: 0
-    - id: 2
-      rotation: 0
-    - id: 1
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
-    - id: 0
-      rotation: 0
     - id: 1
       rotation: 0
     - id: 1
       rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 0
+      rotation: 0
+    - id: 0
+      rotation: 0
     - id: 1
       rotation: 0
-    - id: 2
-      rotation: 0
-    - id: 2
-      rotation: 0
-    - id: 2
+    - id: 1
       rotation: 0
     - id: 1
       rotation: 0
     - id: 2
       rotation: 0
     - id: 2
+      rotation: 0
+    - id: 2
+      rotation: 0
+    - id: 1
+      rotation: 0
+    - id: 1
+      rotation: 0
+    - id: 1
       rotation: 0
     - id: 1
       rotation: 0

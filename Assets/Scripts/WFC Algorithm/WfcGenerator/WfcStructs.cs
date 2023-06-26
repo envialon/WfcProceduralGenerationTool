@@ -98,7 +98,7 @@ namespace WFC_Model
             collapsedIndex = patternToCollapse;
         }
 
-        private void UpdateFrequencies(int removedPatternIndex, in PatternInfo[] patternInfo)
+        private void RemoveFrequencies(int removedPatternIndex, in PatternInfo[] patternInfo)
         {
             sumOfRelativeFreq -= patternInfo[removedPatternIndex].relativeFrecuency;
             sumOfRelativeFreqLog2 -= patternInfo[removedPatternIndex].freqTimesFreqLog2;
@@ -115,7 +115,7 @@ namespace WFC_Model
             if (possiblePatterns.Contains(patternIndex))
             {
                 possiblePatterns.Remove(patternIndex);
-                UpdateFrequencies(patternIndex, patternInfo);
+                RemoveFrequencies(patternIndex, patternInfo);
                 CalculateEntrophy();
             }
         }

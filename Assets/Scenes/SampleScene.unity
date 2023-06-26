@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -323,8 +323,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 10, y: 0, z: 10}
-  m_Center: {x: 5, y: 1, z: 5}
+  m_Size: {x: 20, y: 0, z: 20}
+  m_Center: {x: 21, y: 0, z: 0}
 --- !u!4 &1339589962
 Transform:
   m_ObjectHideFlags: 0
@@ -354,11 +354,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   patternSize: 2
   inputMapSize: 10
-  inputMapHeight: 1
-  selectedTile: 3
-  outputSize: {x: 20, y: 1, z: 20}
-  selectedLayer: 1
-  tileSet: {fileID: 11400000, guid: 43d87efc2f9a6014cb055b492a787204, type: 2}
+  inputMapHeight: 3
+  selectedTile: 1
+  outputSize: {x: 20, y: 2, z: 20}
+  selectedLayer: 0
+  selectOutputMap: 1
+  tileSet: {fileID: 11400000, guid: e6ef6a49b8ab6d242a58b8cba0362832, type: 2}
 --- !u!156049354 &1339589964
 Grid:
   m_ObjectHideFlags: 0
