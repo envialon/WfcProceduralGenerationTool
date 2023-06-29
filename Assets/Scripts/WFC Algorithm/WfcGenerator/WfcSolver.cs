@@ -16,6 +16,8 @@ namespace WFC_Model
         public List<int> uncollapsedCellIndices;
 
         private PatternInfo[] patternInfo;
+        private Dictionary<int, SymmetryType> symmetryDictionary;
+
         private int numberOfPatterns;
         private int collapsedCount = 0;
 
@@ -101,6 +103,7 @@ namespace WFC_Model
             this.numberOfPatterns = patternInfo.Length;
 
             removalDictionary = new Dictionary<Position, HashSet<int>>();
+            symmetryDictionary = inputReader.symmetryDictionary;
 
             if (width != -1 && height != -1 && depth != -1)
             {
@@ -310,7 +313,7 @@ namespace WFC_Model
                     for (int y = 0; y < height; y++)
                     {
                         int patternIndex = cellMap[x + y * yOffset + z * zOffset].GetCollapsedPatternIndex();
-                        output.SetTile(InputReader.DecodeTile(patternInfo[patternIndex].GetEncodedTileIndex()),
+                        output.SetTile(Tile.DecodeTile(patternInfo[patternIndex].GetEncodedTileIndex(), symmetryDictionary ),
                                        x, y, z);
                     }
                 }

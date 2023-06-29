@@ -15,17 +15,28 @@ MonoBehaviour:
   tiles:
   - mesh: {fileID: 0}
     material: {fileID: 0}
+    symmetry: 0
   - mesh: {fileID: -1388485733357891733, guid: d64ec7ea789d13b4886090b1c896ce20, type: 3}
     material: {fileID: 2100000, guid: 26d349362434bac498e9d8775552dd26, type: 2}
+    symmetry: 0
   - mesh: {fileID: -1388485733357891733, guid: d64ec7ea789d13b4886090b1c896ce20, type: 3}
     material: {fileID: 2100000, guid: 2aa66e922dda3e54b93098785dcca5c5, type: 2}
+    symmetry: 0
   - mesh: {fileID: -1388485733357891733, guid: d64ec7ea789d13b4886090b1c896ce20, type: 3}
     material: {fileID: 2100000, guid: 7742f2f55717b7a45954e738407e74f6, type: 2}
+    symmetry: 0
   - mesh: {fileID: -234795621409544537, guid: 35f11f908a505c349930c0870c0f2087, type: 3}
     material: {fileID: 2100000, guid: bfe7412e1389c1242ba9a0a265b0f5b6, type: 2}
+    symmetry: 3
   - mesh: {fileID: -6742930239559620008, guid: b4824698b49b263418f7b2c3834c5d8e, type: 3}
     material: {fileID: 2100000, guid: bfe7412e1389c1242ba9a0a265b0f5b6, type: 2}
+    symmetry: 3
   - mesh: {fileID: 2119453186842651304, guid: 6e7234975f3675644945a977a11483cc, type: 3}
     material: {fileID: 2100000, guid: bfe7412e1389c1242ba9a0a265b0f5b6, type: 2}
+    symmetry: 3
   - mesh: {fileID: -7513297493162946847, guid: f70fb1b5a49792b4bb61fb79d6fbaab3, type: 3}
     material: {fileID: 2100000, guid: 4809ab711978e4045aadbf5909d55ec3, type: 2}
+    symmetry: 0
+  - mesh: {fileID: -7513297493162946847, guid: f70fb1b5a49792b4bb61fb79d6fbaab3, type: 3}
+    material: {fileID: 2100000, guid: 429125e975cb5ee4bb650e310b56867d, type: 2}
+    symmetry: 0

@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEditor;
 using WFC_Model;
-using UnityEditor.Experimental.GraphView;
 
 [ExecuteAlways]
 [RequireComponent(typeof(Grid))]
@@ -251,11 +250,11 @@ public class WfcInterface : MonoBehaviour
     {
         if (selectOutputMap)
         {
-            lastMapGenerated.SetTile(new Tile(selectedTile, 0), pos.x, pos.y, pos.z);
+            lastMapGenerated.SetTile(new Tile(selectedTile, 0, tileSet.GetSymmetry(selectedTile)), pos.x, pos.y, pos.z);
         }
         else
         {
-            inputMap.SetTile(new Tile(selectedTile, 0), pos.x, pos.y, pos.z);
+            inputMap.SetTile(new Tile(selectedTile, 0, tileSet.GetSymmetry(selectedTile)), pos.x, pos.y, pos.z);
         }
     }
 

@@ -15,7 +15,7 @@ MonoBehaviour:
   tilemap:
     width: 10
     depth: 10
-    height: 3
+    height: 2
     map:
     - id: 1
       rotation: 0
@@ -617,3 +617,4 @@ MonoBehaviour:
       rotation: 0
     - id: 0
       rotation: 0
+  tileSet: {fileID: 0}

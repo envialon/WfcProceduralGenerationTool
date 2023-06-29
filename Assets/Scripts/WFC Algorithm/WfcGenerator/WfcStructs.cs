@@ -13,6 +13,93 @@ namespace WFC_Model
         down
     }
 
+    public enum SymmetryType
+    {
+        ERR,
+        X,
+        T,
+        I,
+        L,
+        D   //diagonal
+    }
+
+    [Serializable]
+    public struct Tile
+    {
+        public int id;
+        public int rotation;
+        public SymmetryType symmetry;
+        public bool reflected;
+
+
+        public Tile(int id = 0, int rotation = 0, SymmetryType stype = SymmetryType.ERR, bool isReflected = false)
+        {
+            this.id = id;
+            this.rotation = rotation;
+            this.symmetry = stype;
+            this.reflected = isReflected;
+
+        }
+
+        public void Set(int id, int rotation, SymmetryType stype)
+        {
+            this.id = id;
+            this.rotation = rotation;
+            this.symmetry = stype;
+        }
+
+        public int RotateClockwise()
+        {
+            rotation = (rotation + 1) % 4;
+            return rotation;
+        }
+
+        private static int mod(int x, int y)
+        {
+            return x - y * (int)Math.Floor((double)x / y);
+        }
+
+        private static int EncodeRotation(Tile tile)
+        {
+            if (tile.symmetry == SymmetryType.X)
+            {
+                return 0;
+            }
+
+            if (tile.symmetry == SymmetryType.D || tile.symmetry == SymmetryType.I)
+            {
+                return mod(tile.rotation, 2);
+            }
+            return mod(tile.rotation, 4);
+        }
+        public static int EncodeTile(Tile tile)
+        {
+            return (tile.id * 4 + EncodeRotation(tile)) | ((tile.reflected) ? (1 << 32) : 0);
+        }
+        public static int DecodeTileId(int encodedTile)
+        {
+            return encodedTile / 4;
+        }
+
+        public static int DecodeTileRotation(int encodedTile)
+        {
+            return ((encodedTile - (encodedTile / 4) * 4)) % 4;
+        }
+
+        public static bool DecodeReflection(int encodedTile)
+        {
+            return false;
+        }
+
+        public static Tile DecodeTile(int encodedTile, Dictionary<int, SymmetryType> symmetryDictionary)
+        {
+            int id = DecodeTileId(encodedTile);
+            return new Tile(id, DecodeTileRotation(encodedTile), symmetryDictionary[id], DecodeReflection(encodedTile));
+        }
+
+
+    }
+
     public struct Position
     {
         public int x; public int y; public int z;
@@ -119,15 +206,6 @@ namespace WFC_Model
                 CalculateEntrophy();
             }
         }
-
-        public bool ContainsAnyZeroEnablerCount(int compatiblePattern)
-        {
-            return tileEnablerCountsByDirection[compatiblePattern, 0] == 0 ||
-                    tileEnablerCountsByDirection[compatiblePattern, 1] == 0 ||
-                    tileEnablerCountsByDirection[compatiblePattern, 2] == 0 ||
-                    tileEnablerCountsByDirection[compatiblePattern, 3] == 0;
-        }
-
 
         public override string ToString()
         {

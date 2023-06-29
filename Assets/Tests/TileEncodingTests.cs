@@ -10,17 +10,21 @@ public class TileEncodingTests
     [Test]
     public void TestTileIdEncoding()
     {
-        Tile tile = new Tile(12, 3);
-        int encoded = InputReader.EncodeTile(tile.id, tile.rotation, false);
-        Tile decoded = InputReader.DecodeTile(encoded);
+        Dictionary<int, SymmetryType> dic = new Dictionary<int, SymmetryType>();
+        dic.Add(12, SymmetryType.T);
+        Tile tile = new Tile(12, 3, SymmetryType.T);
+        int encoded = Tile.EncodeTile(tile);
+        Tile decoded = Tile.DecodeTile(encoded, dic);
         Assert.IsTrue(tile.id == decoded.id);
     }
     [Test]
     public void TestTileRotationEncoding()
     {
-        Tile tile = new Tile(12, 3);
-        int encoded = InputReader.EncodeTile(tile.id, tile.rotation, false);
-        Tile decoded = InputReader.DecodeTile(encoded);
+        Dictionary<int, SymmetryType> dic = new Dictionary<int, SymmetryType>();
+        dic.Add(12, SymmetryType.T);
+        Tile tile = new Tile(12, 3, SymmetryType.T);
+        int encoded = Tile.EncodeTile(tile);
+        Tile decoded = Tile.DecodeTile(encoded, dic);
         Assert.IsTrue(tile.rotation == decoded.rotation);
     }
 }

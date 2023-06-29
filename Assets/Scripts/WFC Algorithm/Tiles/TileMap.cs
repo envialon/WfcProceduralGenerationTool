@@ -1,4 +1,7 @@
 
+using Newtonsoft.Json.Bson;
+using System.Collections.Generic;
+
 namespace WFC_Model
 {
     [System.Serializable]
@@ -8,6 +11,7 @@ namespace WFC_Model
         public int depth = 10;
         public int height = 1;
         public Tile[] map;
+
 
         private int yOffset;
         private int zOffset;
@@ -36,28 +40,9 @@ namespace WFC_Model
         public Tilemap(Tilemap other)
         {
             InitializeParams(other.width, other.height, other.depth);
-            this.map = (Tile[])other.map.Clone();
+            map = (Tile[])other.map.Clone();
         }
 
-        //Constructor from the output of the WFC algorithm
-        public Tilemap(int[,,] indexMap)
-        {
-            InitializeParams(indexMap.GetLength(0), indexMap.GetLength(1), indexMap.GetLength(2));
-            Clear();
-
-            for (int i = 0; i < width; i++)
-            {
-                for (int j = 0; j < depth; j++)
-                {
-                    for (int k = 0; k < height; k++)
-                    {
-                        int tileId = indexMap[i, k, j] / 4;
-                        int rotation = indexMap[i, k, j] - tileId * 4;
-                        SetTile(new Tile(tileId, rotation), i, k, j);
-                    }
-                }
-            }
-        }
 
         public void SetTile(Tile tile, int x, int y, int z)
         {
@@ -68,6 +53,19 @@ namespace WFC_Model
             }
         }
 
+        public Dictionary<int, SymmetryType> GetSymmetryDictionary()
+        {
+            Dictionary<int, SymmetryType> symmetryDictionary = new Dictionary<int, SymmetryType>();
+            foreach (Tile tile in map)
+            {
+                if (!symmetryDictionary.ContainsKey(tile.id))
+                {
+                    symmetryDictionary.Add(tile.id, tile.symmetry);
+                }
+            }
+            return symmetryDictionary;
+        }
+
         public void RotateAt(int x, int y, int z)
         {
             map[x + (y * yOffset) + (z * zOffset)].RotateClockwise();
@@ -75,7 +73,7 @@ namespace WFC_Model
 
         public int GetEncodedTileAt(int x, int y, int z)
         {
-            return InputReader.EncodeTile(map[x + (y * yOffset) + (z * zOffset)].id, map[x + (y * yOffset) + (z * zOffset)].rotation);
+            return Tile.EncodeTile(map[x + (y * yOffset) + (z * zOffset)]);
         }
 
         public Tile GetTile(int x, int y, int z)
@@ -117,7 +115,7 @@ namespace WFC_Model
                 {
                     for (int k = 0; k < width; k++)
                     {
-                        output += map[k + (i * yOffset) + (j * zOffset)].id +  " ";
+                        output += map[k + (i * yOffset) + (j * zOffset)].id + " ";
                     }
                     output += "\n";
                 }

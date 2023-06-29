@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using WFC_Model;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "newTileSet", menuName = "ScriptableObjects/TileSet", order = 1)]
@@ -28,6 +29,11 @@ public class TileSet : ScriptableObject
     public Material GetMaterial(int id)
     {
         return tiles[id].material;
+    }
+
+    public SymmetryType GetSymmetry(int id)
+    {
+        return tiles[id].symmetry;
     }
 
 }

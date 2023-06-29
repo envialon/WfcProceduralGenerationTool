@@ -1,3 +1,4 @@
+using GluonGui.Dialog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,15 +13,21 @@ namespace WFC_Model
     /// </summary>
     public class InputReader
     {
+
+
         public int patternSize;
         public int patternHeight;
         public Tilemap inputTileMap;
+        public Dictionary<int, SymmetryType> symmetryDictionary;
 
         private int mapHeight;
         private int mapSize;
         private int[] indexGrid;
         private PatternInfo[] patterns;
         private int totalPatterns = 0;
+
+
+        private int tileCount;
 
         // yOffset and zOffset are the values we need to muliply by the y and z
         // coordinates respectively to get the correct index in a pattern
@@ -43,6 +50,8 @@ namespace WFC_Model
 
             yOffset = patternSize;
             zOffset = patternSize * patternHeight;
+
+            this.symmetryDictionary = inputTileMap.GetSymmetryDictionary();
         }
 
         public InputReader(Tilemap inputTileMap, int patternSize = 2)
@@ -54,6 +63,8 @@ namespace WFC_Model
         {
             indexGrid = new int[inputTileMap.width * inputTileMap.height * inputTileMap.depth];
 
+            HashSet<int> indexes = new HashSet<int>();
+
             for (int k = 0; k < mapHeight; k++)
             {
                 for (int i = 0; i < mapSize; i++)
@@ -61,35 +72,17 @@ namespace WFC_Model
                     for (int j = 0; j < mapSize; j++)
                     {
                         //not using yOffset and zOffset because we're mapping the indexMap, not a pattern.
-                        indexGrid[i + (k * mapSize) + (j * mapHeight * mapSize)] = EncodeTile(inputTileMap.GetTile(i, k, j).id,
-                                                                                              inputTileMap.GetTile(i, k, j).rotation);
+                        indexGrid[i + (k * mapSize) + (j * mapHeight * mapSize)] = Tile.EncodeTile(inputTileMap.GetTile(i, k, j));
+                        indexes.Add(indexGrid[i + (k * mapSize) + (j * mapHeight * mapSize)]);
                     }
                 }
             }
+            tileCount = indexes.Count;
         }
 
         private static int mod(int x, int y)
         {
             return x - y * (int)Math.Floor((double)x / y);
-        }
-
-        public static int EncodeTile(int id, int rotation, bool isReflected = false)
-        {
-            return id * 4 + mod(rotation, 4);
-        }
-
-        public static int DecodeTileId(int encodedTile)
-        {
-            return encodedTile / 4;
-        }
-
-        public static int DecodeTileRotation(int encodedTile)
-        {
-            return ((encodedTile - (encodedTile / 4) * 4)) % 4;
-        }
-        public static Tile DecodeTile(int encodedTile)
-        {
-            return new Tile(DecodeTileId(encodedTile), DecodeTileRotation(encodedTile));
         }
 
         private int GetOffsetedIndexGridAt(int x, int y, int z)
@@ -98,10 +91,16 @@ namespace WFC_Model
             return indexGrid[mod(x, mapSize) + mod(y, mapHeight) * mapSize + mod(z, mapSize) * mapHeight * mapSize];
         }
 
-
-        private string HashPattern(int[] pattern)
+        private long HashPattern(int[] pattern)
         {
-            return string.Join(".", pattern);
+            long hash = 0;
+            long power = 1;
+            for (int i = 0; i < pattern.Length; i++)
+            {
+                hash += pattern[pattern.Length - 1 - i] * power;
+                power *= tileCount;
+            }
+            return hash;
         }
 
         private void UpdateFrecuencies()
@@ -271,14 +270,14 @@ namespace WFC_Model
             {
                 if (pattern[i] != 0)
                 {
-                    int tileIndex = DecodeTileId(pattern[i]);
-                    int originalRotation = DecodeTileRotation(pattern[i]);
-                    pattern[i] = EncodeTile(tileIndex, (originalRotation + 1));
+                    Tile newTile = Tile.DecodeTile(pattern[i], symmetryDictionary);
+                    newTile.RotateClockwise();
+                    pattern[i] = Tile.EncodeTile(newTile);
                 }
             }
         }
 
-        private void RotatePatterns3D(Dictionary<string, PatternInfo> patternFrecuency)
+        private void RotatePatterns3D(Dictionary<long, PatternInfo> patternFrecuency)
         {
             PatternInfo[] patterns = patternFrecuency.Values.ToArray();
             foreach (PatternInfo pattern in patterns)
@@ -289,7 +288,7 @@ namespace WFC_Model
                 {
                     rotatedPattern = RotateMatrix(in rotatedPattern);
                     RotateIndividualTiles(ref rotatedPattern);
-                    string patternHash = HashPattern(rotatedPattern);
+                    long patternHash = HashPattern(rotatedPattern);
                     if (!patternFrecuency.ContainsKey(patternHash))
                     {
                         totalPatterns++;
@@ -309,7 +308,7 @@ namespace WFC_Model
             // not completely supported for directional tiles right now.
         }
 
-        private void ReflectPatterns3D(Dictionary<string, PatternInfo> patternFrecuency)
+        private void ReflectPatterns3D(Dictionary<long, PatternInfo> patternFrecuency)
         {
             PatternInfo[] patterns = patternFrecuency.Values.ToArray();
             foreach (PatternInfo pattern in patterns)
@@ -317,7 +316,7 @@ namespace WFC_Model
                 //reflect it and check if its already in patternFrecuency, if not, add it
                 int[] reflectedPattern = ReflectMatrix(in pattern.pattern);
                 ReflectIndividualTiles(ref reflectedPattern);
-                string reflectedPatternHash = HashPattern(reflectedPattern);
+                long reflectedPatternHash = HashPattern(reflectedPattern);
                 if (!patternFrecuency.ContainsKey(reflectedPatternHash))
                 {
                     totalPatterns++;
@@ -333,7 +332,7 @@ namespace WFC_Model
         private void ExtractUniquePatterns3D(bool enablePatternReflection, bool enablePatternRotation, bool horizontalPeriodic, bool verticalPeriodic)
         {
             //usamos el diccionario para aprovechar el hasheo
-            Dictionary<string, PatternInfo> patternFrecuency = new Dictionary<string, PatternInfo>();
+            Dictionary<long, PatternInfo> patternFrecuency = new Dictionary<long, PatternInfo>();
             totalPatterns = 0;
 
 
@@ -351,7 +350,7 @@ namespace WFC_Model
                     for (int j = horizontalStart; j <= horizontalEnd; j++)
                     {
                         int[] pattern = Extract3DPatternAt(i, k, j);
-                        string patternHash = HashPattern(pattern);
+                        long patternHash = HashPattern(pattern);
                         if (!patternFrecuency.ContainsKey(HashPattern(pattern)))
                         {
                             patternFrecuency.Add(patternHash, new PatternInfo(patternFrecuency.Count, pattern, patternSize, patternHeight));
