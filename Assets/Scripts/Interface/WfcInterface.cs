@@ -398,6 +398,7 @@ public class WfcInterface : MonoBehaviour
 
     public void LoadSerializedInputMap(string path)
     {
+        ClearOutputMap();
         inputMap = TilemapSerializer.DeserializeTilemap(path);
         tileSet = TilemapSerializer.DeserializeTileSet(path);
         inputMapSize = inputMap.depth;
