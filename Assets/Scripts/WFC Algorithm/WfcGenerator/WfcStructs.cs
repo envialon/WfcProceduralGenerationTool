@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace WFC_Model
 {
@@ -74,21 +75,30 @@ namespace WFC_Model
         }
         public static int EncodeTile(Tile tile)
         {
-            return (tile.id * 4 + EncodeRotation(tile)) | ((tile.reflected) ? (1 << 32) : 0);
+            int encoded = (tile.id * 4 + EncodeRotation(tile)) | ((tile.reflected) ? (1 << 31) : 0);
+
+            string binary = Convert.ToString(encoded, 2).PadLeft(32, '0');
+
+            return encoded;
         }
         public static int DecodeTileId(int encodedTile)
         {
-            return encodedTile / 4;
+            int lastBitCleared = encodedTile & ~(1 << 31);
+            return lastBitCleared / 4;
         }
 
         public static int DecodeTileRotation(int encodedTile)
         {
-            return ((encodedTile - (encodedTile / 4) * 4)) % 4;
+            int lastBitCleared = encodedTile & ~(1 << 31);
+            return ((lastBitCleared - (lastBitCleared / 4) * 4)) % 4;
         }
 
         public static bool DecodeReflection(int encodedTile)
         {
-            return false;
+            bool output = ((encodedTile >> 31) & 1) == 1;
+            string binary = Convert.ToString(encodedTile, 2).PadLeft(32, '0');
+
+            return output;
         }
 
         public static Tile DecodeTile(int encodedTile, Dictionary<int, SymmetryType> symmetryDictionary)
