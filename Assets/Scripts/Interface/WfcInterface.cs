@@ -191,7 +191,7 @@ public class WfcInterface : MonoBehaviour
 
             Matrix4x4 currentTRS = Matrix4x4.TRS(transform.position + tilePos + rotationOffset,
                                                 rotation,
-                                                Vector3.one);
+                                                currentTile.reflected ? Vector3.left : Vector3.left); 
 
             Graphics.DrawMesh(tileSet.GetMesh(currentTile.id), currentTRS, tileSet.GetMaterial(currentTile.id), 0, cam);
         }
@@ -384,11 +384,6 @@ public class WfcInterface : MonoBehaviour
     {
         model.Train(inputMap, patternSize);
         Debug.Log(model.inputReader.GetPatternSummary());
-    }
-
-    public void Train3D()
-    {
-        model.Train(inputMap, patternSize);
     }
 
     public void SerializeInputMap()
