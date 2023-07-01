@@ -1,6 +1,13 @@
 using UnityEngine;
+using System.Collections.Generic;
 using UnityEditor;
 using WFC_Model;
+using UnityEngine.UI;
+using Codice.Utils;
+using UnityEngine.AI;
+using System.Data.SqlTypes;
+using UnityEngine.Rendering;
+using System;
 
 [ExecuteAlways]
 [RequireComponent(typeof(Grid))]
@@ -36,6 +43,8 @@ public class WfcInterface : MonoBehaviour
     public WfcModel model;
     private Tilemap inputMap;
     private Tilemap lastMapGenerated;
+
+    private Mesh[] mirroredMeshes;
 
     private void DrawOutputMeshGizmos()
     {
@@ -75,6 +84,7 @@ public class WfcInterface : MonoBehaviour
     {
         ResizeInputMap();
         ResizeOutputMap();
+
     }
 
     private void RefreshCollider()
@@ -180,20 +190,42 @@ public class WfcInterface : MonoBehaviour
         }
     }
 
+    private Matrix4x4 GetTransformMatrixFromTile(Tile currentTile, Vector3 tilePos)
+    {
+        Quaternion rotation = Quaternion.Euler(new Vector3(0, 90 * currentTile.rotation, 0));
+
+        Vector3 rotationOffset = GetRotationOffset(currentTile);
+
+        return Matrix4x4.TRS(transform.position + tilePos + rotationOffset,
+                                            rotation,
+                                            /*currentTile.reflected ? Vector3.left :*/ Vector3.one);
+
+
+    }
+
     private void DrawTile(Tile currentTile, Vector3 tilePos, Camera cam)
     {
         Mesh mesh = tileSet.GetMesh(currentTile.id);
         if (mesh)
         {
-            Quaternion rotation = Quaternion.Euler(new Vector3(0, 90 * currentTile.rotation, 0));
 
-            Vector3 rotationOffset = GetRotationOffset(currentTile);
+            Matrix4x4 currentTRS = GetTransformMatrixFromTile(currentTile, tilePos);
+            Vector3 s = currentTRS.lossyScale;
+            bool needToConvertCulling = Mathf.Sign(s.x * s.y * s.z) < 0;
+            new CommandBuffer().SetInvertCulling(needToConvertCulling);
 
-            Matrix4x4 currentTRS = Matrix4x4.TRS(transform.position + tilePos + rotationOffset,
-                                                rotation,
-                                                currentTile.reflected ? Vector3.left : Vector3.left); 
+            if (currentTile.reflected)
+            {
+                Graphics.DrawMesh(mirroredMeshes[currentTile.id],
+                            currentTRS, tileSet.GetMaterial(currentTile.id), 0, cam);
+            }
+            else
+            {
+                Graphics.DrawMesh(tileSet.GetMesh(currentTile.id),
+                            currentTRS, tileSet.GetMaterial(currentTile.id), 0, cam);
+            }
 
-            Graphics.DrawMesh(tileSet.GetMesh(currentTile.id), currentTRS, tileSet.GetMaterial(currentTile.id), 0, cam);
+
         }
     }
 
@@ -232,6 +264,104 @@ public class WfcInterface : MonoBehaviour
                 }
             }
         }
+    }
+
+
+    public Mesh[] CreateMeshGroups()
+    {
+        int outputX = lastMapGenerated.width;
+        int outputY = lastMapGenerated.height;
+        int outputZ = lastMapGenerated.depth;
+
+        Dictionary<int, List<(Tile, Vector3Int)>> tilesById = new Dictionary<int, List<(Tile, Vector3Int)>>();
+
+        for (int i = 1; i < tileSet.tiles.Count; i++)
+        {
+            if (tileSet.GetMesh(i) is not null)
+            {
+                tilesById.Add(i, new List<(Tile, Vector3Int)>());
+            }
+        }
+
+        for (int i = 0; i < outputX; i++)
+        {
+            for (int k = 0; k < outputY; k++)
+            {
+                for (int j = 0; j < outputZ; j++)
+                {
+                    Tile tile = lastMapGenerated.GetTile(i, k, j);
+                    if (tilesById.ContainsKey(tile.id))
+                    {
+                        tilesById[tile.id].Add((tile, new Vector3Int(i, k, j)));
+                    }
+                }
+            }
+        }
+
+        Mesh[] submeshes = new Mesh[tilesById.Count];
+        int index = 0;
+        foreach (KeyValuePair<int, List<(Tile, Vector3Int)>> keyValuePair in tilesById)
+        {
+            int currentId = keyValuePair.Key;
+            List<(Tile, Vector3Int)> tileList = keyValuePair.Value;
+
+
+            List<CombineInstance> combineByTile = new List<CombineInstance>();
+            Debug.Log("adfs");
+            Mesh mesh = tileSet.GetMesh(currentId);
+            if (mesh is null) continue;
+
+            CombineInstance template = new CombineInstance();
+            template.mesh = new Mesh();
+            template.mesh.vertices = mesh.vertices;
+            template.mesh.triangles = mesh.triangles;
+            template.mesh.uv = mesh.uv;
+            template.mesh.normals = mesh.normals;
+            template.mesh.colors = mesh.colors;
+            template.mesh.tangents = mesh.tangents;
+
+
+            if (template.mesh is null && mesh is not null) throw new System.Exception();
+
+            foreach ((Tile currentTile, Vector3Int currentPos) in tileList)
+            {
+                if (mesh is not null)
+                {
+                    template.transform = GetTransformMatrixFromTile(currentTile, currentPos);
+                    combineByTile.Add(template);
+
+                }
+            }
+            submeshes[index] = new Mesh();
+            submeshes[index].CombineMeshes(combineByTile.ToArray(), mergeSubMeshes: true, useMatrices: true);
+            index++;
+        }
+        return submeshes;
+
+
+    }
+
+    public Mesh CreateMeshFromOutput()
+    {
+        Mesh[] submeshes = CreateMeshGroups();
+
+        CombineInstance[] combine = new CombineInstance[submeshes.Length];
+        int index = 0;
+        foreach (Mesh mesh in submeshes)
+        {
+            combine[index].mesh = new Mesh();
+            combine[index].mesh.vertices = mesh.vertices;
+            combine[index].mesh.triangles = mesh.triangles;
+            combine[index].mesh.uv = mesh.uv;
+            combine[index].mesh.normals = mesh.normals;
+            combine[index].mesh.colors = mesh.colors;
+            combine[index].mesh.tangents = mesh.tangents;
+            index++;
+        }
+
+        Mesh outputMesh = new Mesh();
+        outputMesh.CombineMeshes(combine, mergeSubMeshes: false, useMatrices: false);
+        return outputMesh;
     }
 
     private void DeleteTile(Vector3Int pos)
@@ -401,11 +531,52 @@ public class WfcInterface : MonoBehaviour
         RefreshCollider();
     }
 
+    private Mesh MirrorMesh(in Mesh mesh)
+    {
+        Mesh output = new Mesh();
+        output.vertices = mesh.vertices;
+        output.triangles = mesh.triangles;
+        output.uv = mesh.uv;
+        output.normals = mesh.normals;
+        output.colors = mesh.colors;
+        output.tangents = mesh.tangents;
+
+        Vector3 mirrorVector = new Vector3(-1, 1, 1);
+
+        for (int i = 0; i < output.vertices.Length; i++)
+        {
+            output.vertices[i] = Vector3.Scale(output.vertices[i], mirrorVector);
+            
+        }
+
+        for (int i = 0; i < output.normals.Length; i++)
+        {
+            output.normals[i] = -output.normals[i];
+        }
+
+
+        return output;
+    }
+
+    public void CreateMirroredMeshes()
+    {
+        int numberOfTiles = tileSet.tiles.Count;
+        mirroredMeshes = new Mesh[numberOfTiles];
+        for (int i = 0; i < numberOfTiles; i++)
+        {
+            if (tileSet.tiles[i].mesh && tileSet.tiles[i].mesh.vertexCount > 0)
+            {
+                mirroredMeshes[i] = MirrorMesh(tileSet.tiles[i].mesh);
+            }
+        }
+    }
+
     public void Generate()
     {
         Debug.Log(inputMap);
         lastMapGenerated = model.Generate(outputSize.x, outputSize.y, outputSize.z);
         Debug.Log(lastMapGenerated.ToString());
+        CreateMirroredMeshes();
     }
 
     public void CompleteOutputMap()
