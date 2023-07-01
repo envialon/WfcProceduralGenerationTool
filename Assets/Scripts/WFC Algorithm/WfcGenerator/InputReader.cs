@@ -305,16 +305,7 @@ namespace WFC_Model
 
         private void ReflectIndividualTiles(ref int[] pattern)
         {
-            int patternLength = pattern.Length;
-            for (int i = 0; i < patternLength; i++)
-            {
-                if (pattern[i] != 0)
-                {
-                    Tile newTile = Tile.DecodeTile(pattern[i], symmetryDictionary);
-                    newTile.Reflect();
-                    pattern[i] = Tile.EncodeTile(newTile);
-                }
-            }
+            // not completely supported for directional tiles right now.
         }
 
         private void ReflectPatterns3D(Dictionary<long, PatternInfo> patternFrecuency)
