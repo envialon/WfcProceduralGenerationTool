@@ -55,6 +55,11 @@ namespace WFC_Model
             return rotation;
         }
 
+        public void Reflect()
+        {
+            reflected = !reflected;
+        }
+
         private static int mod(int x, int y)
         {
             return x - y * (int)Math.Floor((double)x / y);
@@ -81,6 +86,7 @@ namespace WFC_Model
 
             return encoded;
         }
+       
         public static int DecodeTileId(int encodedTile)
         {
             int lastBitCleared = encodedTile & ~(1 << 31);
