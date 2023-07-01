@@ -8,6 +8,7 @@ using UnityEngine.AI;
 using System.Data.SqlTypes;
 using UnityEngine.Rendering;
 using System;
+using System.Linq;
 
 [ExecuteAlways]
 [RequireComponent(typeof(Grid))]
@@ -532,28 +533,31 @@ public class WfcInterface : MonoBehaviour
     }
 
     private Mesh MirrorMesh(in Mesh mesh)
-    {
+{
         Mesh output = new Mesh();
-        output.vertices = mesh.vertices;
-        output.triangles = mesh.triangles;
+
+        Vector3 mirrorVector = new Vector3(-1, 1, 1);
+
+        Vector3[] vertices = new Vector3[mesh.vertices.Length];
+        for (int i = 0; i < vertices.Length; i++)
+        {
+            vertices[i] = Vector3.Scale(mesh.vertices[i], mirrorVector);
+        }
+        output.vertices = vertices;
+
+        vertices = new Vector3[mesh.vertices.Length];
+        for (int i = 0; i < mesh.normals.Length; i++)
+        {
+            vertices[i] = Vector3.Scale(mesh.normals[i], mirrorVector);
+        }
+        output.normals = vertices;
+
+        //output.normals = mesh.normals;
+        output.triangles = Enumerable.Reverse(mesh.triangles).ToArray();
         output.uv = mesh.uv;
         output.normals = mesh.normals;
         output.colors = mesh.colors;
         output.tangents = mesh.tangents;
-
-        Vector3 mirrorVector = new Vector3(-1, 1, 1);
-
-        for (int i = 0; i < output.vertices.Length; i++)
-        {
-            output.vertices[i] = Vector3.Scale(output.vertices[i], mirrorVector);
-            
-        }
-
-        for (int i = 0; i < output.normals.Length; i++)
-        {
-            output.normals[i] = -output.normals[i];
-        }
-
 
         return output;
     }
