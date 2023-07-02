@@ -65,22 +65,32 @@ namespace WFC_Model
             return x - y * (int)Math.Floor((double)x / y);
         }
 
-        private static int EncodeRotation(Tile tile)
+        private static int EncodeRotationAndRotation(Tile tile)
         {
+
             if (tile.symmetry == SymmetryType.X)
             {
                 return 0;
             }
 
+            int output = 0;
+
             if (tile.symmetry == SymmetryType.D || tile.symmetry == SymmetryType.I)
             {
-                return mod(tile.rotation, 2);
+                output = mod(tile.rotation, 2);
             }
-            return mod(tile.rotation, 4);
+            else
+            {
+                output = mod(tile.rotation, 4);
+            }
+            
+            return output | ((tile.reflected) ? (1 << 31) : 0);
         }
+
+
         public static int EncodeTile(Tile tile)
         {
-            int encoded = (tile.id * 4 + EncodeRotation(tile)) | ((tile.reflected) ? (1 << 31) : 0);
+            int encoded = (tile.id * 4 + EncodeRotationAndRotation(tile)) ;
 
             string binary = Convert.ToString(encoded, 2).PadLeft(32, '0');
 
@@ -112,8 +122,6 @@ namespace WFC_Model
             int id = DecodeTileId(encodedTile);
             return new Tile(id, DecodeTileRotation(encodedTile), symmetryDictionary[id], DecodeReflection(encodedTile));
         }
-
-
     }
 
     public struct Position
