@@ -371,16 +371,17 @@ namespace WFC_Model
 
             }
 
-            if (enablePatternReflection)
-            {
-                //Debug.Log("Reflection");
-                ReflectPatterns3D(patternFrecuency);
-            }
             if (enablePatternRotation)
             {
                 //Debug.Log("Rotation");
                 RotatePatterns3D(patternFrecuency);
             }
+            if (enablePatternReflection)
+            {
+                //Debug.Log("Reflection");
+                ReflectPatterns3D(patternFrecuency);
+            }
+           
 
             patterns = patternFrecuency.Values.ToArray();
         }

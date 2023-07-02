@@ -472,7 +472,7 @@ public class WfcInterface : MonoBehaviour
                     ReflectTile(cellPosition);
                 }
                 else
-                {
+                    {
                     DeleteTile(cellPosition);
                 }
             }

@@ -323,8 +323,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 12, y: 0, z: 12}
-  m_Center: {x: 6, y: 0, z: 6}
+  m_Size: {x: 4, y: 0, z: 4}
+  m_Center: {x: 2, y: 0, z: 2}
 --- !u!4 &1339589962
 Transform:
   m_ObjectHideFlags: 0
@@ -333,7 +333,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1339589959}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.24, y: 0.03, z: -0.02}
+  m_LocalPosition: {x: 0.273, y: 0.03, z: 0.004}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -353,13 +353,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   patternSize: 3
-  inputMapSize: 12
-  inputMapHeight: 1
-  selectedTile: 3
-  outputSize: {x: 20, y: 0, z: 20}
+  inputMapSize: 4
+  inputMapHeight: 2
+  selectedTile: 5
+  outputSize: {x: 20, y: 2, z: 20}
   selectedLayer: 0
   selectOutputMap: 0
-  tileSet: {fileID: 11400000, guid: 43d87efc2f9a6014cb055b492a787204, type: 2}
+  tileSet: {fileID: 11400000, guid: e6ef6a49b8ab6d242a58b8cba0362832, type: 2}
 --- !u!156049354 &1339589964
 Grid:
   m_ObjectHideFlags: 0
