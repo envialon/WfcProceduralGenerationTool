@@ -66,6 +66,11 @@ namespace WFC_Model
             return symmetryDictionary;
         }
 
+        public void ReflectAt(int x, int y, int z)
+        {
+            map[x + (y * yOffset) + (z * zOffset)].Reflect();
+        }
+
         public void RotateAt(int x, int y, int z)
         {
             map[x + (y * yOffset) + (z * zOffset)].RotateClockwise();

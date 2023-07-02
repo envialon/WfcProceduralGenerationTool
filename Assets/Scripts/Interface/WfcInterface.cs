@@ -9,6 +9,7 @@ using System.Data.SqlTypes;
 using UnityEngine.Rendering;
 using System;
 using System.Linq;
+using static UnityEditor.PlayerSettings;
 
 [ExecuteAlways]
 [RequireComponent(typeof(Grid))]
@@ -178,14 +179,21 @@ public class WfcInterface : MonoBehaviour
 
     private Vector3 GetRotationOffset(Tile currentTile)
     {
-        switch (currentTile.rotation)
+        switch ((currentTile.rotation, currentTile.reflected))
         {
-            case 1:
+            case (1, false):
                 return new Vector3(0, 0, 1);
-            case 2:
+            case (2, false):
                 return new Vector3(1, 0, 1);
-            case 3:
+            case (3, false):
                 return new Vector3(1, 0, 0);
+            case (0, true):
+                return new Vector3(1, 0, 0);
+            case (2, true):
+                return new Vector3(0, 0, 1);
+
+            case (3, true):
+                return new Vector3(1, 0, 1);
             default:
                 return Vector3.zero;
         }
@@ -199,7 +207,7 @@ public class WfcInterface : MonoBehaviour
 
         return Matrix4x4.TRS(transform.position + tilePos + rotationOffset,
                                             rotation,
-                                            /*currentTile.reflected ? Vector3.left :*/ Vector3.one);
+                                            Vector3.one);
 
 
     }
@@ -389,6 +397,18 @@ public class WfcInterface : MonoBehaviour
         }
     }
 
+    private void ReflectTile(Vector3Int pos)
+    {
+        if (selectOutputMap)
+        {
+            lastMapGenerated.ReflectAt(pos.x, pos.y, pos.z);
+        }
+        else
+        {
+            inputMap.ReflectAt(pos.x, pos.y, pos.z);
+        }
+    }
+
     private void RotateTile(Vector3Int pos)
     {
         if (selectOutputMap)
@@ -440,7 +460,14 @@ public class WfcInterface : MonoBehaviour
             //Debug.Log("Hit at: " + hit.point + " Corresponds to cell " + cellPosition);
             if (mouseButton == 1)
             {
-                DeleteTile(cellPosition);
+                if (selectedTile == GetClickedOnTile(cellPosition.x, cellPosition.y, cellPosition.z).id)
+                {
+                    ReflectTile(cellPosition);
+                }
+                else
+                {
+                    DeleteTile(cellPosition);
+                }
             }
             else if (selectedTile == GetClickedOnTile(cellPosition.x, cellPosition.y, cellPosition.z).id)
             {
@@ -533,7 +560,7 @@ public class WfcInterface : MonoBehaviour
     }
 
     private Mesh MirrorMesh(in Mesh mesh)
-{
+    {
         Mesh output = new Mesh();
 
         Vector3 mirrorVector = new Vector3(-1, 1, 1);
