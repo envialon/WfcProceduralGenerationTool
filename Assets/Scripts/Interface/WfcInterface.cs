@@ -164,16 +164,14 @@ public class WfcInterface : MonoBehaviour
 
     private void DrawWithCamera(Camera cam)
     {
-        if (cam)
+        if (cam && tileSet)
         {
-            if (tileSet)
+            DrawInputMap(cam);
+            if (lastMapGenerated != null)
             {
-                DrawInputMap(cam);
-                if (lastMapGenerated != null)
-                {
-                    DrawGeneratedMap(cam);
-                }
+                DrawGeneratedMap(cam);
             }
+
         }
     }
 
@@ -199,9 +197,18 @@ public class WfcInterface : MonoBehaviour
         }
     }
 
+    private Quaternion GetRotationFromTile(Tile currentTile)
+    {
+        int rotation = currentTile.rotation;
+
+
+
+        return Quaternion.Euler(new Vector3(0, 90 * rotation, 0));
+    }
+
     private Matrix4x4 GetTransformMatrixFromTile(Tile currentTile, Vector3 tilePos)
     {
-        Quaternion rotation = Quaternion.Euler(new Vector3(0, 90 * currentTile.rotation, 0));
+        Quaternion rotation = GetRotationFromTile(currentTile);
 
         Vector3 rotationOffset = GetRotationOffset(currentTile);
 

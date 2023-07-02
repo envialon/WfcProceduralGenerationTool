@@ -51,6 +51,10 @@ namespace WFC_Model
 
         public int RotateClockwise()
         {
+            if (symmetry == SymmetryType.X)
+            {
+                return rotation;
+            }
             rotation = (rotation + 1) % 4;
             return rotation;
         }
@@ -77,26 +81,32 @@ namespace WFC_Model
 
             if (tile.symmetry == SymmetryType.D || tile.symmetry == SymmetryType.I)
             {
-                output = mod(tile.rotation, 2);
+                output = mod(tile.rotation, 2) | ((tile.reflected) ? (1 << 31) : 0);
             }
-            else
+
+            else if (tile.symmetry == SymmetryType.T && tile.reflected)
             {
-                output = mod(tile.rotation, 4);
+                output = (tile.rotation % 2 == 0) ? mod(tile.rotation, 4) : mod(tile.rotation, 4) | (1 << 31);
             }
             
-            return output | ((tile.reflected) ? (1 << 31) : 0);
+            else
+            {
+                output = mod(tile.rotation, 4) | ((tile.reflected) ? (1 << 31) : 0);
+            }
+
+            return output;
         }
 
 
         public static int EncodeTile(Tile tile)
         {
-            int encoded = (tile.id * 4 + EncodeRotationAndRotation(tile)) ;
+            int encoded = (tile.id * 4 + EncodeRotationAndRotation(tile));
 
             string binary = Convert.ToString(encoded, 2).PadLeft(32, '0');
 
             return encoded;
         }
-       
+
         public static int DecodeTileId(int encodedTile)
         {
             int lastBitCleared = encodedTile & ~(1 << 31);
