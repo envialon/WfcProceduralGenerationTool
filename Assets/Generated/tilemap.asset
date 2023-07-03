@@ -19,39 +19,39 @@ MonoBehaviour:
     map:
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 6
       rotation: 2
@@ -63,27 +63,27 @@ MonoBehaviour:
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 4
       rotation: 3
@@ -95,54 +95,54 @@ MonoBehaviour:
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
     - id: 0
       rotation: 0
-      symmetry: 0
+      symmetry: 1
       reflected: 0
-  tileSet: {fileID: 0}
+  tileSet: {fileID: 11400000, guid: e6ef6a49b8ab6d242a58b8cba0362832, type: 2}
