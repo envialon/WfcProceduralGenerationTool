@@ -79,6 +79,7 @@ namespace WFC_Model
 
             int output;
 
+            // TO DO: I SYMMETRY MUST BE THE SAME WHEN REFLECTED AND ROTATION % 2 == 0
             if (tile.symmetry == SymmetryType.D || tile.symmetry == SymmetryType.I)
             {
                 output = mod(tile.rotation, 2) | ((tile.reflected) ? (1 << 31) : 0);

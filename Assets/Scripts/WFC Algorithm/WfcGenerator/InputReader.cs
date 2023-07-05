@@ -13,8 +13,6 @@ namespace WFC_Model
     /// </summary>
     public class InputReader
     {
-
-
         public int patternSize;
         public int patternHeight;
         public Tilemap inputTileMap;
