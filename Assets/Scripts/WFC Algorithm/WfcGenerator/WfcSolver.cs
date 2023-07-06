@@ -10,7 +10,8 @@ namespace WFC_Model
         public int height;
         public int depth;
 
-        private Random random = new Random();
+        public bool deepFirstPropagation;
+
         public Cell[] cellMap;
 
         public List<int> uncollapsedCellIndices;
@@ -23,6 +24,8 @@ namespace WFC_Model
 
         private int yOffset;
         private int zOffset;
+
+        private Random random = new Random();
 
         private Dictionary<Position, HashSet<int>> removalDictionary;
 
@@ -93,11 +96,13 @@ namespace WFC_Model
             uncollapsedCellIndices = Enumerable.Range(0, width * height * depth).ToList();
         }
 
-        public WfcSolver(InputReader inputReader, int width = -1, int height = -1, int depth = -1)
+        public WfcSolver(InputReader inputReader, int width = -1, int height = -1, int depth = -1, bool deepFirstPropagation = true)
         {
             this.width = width;
             this.height = height;
             this.depth = depth;
+
+            this.deepFirstPropagation = deepFirstPropagation;
 
             this.patternInfo = inputReader.GetPatternInfo();
             this.numberOfPatterns = patternInfo.Length;
@@ -176,7 +181,6 @@ namespace WFC_Model
                 randomValue -= candidateFrecuencies[i];
             }
 
-
             AddRemovalUpdate(pos, cellMap[cellIndex].possiblePatterns);
             removalDictionary[pos].Remove(candidatePatternIndices[collapsedIndex]);
 
@@ -244,11 +248,18 @@ namespace WFC_Model
 
         private RemovalUpdate GetRemovalUpdate()
         {
-            Position pos = removalDictionary.First().Key;
-            HashSet<int> indexesToRemove = removalDictionary.First().Value;
+            KeyValuePair<Position, HashSet<int>> removalUpdate;
+            if (deepFirstPropagation)
+            {
+                removalUpdate = removalDictionary.First();
+            }
+            else
+            {
+                removalUpdate = removalDictionary.Last();
+            }
 
-            removalDictionary.Remove(pos);
-            return new RemovalUpdate(pos, indexesToRemove);
+            removalDictionary.Remove(removalUpdate.Key);
+            return new RemovalUpdate(removalUpdate.Key, removalUpdate.Value);
         }
 
         private void Propagate()
@@ -278,7 +289,7 @@ namespace WFC_Model
             int cellsToBeCollapsed = width * height * depth;
             collapsedCount = 0;
 
-           // ProcessIncompleteMap(incompleteMap);
+            // ProcessIncompleteMap(incompleteMap);
             if (removalDictionary.Count != 0) Propagate();
 
             while (collapsedCount < cellsToBeCollapsed)
@@ -313,7 +324,7 @@ namespace WFC_Model
                     for (int y = 0; y < height; y++)
                     {
                         int patternIndex = cellMap[x + y * yOffset + z * zOffset].GetCollapsedPatternIndex();
-                        output.SetTile(Tile.DecodeTile(patternInfo[patternIndex].GetEncodedTileIndex(), symmetryDictionary ),
+                        output.SetTile(Tile.DecodeTile(patternInfo[patternIndex].GetEncodedTileIndex(), symmetryDictionary),
                                        x, y, z);
                     }
                 }

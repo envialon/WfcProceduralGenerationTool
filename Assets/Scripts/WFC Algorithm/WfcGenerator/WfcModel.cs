@@ -1,3 +1,4 @@
+using GluonGui.WorkspaceWindow.Views.Checkin.Operations;
 using System;
 
 namespace WFC_Model
@@ -15,7 +16,7 @@ namespace WFC_Model
         public bool horizontalPeriodicInput = true;
         public bool verticalPeriodicInput = true;
 
-        public bool dephtFirstPropagation = false;
+        public bool depthFirstPropagation = false;
 
         public WfcModel(Tilemap data)
         {
@@ -30,19 +31,17 @@ namespace WFC_Model
                               sandwichPatterns,
                               horizontalPeriodicInput,
                               verticalPeriodicInput);
-
-            solver = new WfcSolver(inputReader);
         }
 
         public Tilemap Generate(Tilemap incompleteMap)
         {
-            solver = new WfcSolver(inputReader, incompleteMap.width, incompleteMap.height, incompleteMap.depth);
+            solver = new WfcSolver(inputReader, incompleteMap.width, incompleteMap.height, incompleteMap.depth, depthFirstPropagation);
             return solver.Generate(incompleteMap);
         }
 
         public Tilemap Generate(int outputX, int outputY, int outputZ)
         {
-            solver = new WfcSolver(inputReader, outputX, outputY, outputZ);
+            solver = new WfcSolver(inputReader, outputX, outputY, outputZ, depthFirstPropagation);
             return solver.Generate();
         }
 

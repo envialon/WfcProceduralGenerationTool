@@ -2,14 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEditor;
 using WFC_Model;
-using UnityEngine.UI;
-using Codice.Utils;
-using UnityEngine.AI;
-using System.Data.SqlTypes;
 using UnityEngine.Rendering;
-using System;
 using System.Linq;
-using static UnityEditor.PlayerSettings;
 
 [ExecuteAlways]
 [RequireComponent(typeof(Grid))]
@@ -38,6 +32,7 @@ public class WfcInterface : MonoBehaviour
     public bool selectOutputMap = false;
 
     public TileSet tileSet;
+    private TileSet tileSetCheck = null;
 
     private Grid grid;
     private BoxCollider boxCollider;
@@ -84,9 +79,19 @@ public class WfcInterface : MonoBehaviour
 
     private void OnValidate()
     {
+        ChangedTileSet();
         ResizeInputMap();
         ResizeOutputMap();
 
+    }
+
+    private void ChangedTileSet()
+    {
+        if (tileSet != tileSetCheck)
+        {
+            CreateMirroredMeshes();
+            tileSetCheck = tileSet;
+        }
     }
 
     private void RefreshCollider()
@@ -158,6 +163,8 @@ public class WfcInterface : MonoBehaviour
 
         boxCollider = GetComponent<BoxCollider>();
 
+
+        ChangedTileSet();
         ResizeInputMap();
         ResizeOutputMap();
     }
@@ -283,7 +290,7 @@ public class WfcInterface : MonoBehaviour
     }
 
 
-    public Mesh[] CreateMeshGroups()
+    private Mesh[] CreateMeshGroups()
     {
         int outputX = lastMapGenerated.width;
         int outputY = lastMapGenerated.height;
@@ -328,6 +335,7 @@ public class WfcInterface : MonoBehaviour
             if (mesh is null) continue;
 
             CombineInstance template = new CombineInstance();
+
             template.mesh = new Mesh();
             template.mesh.vertices = mesh.vertices;
             template.mesh.triangles = mesh.triangles;
@@ -472,7 +480,7 @@ public class WfcInterface : MonoBehaviour
                     ReflectTile(cellPosition);
                 }
                 else
-                    {
+                {
                     DeleteTile(cellPosition);
                 }
             }
@@ -564,6 +572,7 @@ public class WfcInterface : MonoBehaviour
         inputMapSize = inputMap.depth;
         inputMapHeight = inputMap.height;
         RefreshCollider();
+        ChangedTileSet();
     }
 
     private Mesh MirrorMesh(in Mesh mesh)
@@ -596,7 +605,7 @@ public class WfcInterface : MonoBehaviour
         return output;
     }
 
-    public void CreateMirroredMeshes()
+    private void CreateMirroredMeshes()
     {
         int numberOfTiles = tileSet.tiles.Count;
         mirroredMeshes = new Mesh[numberOfTiles];
@@ -614,7 +623,6 @@ public class WfcInterface : MonoBehaviour
         Debug.Log(inputMap);
         lastMapGenerated = model.Generate(outputSize.x, outputSize.y, outputSize.z);
         Debug.Log(lastMapGenerated.ToString());
-        CreateMirroredMeshes();
     }
 
     public void CompleteOutputMap()
@@ -655,6 +663,11 @@ public class WfcInterfaceEditor : Editor
         t.model.horizontalPeriodicInput = EditorGUILayout.Toggle("Horizontal periodic input", t.model.horizontalPeriodicInput);
         t.model.verticalPeriodicInput = EditorGUILayout.Toggle("Vertical periodic input", t.model.verticalPeriodicInput);
         GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        t.model.depthFirstPropagation = EditorGUILayout.Toggle("Deep-First propagation", t.model.depthFirstPropagation);
+        GUILayout.EndHorizontal();
+
 
         GUILayout.Space(20);
 
