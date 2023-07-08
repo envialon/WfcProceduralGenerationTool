@@ -25,7 +25,7 @@ public class WfcInterface : MonoBehaviour
     public Vector3Int outputSize = new Vector3Int(20, 1, 20);
     private Vector3Int outputSizeCheck = Vector3Int.zero;
 
-    private Vector3Int startingPoint;
+    private Vector3Int outputGridOffset;
 
     public int selectedLayer = 0;
 
@@ -51,8 +51,8 @@ public class WfcInterface : MonoBehaviour
             for (int j = 0; j <= outputSize.z; j++)
             {
 
-                Gizmos.DrawLine(new Vector3(startingPoint.x, selectedLayer, i + startingPoint.z) + pos, new Vector3(outputSize.x + startingPoint.x, selectedLayer, i + startingPoint.z) + pos);
-                Gizmos.DrawLine(new Vector3(i + startingPoint.x, selectedLayer, startingPoint.z) + pos, new Vector3(i + startingPoint.x, selectedLayer, outputSize.z + startingPoint.z) + pos);
+                Gizmos.DrawLine(new Vector3(outputGridOffset.x, selectedLayer, i + outputGridOffset.z) + pos, new Vector3(outputSize.x + outputGridOffset.x, selectedLayer, i + outputGridOffset.z) + pos);
+                Gizmos.DrawLine(new Vector3(i + outputGridOffset.x, selectedLayer, outputGridOffset.z) + pos, new Vector3(i + outputGridOffset.x, selectedLayer, outputSize.z + outputGridOffset.z) + pos);
 
             }
         }
@@ -104,7 +104,7 @@ public class WfcInterface : MonoBehaviour
         if (selectOutputMap)
         {
             boxCollider.size = new Vector3(outputSize.x, 0, outputSize.z);
-            boxCollider.center = new Vector3((outputSize.x / 2) + startingPoint.x, selectedLayer, (outputSize.z / 2) + startingPoint.z);
+            boxCollider.center = new Vector3((outputSize.x / 2) + outputGridOffset.x, selectedLayer, (outputSize.z / 2) + outputGridOffset.z);
         }
         else
         {
@@ -127,6 +127,8 @@ public class WfcInterface : MonoBehaviour
             inputMap = new Tilemap(inputMapSize, inputMapHeight, inputMapSize);
             model = new WfcModel(inputMap);
 
+            outputGridOffset = new Vector3Int(inputMapSize + 1, 0, -outputSize.z / 2);
+
             RefreshCollider();
         }
     }
@@ -136,7 +138,7 @@ public class WfcInterface : MonoBehaviour
         if (outputSizeCheck != outputSize && model is not null)
         {
             model.SetOutputSize(outputSize.x, outputSize.y, outputSize.z);
-            startingPoint = new Vector3Int(inputMapSize + 1, 0, -outputSize.z / 2);
+            outputGridOffset = new Vector3Int(inputMapSize + 1, 0, -outputSize.z / 2);
         }
     }
 
@@ -280,7 +282,7 @@ public class WfcInterface : MonoBehaviour
             {
                 for (int j = 0; j < outputZ; j++)
                 {
-                    Vector3Int tilePos = startingPoint + new Vector3Int(i, k, j);
+                    Vector3Int tilePos = outputGridOffset + new Vector3Int(i, k, j);
                     Tile tile = lastMapGenerated.GetTile(i, k, j);
 
                     DrawTile(tile, tilePos, cam);
@@ -442,7 +444,7 @@ public class WfcInterface : MonoBehaviour
 
         if (selectOutputMap)
         {
-            output -= startingPoint;
+            output -= outputGridOffset;
         }
 
         return output;
