@@ -384,7 +384,7 @@ namespace WFC_Model
             patterns = patternFrecuency.Values.ToArray();
         }
 
-        public void Train(int patternSize = 2, Tilemap inputTileMap = null, bool enableReflection = true,
+        public void ReadInput(int patternSize = 2, Tilemap inputTileMap = null, bool enableReflection = true,
                                                 bool enableRotation = true, bool sandwitchPatterns = true,
                                                 bool horizontalPeriodic = true, bool verticalPeriodic = true)
         {

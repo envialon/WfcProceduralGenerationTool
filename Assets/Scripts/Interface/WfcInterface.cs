@@ -209,18 +209,13 @@ public class WfcInterface : MonoBehaviour
     private Quaternion GetRotationFromTile(Tile currentTile)
     {
         int rotation = currentTile.rotation;
-
-
-
         return Quaternion.Euler(new Vector3(0, 90 * rotation, 0));
     }
 
     private Matrix4x4 GetTransformMatrixFromTile(Tile currentTile, Vector3 tilePos)
     {
         Quaternion rotation = GetRotationFromTile(currentTile);
-
         Vector3 rotationOffset = GetRotationOffset(currentTile);
-
         return Matrix4x4.TRS(transform.position + tilePos + rotationOffset,
                                             rotation,
                                             Vector3.one);
@@ -249,8 +244,6 @@ public class WfcInterface : MonoBehaviour
                 Graphics.DrawMesh(tileSet.GetMesh(currentTile.id),
                             currentTRS, tileSet.GetMaterial(currentTile.id), 0, cam);
             }
-
-
         }
     }
 
@@ -346,7 +339,6 @@ public class WfcInterface : MonoBehaviour
             template.mesh.colors = mesh.colors;
             template.mesh.tangents = mesh.tangents;
 
-
             if (template.mesh is null && mesh is not null) throw new System.Exception();
 
             foreach ((Tile currentTile, Vector3Int currentPos) in tileList)
@@ -363,8 +355,6 @@ public class WfcInterface : MonoBehaviour
             index++;
         }
         return submeshes;
-
-
     }
 
     public Mesh CreateMeshFromOutput()
@@ -555,9 +545,9 @@ public class WfcInterface : MonoBehaviour
         lastMapGenerated.Clear();
     }
 
-    public void Train()
+    public void ReadInput()
     {
-        model.Train(inputMap, patternSize);
+        model.ReadInput(inputMap, patternSize);
         Debug.Log(model.inputReader.GetPatternSummary());
     }
 
@@ -692,9 +682,9 @@ public class WfcInterfaceEditor : Editor
 
         GUILayout.Space(10);
 
-        if (GUILayout.Button("Train"))
+        if (GUILayout.Button("Read input"))
         {
-            t.Train();
+            t.ReadInput();
         }
 
     }

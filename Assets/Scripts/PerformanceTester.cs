@@ -42,7 +42,7 @@ public class PerformanceTester : MonoBehaviour
         model.enablePatternRotations = enableReflections;
 
         stopwatch.Start();
-        model.Train(tm, patternSize);
+        model.ReadInput(tm, patternSize);
         stopwatch.Stop();
         trainingTimeTable[tilemapIndex].Add(stopwatch.ElapsedMilliseconds);
 
@@ -127,7 +127,7 @@ public class PerformanceTester : MonoBehaviour
         model = new WfcModel(tm);
         model.enablePatternReflection = enableReflections;
         model.enablePatternRotations = enableRotations;
-        model.Train(tm, patternSize);
+        model.ReadInput(tm, patternSize);
 
         int numberOfPatterns = model.GetNumberOfPatterns();
         long averageTrainingTime = 0;
@@ -141,7 +141,7 @@ public class PerformanceTester : MonoBehaviour
 
             stopwatch = new Stopwatch();
             stopwatch.Start();
-            model.Train(tm, patternSize);
+            model.ReadInput(tm, patternSize);
             stopwatch.Stop();
             averageTrainingTime += stopwatch.ElapsedMilliseconds;
 

@@ -28,7 +28,7 @@ public class TrainingTests
     {
         Tilemap tm = GenerateInputMap();
         model = new WfcModel(tm);
-        model.Train(tm, 2);
+        model.ReadInput(tm, 2);
     }
 
     [Test]
@@ -41,9 +41,9 @@ public class TrainingTests
         model.sandwichPatterns = false;
         model.horizontalPeriodicInput = false;
         model.verticalPeriodicInput = false;
-        model.Train(tm, 2);
+        model.ReadInput(tm, 2);
         model.enablePatternReflection = false;
-        model.Train(tm, 2);
+        model.ReadInput(tm, 2);
     }
     
     [Test]
@@ -55,9 +55,9 @@ public class TrainingTests
         model.sandwichPatterns = false;
         model.horizontalPeriodicInput = false;
         model.verticalPeriodicInput = false;
-        model.Train(tm, 2);
+        model.ReadInput(tm, 2);
         model.enablePatternRotations = false;
-        model.Train(tm, 2);
+        model.ReadInput(tm, 2);
         
     }
 
@@ -71,9 +71,9 @@ public class TrainingTests
         model.sandwichPatterns = false;
         model.horizontalPeriodicInput = false;
         model.verticalPeriodicInput = false;
-        model.Train(tm, 2);
+        model.ReadInput(tm, 2);
         model.sandwichPatterns = true;
-        model.Train(tm, 2);
+        model.ReadInput(tm, 2);
     }
 
     [Test]
@@ -86,9 +86,9 @@ public class TrainingTests
         model.sandwichPatterns = false;
         model.horizontalPeriodicInput = false;
         model.verticalPeriodicInput = false;
-        model.Train(tm, 2);
+        model.ReadInput(tm, 2);
         model.horizontalPeriodicInput = true;
-        model.Train(tm, 2);
+        model.ReadInput(tm, 2);
     }
 
 
@@ -102,9 +102,9 @@ public class TrainingTests
         model.sandwichPatterns = false;
         model.horizontalPeriodicInput = false;
         model.verticalPeriodicInput = false;
-        model.Train(tm, 2);
+        model.ReadInput(tm, 2);
         model.verticalPeriodicInput = true;
-        model.Train(tm, 2);
+        model.ReadInput(tm, 2);
     }
 
 }

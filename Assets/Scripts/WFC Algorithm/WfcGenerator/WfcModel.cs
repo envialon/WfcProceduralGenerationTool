@@ -1,4 +1,3 @@
-using GluonGui.WorkspaceWindow.Views.Checkin.Operations;
 using System;
 
 namespace WFC_Model
@@ -23,9 +22,9 @@ namespace WFC_Model
             inputReader = new InputReader(data, patternSize);
         }
 
-        public void Train(Tilemap inputTileMap, int patternSize = 2)
+        public void ReadInput(Tilemap inputTileMap, int patternSize = 2)
         {
-            inputReader.Train(patternSize, inputTileMap,
+            inputReader.ReadInput(patternSize, inputTileMap,
                               enablePatternReflection,
                               enablePatternRotations,
                               sandwichPatterns,
