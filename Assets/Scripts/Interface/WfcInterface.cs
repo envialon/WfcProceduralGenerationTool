@@ -524,11 +524,11 @@ public class WfcInterface : MonoBehaviour
                 break;
 
             case KeyCode.K:
-                ChangeLayer(mod(selectedLayer + 1, inputMapHeight));
+                ChangeLayer(mod(selectedLayer + 1, (selectOutputMap) ? outputSize.y : inputMapHeight));
                 break;
 
             case KeyCode.J:
-                ChangeLayer(Mathf.Abs(mod(selectedLayer - 1, inputMapHeight)));
+                ChangeLayer(Mathf.Abs(mod(selectedLayer - 1, (selectOutputMap) ? outputSize.y : inputMapHeight)));
                 break;
         }
     }

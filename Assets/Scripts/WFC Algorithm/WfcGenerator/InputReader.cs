@@ -286,17 +286,19 @@ namespace WFC_Model
                 {
                     rotatedPattern = RotateMatrix(in rotatedPattern);
                     RotateIndividualTiles(ref rotatedPattern);
-                    long patternHash = HashPattern(rotatedPattern);
-                    if (!patternFrecuency.ContainsKey(patternHash))
+                    long rotatedPatternHash = HashPattern(rotatedPattern);
+                    if (!patternFrecuency.ContainsKey(rotatedPatternHash))
                     {
-                        totalPatterns++;
-                        patternFrecuency.Add(patternHash, new PatternInfo(patternFrecuency.Count,
+                        patternFrecuency.Add(rotatedPatternHash, new PatternInfo(patternFrecuency.Count,
                                                                           rotatedPattern,
                                                                           patternSize,
                                                                           patternHeight,
                                                                           pattern.frecuency,
                                                                           direction));
                     }
+
+                    totalPatterns++;
+                    patternFrecuency[rotatedPatternHash]++;
                 }
             }
         }
@@ -326,13 +328,15 @@ namespace WFC_Model
                 long reflectedPatternHash = HashPattern(reflectedPattern);
                 if (!patternFrecuency.ContainsKey(reflectedPatternHash))
                 {
-                    totalPatterns++;
                     patternFrecuency.Add(reflectedPatternHash, new PatternInfo(patternFrecuency.Count,
                                                                                reflectedPattern,
                                                                                patternSize,
                                                                                patternHeight,
                                                                                pattern.frecuency));
                 }
+
+                totalPatterns++;
+                patternFrecuency[reflectedPatternHash]++;
             }
         }
 
@@ -379,7 +383,7 @@ namespace WFC_Model
                 //Debug.Log("Reflection");
                 ReflectPatterns3D(patternFrecuency);
             }
-           
+
 
             patterns = patternFrecuency.Values.ToArray();
         }
