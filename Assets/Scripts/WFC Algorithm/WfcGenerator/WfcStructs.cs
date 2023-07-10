@@ -16,7 +16,7 @@ namespace WFC_Model
 
     public enum SymmetryType
     {
-        ERR,
+        none,
         X,
         T,
         I,
@@ -33,7 +33,7 @@ namespace WFC_Model
         public bool reflected;
 
 
-        public Tile(int id = 0, int rotation = 0, SymmetryType stype = SymmetryType.ERR, bool isReflected = false)
+        public Tile(int id = 0, int rotation = 0, SymmetryType stype = SymmetryType.none, bool isReflected = false)
         {
             this.id = id;
             this.rotation = rotation;
