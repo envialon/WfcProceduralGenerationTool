@@ -10,6 +10,7 @@ namespace WFC_Model
         public int depth = 10;
         public int height = 1;
         public Tile[] map;
+        public Dictionary<int, SymmetryType> symmetryDictionary;
 
 
         private int yOffset;
@@ -24,22 +25,25 @@ namespace WFC_Model
             zOffset = width * height;
         }
 
-        public Tilemap(int mapSize = 10, int height = 1)
+        public Tilemap(Dictionary<int, SymmetryType> symmetryDictionary, int mapSize = 10, int height = 1)
         {
             InitializeParams(mapSize, height, mapSize);
+            this.symmetryDictionary = symmetryDictionary;
             Clear();
         }
 
-        public Tilemap(int width = 10, int height = 1, int depth = 10)
+        public Tilemap(Dictionary<int, SymmetryType> symmetryDictionary, int width = 10, int height = 1, int depth = 10)
         {
             InitializeParams(width, height, depth);
+            this.symmetryDictionary = symmetryDictionary;
             Clear();
         }
 
-        public Tilemap(Tilemap other)
+        public Tilemap(Tilemap other, Dictionary<int, SymmetryType> symmetryDictionary = null)
         {
             InitializeParams(other.width, other.height, other.depth);
             map = (Tile[])other.map.Clone();
+            this.symmetryDictionary = symmetryDictionary is null ? new Dictionary<int, SymmetryType>(other.symmetryDictionary) : symmetryDictionary;
         }
 
 
@@ -54,14 +58,6 @@ namespace WFC_Model
 
         public Dictionary<int, SymmetryType> GetSymmetryDictionary()
         {
-            Dictionary<int, SymmetryType> symmetryDictionary = new Dictionary<int, SymmetryType>();
-            foreach (Tile tile in map)
-            {
-                if (!symmetryDictionary.ContainsKey(tile.id))
-                {
-                    symmetryDictionary.Add(tile.id, tile.symmetry);
-                }
-            }
             return symmetryDictionary;
         }
 
@@ -77,30 +73,12 @@ namespace WFC_Model
 
         public int GetEncodedTileAt(int x, int y, int z)
         {
-            return Tile.EncodeTile(map[x + (y * yOffset) + (z * zOffset)]);
+            return Tile.EncodeTile(map[x + (y * yOffset) + (z * zOffset)], symmetryDictionary);
         }
 
         public Tile GetTile(int x, int y, int z)
         {
             return map[x + (y * yOffset) + (z * zOffset)];
-        }
-
-        public int[,] Get2dPatternAt(int x, int y, int z, int patternSize)
-        {
-            int[,] output = new int[patternSize, patternSize];
-            for (int i = 0; i < patternSize; i++)
-            {
-                for (int j = 0; j < patternSize; j++)
-                {
-                    if (x + i >= width || y + j >= depth)
-                    {
-                        output[i, j] = 0; continue;
-                    }
-                    output[i, j] = map[(x + i) + (y * yOffset) + (z + j * zOffset)].id;
-
-                }
-            }
-            return output;
         }
 
         public void Clear()

@@ -124,7 +124,7 @@ public class WfcInterface : MonoBehaviour
         {
             inputMapSizeCheck = inputMapSize;
             inputMapHeightCheck = inputMapHeight;
-            inputMap = new Tilemap(inputMapSize, inputMapHeight, inputMapSize);
+            inputMap = new Tilemap(tileSet.GetSymmetryDictionary(),  inputMapSize, inputMapHeight, inputMapSize);
             model = new WfcModel(inputMap);
 
             outputGridOffset = new Vector3Int(inputMapSize + 1, 0, -outputSize.z / 2);
@@ -156,8 +156,8 @@ public class WfcInterface : MonoBehaviour
 
     private void Initialize()
     {
-        inputMap = new Tilemap(inputMapSize, inputMapHeight);
-        lastMapGenerated = new Tilemap(outputSize.x, outputSize.y, outputSize.z);
+        inputMap = new Tilemap(tileSet.GetSymmetryDictionary(), inputMapSize, inputMapHeight);
+        lastMapGenerated = new Tilemap(tileSet.GetSymmetryDictionary(), outputSize.x, outputSize.y, outputSize.z);
         model = new WfcModel(inputMap);
 
         grid = GetComponent<Grid>();
@@ -396,11 +396,11 @@ public class WfcInterface : MonoBehaviour
     {
         if (selectOutputMap)
         {
-            lastMapGenerated.SetTile(new Tile(selectedTile, 0, tileSet.GetSymmetry(selectedTile)), pos.x, pos.y, pos.z);
+            lastMapGenerated.SetTile(new Tile(selectedTile, 0), pos.x, pos.y, pos.z);
         }
         else
         {
-            inputMap.SetTile(new Tile(selectedTile, 0, tileSet.GetSymmetry(selectedTile)), pos.x, pos.y, pos.z);
+            inputMap.SetTile(new Tile(selectedTile, 0), pos.x, pos.y, pos.z);
         }
     }
 

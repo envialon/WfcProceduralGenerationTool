@@ -36,4 +36,15 @@ public class TileSet : ScriptableObject
         return tiles[id].symmetry;
     }
 
+    public Dictionary<int, SymmetryType> GetSymmetryDictionary()
+    {
+        Dictionary<int, SymmetryType> symmetryDictionary = new Dictionary<int, SymmetryType>();
+        for (int i = 0; i < tiles.Count; i++)
+        {
+            symmetryDictionary.Add(i, tiles[i].symmetry);
+        }
+        return symmetryDictionary;
+    }
+
+
 }

@@ -316,7 +316,7 @@ namespace WFC_Model
 
         public Tilemap GetOutputTileIndexGrid()
         {
-            Tilemap output = new Tilemap(width, height, depth);
+            Tilemap output = new Tilemap(symmetryDictionary, width, height, depth);
             for (int x = 0; x < width; x++)
             {
                 for (int z = 0; z < depth; z++)
