@@ -16,7 +16,7 @@ namespace WFC_Model
 
     public enum SymmetryType
     {
-        ERR,
+        none,
         X,
         T,
         I,
@@ -29,32 +29,25 @@ namespace WFC_Model
     {
         public int id;
         public int rotation;
-        public SymmetryType symmetry;
         public bool reflected;
 
 
-        public Tile(int id = 0, int rotation = 0, SymmetryType stype = SymmetryType.ERR, bool isReflected = false)
+        public Tile(int id = 0, int rotation = 0, bool isReflected = false)
         {
             this.id = id;
             this.rotation = rotation;
-            this.symmetry = stype;
             this.reflected = isReflected;
 
         }
 
-        public void Set(int id, int rotation, SymmetryType stype)
+        public void Set(int id, int rotation)
         {
             this.id = id;
             this.rotation = rotation;
-            this.symmetry = stype;
         }
 
         public int RotateClockwise()
         {
-            if (symmetry == SymmetryType.X)
-            {
-                return rotation;
-            }
             rotation = (rotation + 1) % 4;
             return rotation;
         }
@@ -69,10 +62,11 @@ namespace WFC_Model
             return x - y * (int)Math.Floor((double)x / y);
         }
 
-        private static int EncodeRotationAndRotation(Tile tile)
+        private static int EncodeRotationAndRotation(Tile tile, in Dictionary<int, SymmetryType> symmetryDictionary)
         {
+            SymmetryType symmetry = symmetryDictionary[tile.id];
 
-            if (tile.symmetry == SymmetryType.X)
+            if (symmetry == SymmetryType.X)
             {
                 return 0;
             }
@@ -80,16 +74,16 @@ namespace WFC_Model
             int output;
 
             // TO DO: I SYMMETRY MUST BE THE SAME WHEN REFLECTED AND ROTATION % 2 == 0
-            if (tile.symmetry == SymmetryType.D || tile.symmetry == SymmetryType.I)
+            if (symmetry == SymmetryType.D || symmetry == SymmetryType.I)
             {
                 output = mod(tile.rotation, 2) | ((tile.reflected) ? (1 << 31) : 0);
             }
 
-            else if (tile.symmetry == SymmetryType.T && tile.reflected)
+            else if (symmetry == SymmetryType.T && tile.reflected)
             {
                 output = (tile.rotation % 2 == 0) ? mod(tile.rotation, 4) : mod(tile.rotation, 4) | (1 << 31);
             }
-            else if (tile.symmetry == SymmetryType.L && tile.reflected)
+            else if (symmetry == SymmetryType.L && tile.reflected)
             {
                 output = (tile.rotation % 2 == 0) ? mod(tile.rotation + 2, 4) : mod(tile.rotation, 4);
                 output |= (1 << 31);
@@ -103,12 +97,9 @@ namespace WFC_Model
         }
 
 
-        public static int EncodeTile(Tile tile)
+        public static int EncodeTile(Tile tile, in Dictionary<int, SymmetryType> symmetryDictionary)
         {
-            int encoded = (tile.id * 4 + EncodeRotationAndRotation(tile));
-
-            string binary = Convert.ToString(encoded, 2).PadLeft(32, '0');
-
+            int encoded = (tile.id * 4 + EncodeRotationAndRotation(tile, symmetryDictionary));
             return encoded;
         }
 
@@ -135,7 +126,7 @@ namespace WFC_Model
         public static Tile DecodeTile(int encodedTile, Dictionary<int, SymmetryType> symmetryDictionary)
         {
             int id = DecodeTileId(encodedTile);
-            return new Tile(id, DecodeTileRotation(encodedTile), symmetryDictionary[id], DecodeReflection(encodedTile));
+            return new Tile(id, DecodeTileRotation(encodedTile), DecodeReflection(encodedTile));
         }
     }
 
@@ -276,7 +267,6 @@ namespace WFC_Model
         public int[] pattern;
         public int patternSize;
         public int patternHeight;
-        public int patternRotation;
 
         public Dictionary<Direction, HashSet<int>> neigbourIndices;
 
@@ -288,7 +278,6 @@ namespace WFC_Model
             this.patternHeight = patternHeight;
             this.patternSize = patternSize;
             this.frecuency = frecuency;
-            this.patternRotation = patternRotation;
             relativeFrecuency = 0;
             relativeFrecuencyLog2 = 0;
             freqTimesFreqLog2 = 0;

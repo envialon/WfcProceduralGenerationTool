@@ -70,7 +70,7 @@ namespace WFC_Model
                     for (int j = 0; j < mapSize; j++)
                     {
                         //not using yOffset and zOffset because we're mapping the indexMap, not a pattern.
-                        indexGrid[i + (k * mapSize) + (j * mapHeight * mapSize)] = Tile.EncodeTile(inputTileMap.GetTile(i, k, j));
+                        indexGrid[i + (k * mapSize) + (j * mapHeight * mapSize)] = Tile.EncodeTile(inputTileMap.GetTile(i, k, j), symmetryDictionary);
                         indexes.Add(indexGrid[i + (k * mapSize) + (j * mapHeight * mapSize)]);
                     }
                 }
@@ -270,7 +270,7 @@ namespace WFC_Model
                 {
                     Tile newTile = Tile.DecodeTile(pattern[i], symmetryDictionary);
                     newTile.RotateClockwise();
-                    pattern[i] = Tile.EncodeTile(newTile);
+                    pattern[i] = Tile.EncodeTile(newTile, symmetryDictionary);
                 }
             }
         }
@@ -312,7 +312,7 @@ namespace WFC_Model
                 {
                     Tile newTile = Tile.DecodeTile(pattern[i], symmetryDictionary);
                     newTile.Reflect();
-                    pattern[i] = Tile.EncodeTile(newTile);
+                    pattern[i] = Tile.EncodeTile(newTile,  symmetryDictionary);
                 }
             }
         }
