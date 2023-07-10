@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 namespace WFC_Model
 {
@@ -60,6 +61,7 @@ namespace WFC_Model
                     AddRemovalUpdate(CellPos, patternIndex);
                 }
             }
+            cellMap[cellIndex].CalculateEntrophy();
 
             if (cellMap[cellIndex].possiblePatterns.Count == 1)
             {
@@ -92,7 +94,6 @@ namespace WFC_Model
                     }
                 }
             }
-
             uncollapsedCellIndices = Enumerable.Range(0, width * height * depth).ToList();
         }
 
@@ -220,6 +221,7 @@ namespace WFC_Model
                 compatiblePatternsToRemove.AddRange(patternInfo[patternIndex].GetCompatiblesInDirection((Direction)direction));
             }
 
+            bool removedPatterns = false;
             foreach (int compatiblePattern in compatiblePatternsToRemove)
             {
                 //  int oppositeDirection = (direction + 2) % 4;
@@ -229,20 +231,22 @@ namespace WFC_Model
                 if (neighbourEnablers[compatiblePattern, direction] == 0 &&
                     cellMap[neighbourCellIndex].possiblePatterns.Contains(compatiblePattern))
                 {
+                    removedPatterns = true;
 
                     cellMap[neighbourCellIndex].RemovePattern(compatiblePattern, patternInfo);
 
+                    AddRemovalUpdate(neighbourCoord, compatiblePattern);
                     // collapse cell when only one pattern is left
                     if (cellMap[neighbourCellIndex].possiblePatterns.Count == 1)
                     {
                         int lastPattern = cellMap[neighbourCellIndex].possiblePatterns.ToArray()[0];
                         CollapseCell(neighbourCellIndex, lastPattern);
+                        break;
                     }
-
-                    AddRemovalUpdate(neighbourCoord, compatiblePattern);
                 }
             }
 
+            if (removedPatterns) cellMap[neighbourCellIndex].CalculateEntrophy();
         }
 
 
@@ -273,9 +277,7 @@ namespace WFC_Model
                 for (int direction = 0; direction < numberOfDirections; direction++)
                 {
                     Position neighbourCoord = removalUpdate.position + Position.directions[direction];
-
                     if (!PositionIsValid(neighbourCoord) || cellMap[neighbourCoord.x + neighbourCoord.y * yOffset + neighbourCoord.z * zOffset].collapsed) continue;
-
                     RemoveUncompatiblePatternsInNeighbour(removalUpdate, neighbourCoord, direction);
                 }
             }
@@ -306,11 +308,16 @@ namespace WFC_Model
             collapsedCount = 0;
 
 
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             while (collapsedCount < cellsToBeCollapsed)
             {
                 Observe();
                 Propagate();
             }
+            sw.Stop();
+            UnityEngine.Debug.Log(sw.ElapsedMilliseconds);
+
             return GetOutputTileIndexGrid();
         }
 

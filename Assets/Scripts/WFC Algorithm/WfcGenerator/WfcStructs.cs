@@ -91,7 +91,7 @@ namespace WFC_Model
             }
             else if (tile.symmetry == SymmetryType.L && tile.reflected)
             {
-                output = (tile.rotation %2 == 0) ?  mod(tile.rotation+2, 4) : mod(tile.rotation, 4) ;
+                output = (tile.rotation % 2 == 0) ? mod(tile.rotation + 2, 4) : mod(tile.rotation, 4);
                 output |= (1 << 31);
             }
             else
@@ -192,6 +192,8 @@ namespace WFC_Model
         float sumOfRelativeFreqLog2;
         int collapsedIndex;
 
+        private static Random random = new Random();
+
         public Cell(Position pos, int[] possiblePatterns, in PatternInfo[] patternInfo, in int[,] tileEnablerTemplate, int collapsedValue = -1)
         {
             this.position = pos;
@@ -208,8 +210,10 @@ namespace WFC_Model
             }
             tileEnablerCountsByDirection = new int[tileEnablerTemplate.GetLength(0), tileEnablerTemplate.GetLength(1)];
             Buffer.BlockCopy(tileEnablerTemplate, 0, tileEnablerCountsByDirection, 0, tileEnablerCountsByDirection.Length * sizeof(int));
+            random = new Random(Guid.NewGuid().GetHashCode());
             CalculateEntrophy();
         }
+
 
         public int GetCollapsedPatternIndex()
         {
@@ -230,10 +234,9 @@ namespace WFC_Model
             sumOfRelativeFreqLog2 -= patternInfo[removedPatternIndex].freqTimesFreqLog2;
         }
 
-        private void CalculateEntrophy()
+        public void CalculateEntrophy()
         {
-            Random rand = new Random(Guid.NewGuid().GetHashCode());
-            entrophy = (float)(Math.Log(sumOfRelativeFreq, 2) - (sumOfRelativeFreqLog2 / sumOfRelativeFreq) + (rand.NextDouble() * 0.001f));
+            entrophy = (float)(Math.Log(sumOfRelativeFreq, 2) - (sumOfRelativeFreqLog2 / sumOfRelativeFreq) + (random.NextDouble() * 0.001f));
         }
 
         public void RemovePattern(int patternIndex, in PatternInfo[] patternInfo)
@@ -242,7 +245,6 @@ namespace WFC_Model
             {
                 possiblePatterns.Remove(patternIndex);
                 RemoveFrequencies(patternIndex, patternInfo);
-                CalculateEntrophy();
             }
         }
 

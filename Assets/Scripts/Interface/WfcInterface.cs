@@ -612,9 +612,9 @@ public class WfcInterface : MonoBehaviour
 
     public void Generate()
     {
-        Debug.Log(inputMap);
+        //Debug.Log(inputMap);
         lastMapGenerated = model.Generate(outputSize.x, outputSize.y, outputSize.z);
-        Debug.Log(lastMapGenerated.ToString());
+        //Debug.Log(lastMapGenerated.ToString());
     }
 
     public void CompleteOutputMap()
