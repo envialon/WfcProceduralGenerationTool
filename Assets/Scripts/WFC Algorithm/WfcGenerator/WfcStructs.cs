@@ -62,7 +62,7 @@ namespace WFC_Model
             return x - y * (int)Math.Floor((double)x / y);
         }
 
-        private static int EncodeRotationAndRotation(Tile tile, in Dictionary<int,SymmetryType> symmetryDictionary)
+        private static int EncodeRotationAndRotation(Tile tile, in Dictionary<int, SymmetryType> symmetryDictionary)
         {
             SymmetryType symmetry = symmetryDictionary[tile.id];
 
@@ -85,7 +85,7 @@ namespace WFC_Model
             }
             else if (symmetry == SymmetryType.L && tile.reflected)
             {
-                output = (tile.rotation %2 == 0) ?  mod(tile.rotation+2, 4) : mod(tile.rotation, 4) ;
+                output = (tile.rotation % 2 == 0) ? mod(tile.rotation + 2, 4) : mod(tile.rotation, 4);
                 output |= (1 << 31);
             }
             else
@@ -265,7 +265,6 @@ namespace WFC_Model
         public int[] pattern;
         public int patternSize;
         public int patternHeight;
-        public int patternRotation;
 
         public Dictionary<Direction, HashSet<int>> neigbourIndices;
 
@@ -277,7 +276,6 @@ namespace WFC_Model
             this.patternHeight = patternHeight;
             this.patternSize = patternSize;
             this.frecuency = frecuency;
-            this.patternRotation = patternRotation;
             relativeFrecuency = 0;
             relativeFrecuencyLog2 = 0;
             freqTimesFreqLog2 = 0;
