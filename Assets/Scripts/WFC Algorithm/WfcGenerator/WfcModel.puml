@@ -1,0 +1,18 @@
+@startuml
+class WfcModel {
+    + enablePatternReflection : bool = false
+    + enablePatternRotations : bool = true
+    + sandwichPatterns : bool = true
+    + horizontalPeriodicInput : bool = true
+    + verticalPeriodicInput : bool = true
+    + depthFirstPropagation : bool = false
+    + WfcModel(data:Tilemap)
+    + ReadInput(inputTileMap:Tilemap, patternSize:int) : void
+    + Generate(incompleteMap:Tilemap) : Tilemap
+    + Generate(outputX:int, outputY:int, outputZ:int) : Tilemap
+    + SetOutputSize(outputX:int, outputY:int, outputZ:int) : void
+    + GetNumberOfPatterns() : int
+}
+WfcModel --> "inputReader" InputReader
+WfcModel --> "solver" WfcSolver
+@enduml

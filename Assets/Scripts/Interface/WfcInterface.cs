@@ -633,7 +633,7 @@ public class WfcInterfaceEditor : Editor
 {
     WfcInterface t;
     UnityEngine.Object obj = null;
-
+    
     private void Awake()
     {
         t = (WfcInterface)target;
@@ -689,8 +689,15 @@ public class WfcInterfaceEditor : Editor
 
     }
 
+    private void DrawInstructions()
+    {
+      
+    }
+
     public override void OnInspectorGUI()
     {
+        DrawInstructions();
+
         DrawDefaultInspector();
 
         if (GUILayout.Button("Clear"))

@@ -1,0 +1,10 @@
+@startuml
+class SerializableTilemap {
+    + SetFromTilemap(tm:Tilemap, tileSet:TileSet) : void
+    + GetTilemap() : Tilemap
+    + GetTileSet() : TileSet
+}
+ScriptableObject <|-- SerializableTilemap
+SerializableTilemap --> "tilemap" Tilemap
+SerializableTilemap --> "tileSet" TileSet
+@enduml

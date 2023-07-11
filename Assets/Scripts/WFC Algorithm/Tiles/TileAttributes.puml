@@ -1,0 +1,7 @@
+@startuml
+class TileAttributes <<struct>> {
+}
+TileAttributes --> "mesh" Mesh
+TileAttributes --> "material" Material
+TileAttributes --> "symmetry" SymmetryType
+@enduml

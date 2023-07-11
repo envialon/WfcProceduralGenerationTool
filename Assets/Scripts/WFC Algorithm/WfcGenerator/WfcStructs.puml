@@ -1,0 +1,78 @@
+@startuml
+enum Direction {
+    south,
+    east,
+    west,
+    north,
+    up,
+    down,
+}
+enum SymmetryType {
+    none,
+    X,
+    T,
+    I,
+    L,
+    D,
+}
+class Tile <<struct>> {
+    + id : int
+    + rotation : int
+    + reflected : bool
+    + Tile(id:int, rotation:int, isReflected:bool)
+    + Set(id:int, rotation:int) : void
+    + RotateClockwise() : int
+    + Reflect() : void
+    + {static} EncodeTile(tile:Tile, symmetryDictionary:Dictionary<int, SymmetryType>) : int
+    + {static} DecodeTileId(encodedTile:int) : int
+    + {static} DecodeTileRotation(encodedTile:int) : int
+    + {static} DecodeReflection(encodedTile:int) : bool
+    + {static} DecodeTile(encodedTile:int, symmetryDictionary:Dictionary<int, SymmetryType>) : Tile
+}
+class Position <<struct>> {
+    + x : int
+    + y : int
+    + z : int
+    + Position(x:int, y:int, z:int)
+    + <<override>> ToString() : string
+}
+class RemovalUpdate <<struct>> {
+    + RemovalUpdate(position:Position, patternIndicesRemoved:HashSet<int>)
+}
+class Cell <<struct>> {
+    + entrophy : float
+    + collapsed : bool
+    + Cell(pos:Position, possiblePatterns:int[], patternInfo:PatternInfo[], tileEnablerTemplate:int[,], collapsedValue:int)
+    + GetCollapsedPatternIndex() : int
+    + CollapseOn(patternToCollapse:int) : void
+    + CalculateEntrophy() : void
+    + RemovePattern(patternIndex:int, patternInfo:PatternInfo[]) : void
+    + <<override>> ToString() : string
+    + CompareTo(other:Cell) : int
+}
+class PatternInfo <<struct>> {
+    + id : int
+    + frecuency : int
+    + relativeFrecuency : float
+    + relativeFrecuencyLog2 : float
+    + freqTimesFreqLog2 : float
+    + patternSize : int
+    + patternHeight : int
+    + PatternInfo(patternId:int, pattern:int[], patternSize:int, patternHeight:int, frecuency:int, patternRotation:int)
+    + GetCompatiblesInDirection(direction:Direction) : HashSet<int>
+    + GetEncodedTileIndex() : int
+    + <<override>> ToString() : string
+}
+class "HashSet`1"<T> {
+}
+class "IComparable`1"<T> {
+}
+class "Dictionary`2"<T1,T2> {
+}
+RemovalUpdate --> "patternIndicesRemoved<int>" "HashSet`1"
+RemovalUpdate --> "position" Position
+"IComparable`1" "<Cell>" <|-- Cell
+Cell --> "position" Position
+Cell --> "possiblePatterns<int>" "HashSet`1"
+PatternInfo --> "neigbourIndices<Direction,HashSet<int>>" "Dictionary`2"
+@enduml

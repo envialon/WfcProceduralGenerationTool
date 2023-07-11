@@ -1,0 +1,21 @@
+@startuml
+class Tilemap {
+    + width : int = 10
+    + depth : int = 10
+    + height : int = 1
+    + Tilemap(symmetryDictionary:Dictionary<int, SymmetryType>, mapSize:int, height:int)
+    + Tilemap(symmetryDictionary:Dictionary<int, SymmetryType>, width:int, height:int, depth:int)
+    + Tilemap(other:Tilemap, symmetryDictionary:Dictionary<int, SymmetryType>)
+    + SetTile(tile:Tile, x:int, y:int, z:int) : void
+    + GetSymmetryDictionary() : Dictionary<int, SymmetryType>
+    + ReflectAt(x:int, y:int, z:int) : void
+    + RotateAt(x:int, y:int, z:int) : void
+    + GetEncodedTileAt(x:int, y:int, z:int) : int
+    + GetTile(x:int, y:int, z:int) : Tile
+    + Clear() : void
+    + <<override>> ToString() : string
+}
+class "Dictionary`2"<T1,T2> {
+}
+Tilemap --> "symmetryDictionary<int,SymmetryType>" "Dictionary`2"
+@enduml

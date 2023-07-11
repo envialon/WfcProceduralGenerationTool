@@ -1,0 +1,12 @@
+@startuml
+class TileSet {
+    + GetMesh(id:int) : Mesh
+    + GetMaterial(id:int) : Material
+    + GetSymmetry(id:int) : SymmetryType
+    + GetSymmetryDictionary() : Dictionary<int, SymmetryType>
+}
+class "List`1"<T> {
+}
+ScriptableObject <|-- TileSet
+TileSet --> "tiles<TileAttributes>" "List`1"
+@enduml

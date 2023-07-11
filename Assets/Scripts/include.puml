@@ -1,0 +1,150 @@
+@startuml
+
+class SerializableTilemap {
+    + SetFromTilemap(tm:Tilemap, tileSet:TileSet) : void
+    + GetTilemap() : Tilemap
+    + GetTileSet() : TileSet
+}
+ScriptableObject <|-- SerializableTilemap
+SerializableTilemap --> "tilemap" Tilemap
+SerializableTilemap --> "tileSet" TileSet
+
+class WfcInterface {
+    + patternSize : int = 2
+    + inputMapSize : int = 10
+    + inputMapHeight : int = 1
+    + selectedTile : int = 0
+    + selectedLayer : int = 0
+    + selectOutputMap : bool = false
+    + outputSize : Vector3Int
+    + CreateMeshFromOutput() : Mesh
+    + HandleClick(mousePosition:Vector3, mouseButton:int) : void
+    + HandleKeyPress(keycode:KeyCode) : void
+    + Clear() : void
+    + ClearOutputMap() : void
+    + ReadInput() : void
+    + SerializeInputMap() : void
+    + LoadSerializedInputMap(path:string) : void
+    + Generate() : void
+    + CompleteOutputMap() : void
+}
+MonoBehaviour <|-- WfcInterface
+WfcInterface --> "tileSet" TileSet
+WfcInterface --> "model" WfcModel
+class TileAttributes <<struct>> {
+}
+TileAttributes --> "mesh" Mesh
+TileAttributes --> "material" Material
+TileAttributes --> "symmetry" SymmetryType
+class Tilemap {
+    + width : int = 10
+    + depth : int = 10
+    + height : int = 1
+    +symmetryDictionary : Dictionary<int, SymmetryType>
+    + SetTile(tile:Tile, x:int, y:int, z:int) : void
+    + GetSymmetryDictionary() : Dictionary<int, SymmetryType>
+    + ReflectAt(x:int, y:int, z:int) : void
+    + RotateAt(x:int, y:int, z:int) : void
+    + GetEncodedTileAt(x:int, y:int, z:int) : int
+    + GetTile(x:int, y:int, z:int) : Tile
+    + Clear() : void
+    + <<override>> ToString() : string
+}
+Tilemap --> "map<Tile[]>" "Tile"
+class TileSet {
+    + tiles : List<TileAttributes>
+    + GetMesh(id:int) : Mesh
+    + GetMaterial(id:int) : Material
+    + GetSymmetry(id:int) : SymmetryType
+    + GetSymmetryDictionary() : Dictionary<int, SymmetryType>
+}
+ScriptableObject <|-- TileSet
+TileSet --> "tiles<TileAttributes>" "TileAttributes"
+class InputReader {
+    + patternSize : int
+    + patternHeight : int
+    + symmetryDictionary : Dictionary<int, SymmetryType>
+    + ReadInput(patternSize:int, inputTileMap:Tilemap) : void
+    + GetPatternInfo() : PatternInfo[]
+}
+InputReader --> "patterns<PatternInfo[]>" PatternInfo 
+class WfcModel {
+    + enablePatternReflection : bool = false
+    + enablePatternRotations : bool = true
+    + sandwichPatterns : bool = true
+    + horizontalPeriodicInput : bool = true
+    + verticalPeriodicInput : bool = true
+    + depthFirstPropagation : bool = false
+    + ReadInput(inputTileMap:Tilemap, patternSize:int) : void
+    + Generate(incompleteMap:Tilemap) : Tilemap
+    + Generate(outputX:int, outputY:int, outputZ:int) : Tilemap
+}
+WfcModel --> "inputReader" InputReader
+WfcModel --> "solver" WfcSolver
+class WfcSolver {
+    + width : int
+    + height : int
+    + depth : int
+    + deepFirstPropagation : bool
+    + SetOutputSize(width:int, height:int, depth:int) : void
+    + Generate(incompleteMap:Tilemap) : Tilemap
+    + Generate() : Tilemap
+    + GetOutputTileIndexGrid() : Tilemap
+}
+WfcSolver --> "patterns<PatternInfo[]>" PatternInfo
+WfcSolver --> "cellMap<Cell[]>" Cell
+enum SymmetryType {
+    none,
+    X,
+    T,
+    I,
+    L,
+    D,
+}
+class Tile <<struct>> {
+    + id : int
+    + rotation : int
+    + reflected : bool
+    + Set(id:int, rotation:int) : void
+    + RotateClockwise() : int
+    + Reflect() : void
+    + {static} EncodeTile(tile:Tile, symmetryDictionary:Dictionary<int, SymmetryType>) : int
+    + {static} DecodeTileId(encodedTile:int) : int
+    + {static} DecodeTileRotation(encodedTile:int) : int
+    + {static} DecodeReflection(encodedTile:int) : bool
+    + {static} DecodeTile(encodedTile:int, symmetryDictionary:Dictionary<int, SymmetryType>) : Tile
+}
+class Position <<struct>> {
+    + x : int
+    + y : int
+    + z : int
+    + Position(x:int, y:int, z:int)
+    + <<override>> ToString() : string
+}
+class Cell <<struct>> {
+    + entrophy : float
+    + collapsed : bool
+    + GetCollapsedPatternIndex() : int
+    + CollapseOn(patternToCollapse:int) : void
+    + CalculateEntrophy() : void
+    + RemovePattern(patternIndex:int, patternInfo:PatternInfo[]) : void
+    + <<override>> ToString() : string
+    + CompareTo(other:Cell) : int
+}
+class PatternInfo <<struct>> {
+    + id : int
+    + frecuency : int
+    + relativeFrecuency : float
+    + relativeFrecuencyLog2 : float
+    + freqTimesFreqLog2 : float
+    + patternSize : int
+    + patternHeight : int
+    + possiblePatterns : HashSet<int>
+    + neighbourIndices : Dictionary<Direction,HashSet<int>>
+    + GetCompatiblesInDirection(direction:Direction) : HashSet<int>
+    + GetEncodedTileIndex() : int
+    + <<override>> ToString() : string
+}
+"IComparable" "<Cell>" <|-- Cell
+Cell --> "position" Position
+@enduml

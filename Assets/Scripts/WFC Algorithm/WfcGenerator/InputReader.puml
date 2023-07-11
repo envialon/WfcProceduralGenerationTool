@@ -1,0 +1,15 @@
+@startuml
+class InputReader {
+    + patternSize : int
+    + patternHeight : int
+    + InputReader(inputTileMap:Tilemap, patternSize:int)
+    + ReadInput(patternSize:int, inputTileMap:Tilemap, enableReflection:bool, enableRotation:bool, sandwitchPatterns:bool, horizontalPeriodic:bool, verticalPeriodic:bool) : void
+    + GetMatrixVisualization(mat:int[], maxX:int, maxY:int, maxZ:int) : string
+    + GetPatternSummary() : string
+    + GetPatternInfo() : PatternInfo[]
+}
+class "Dictionary`2"<T1,T2> {
+}
+InputReader --> "inputTileMap" Tilemap
+InputReader --> "symmetryDictionary<int,SymmetryType>" "Dictionary`2"
+@enduml

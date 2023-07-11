@@ -1,0 +1,6 @@
+@startuml
+class TilemapSerializer <<static>> {
+    + {static} SerializeTilemap(tilemap:Tilemap, tileSet:TileSet, assetPath:string, filename:string) : void
+    + {static} DeserializeTilemap(path:string) : Tilemap
+}
+@enduml

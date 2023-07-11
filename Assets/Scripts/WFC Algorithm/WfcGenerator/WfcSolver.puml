@@ -1,0 +1,16 @@
+@startuml
+class WfcSolver {
+    + width : int
+    + height : int
+    + depth : int
+    + deepFirstPropagation : bool
+    + WfcSolver(inputReader:InputReader, width:int, height:int, depth:int, deepFirstPropagation:bool)
+    + SetOutputSize(width:int, height:int, depth:int) : void
+    + Generate(incompleteMap:Tilemap) : Tilemap
+    + Generate() : Tilemap
+    + GetOutputTileIndexGrid() : Tilemap
+}
+class "List`1"<T> {
+}
+WfcSolver --> "uncollapsedCellIndices<int>" "List`1"
+@enduml

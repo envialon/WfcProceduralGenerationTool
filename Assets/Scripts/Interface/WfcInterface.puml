@@ -1,0 +1,24 @@
+@startuml
+class WfcInterface {
+    + patternSize : int = 2
+    + inputMapSize : int = 10
+    + inputMapHeight : int = 1
+    + selectedTile : int = 0
+    + selectedLayer : int = 0
+    + selectOutputMap : bool = false
+    + CreateMeshFromOutput() : Mesh
+    + HandleClick(mousePosition:Vector3, mouseButton:int) : void
+    + HandleKeyPress(keycode:KeyCode) : void
+    + Clear() : void
+    + ClearOutputMap() : void
+    + ReadInput() : void
+    + SerializeInputMap() : void
+    + LoadSerializedInputMap(path:string) : void
+    + Generate() : void
+    + CompleteOutputMap() : void
+}
+MonoBehaviour <|-- WfcInterface
+WfcInterface o-> "outputSize" Vector3Int
+WfcInterface --> "tileSet" TileSet
+WfcInterface --> "model" WfcModel
+@enduml
