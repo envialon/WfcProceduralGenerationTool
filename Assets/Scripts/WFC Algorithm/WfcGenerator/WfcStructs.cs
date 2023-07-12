@@ -71,25 +71,36 @@ namespace WFC_Model
                 return 0;
             }
 
-            int output;
+            int output = 0;
 
-            if (symmetry == SymmetryType.D || symmetry == SymmetryType.I)
-            {
-                output = mod(tile.rotation, 2);
-            }
 
-            else if (symmetry == SymmetryType.T && tile.reflected)
+
+            if (tile.reflected)
             {
-                output = (tile.rotation % 2 == 0) ? mod(tile.rotation, 4) : mod(tile.rotation, 4) | (1 << 31);
-            }
-            else if (symmetry == SymmetryType.L && tile.reflected)
-            {
-                output = (tile.rotation % 2 == 0) ? mod(tile.rotation + 2, 4) : mod(tile.rotation, 4);
-                output |= (1 << 31);
+                if (symmetry == SymmetryType.T)
+                {
+                    output = (tile.rotation % 2 == 0) ? mod(tile.rotation, 4) : mod(tile.rotation, 4) | (1 << 31);
+                }
+                if (symmetry == SymmetryType.D)
+                {
+                    output = mod(tile.rotation + 1, 2);
+                }
+                else if (symmetry == SymmetryType.L)
+                {
+                    output = (tile.rotation % 2 == 0) ? mod(tile.rotation + 2, 4) : mod(tile.rotation, 4);
+                    output |= (1 << 31);
+                }
             }
             else
             {
-                output = mod(tile.rotation, 4) | ((tile.reflected) ? (1 << 31) : 0);
+                if (symmetry == SymmetryType.I || symmetry == SymmetryType.D)
+                {
+                    output = mod(tile.rotation, 2);
+                }
+                else
+                {
+                    output = mod(tile.rotation, 4) | ((tile.reflected) ? (1 << 31) : 0);
+                }
             }
 
             return output;
