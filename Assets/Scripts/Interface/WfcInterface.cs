@@ -124,7 +124,7 @@ public class WfcInterface : MonoBehaviour
         {
             inputMapSizeCheck = inputMapSize;
             inputMapHeightCheck = inputMapHeight;
-            inputMap = new Tilemap(tileSet.GetSymmetryDictionary(),  inputMapSize, inputMapHeight, inputMapSize);
+            inputMap = new Tilemap(tileSet.GetSymmetryDictionary(), inputMapSize, inputMapHeight, inputMapSize);
             model = new WfcModel(inputMap);
 
             outputGridOffset = new Vector3Int(inputMapSize + 1, 0, -outputSize.z / 2);
@@ -467,14 +467,14 @@ public class WfcInterface : MonoBehaviour
             //Debug.Log("Hit at: " + hit.point + " Corresponds to cell " + cellPosition);
             if (mouseButton == 1)
             {
-                if (selectedTile == GetClickedOnTile(cellPosition.x, cellPosition.y, cellPosition.z).id)
-                {
-                    ReflectTile(cellPosition);
-                }
-                else
-                {
-                    DeleteTile(cellPosition);
-                }
+                //if (selectedTile == GetClickedOnTile(cellPosition.x, cellPosition.y, cellPosition.z).id)
+                //{
+                //    ReflectTile(cellPosition);
+                //}
+                //else
+                //{
+                DeleteTile(cellPosition);
+                //}
             }
             else if (selectedTile == GetClickedOnTile(cellPosition.x, cellPosition.y, cellPosition.z).id)
             {
@@ -633,7 +633,9 @@ public class WfcInterfaceEditor : Editor
 {
     WfcInterface t;
     UnityEngine.Object obj = null;
-    
+
+    bool showInstructions = false;
+
     private void Awake()
     {
         t = (WfcInterface)target;
@@ -691,7 +693,19 @@ public class WfcInterfaceEditor : Editor
 
     private void DrawInstructions()
     {
-      
+        showInstructions = EditorGUILayout.BeginFoldoutHeaderGroup(showInstructions, "Instructions");
+        if (showInstructions)
+        {
+            GUILayout.Label("Make sure you have the GameObject with the WfcIterface component\nselected on the hierarchy.\n\n" +
+                                 "The keybinds to control are the following: \n" +
+                                 "\t [o]: Alternates the selected grid to manipulate between the input and the output grid\n" +
+                                 "\t [j] and [k]: To select the layer to manipulate\n" +
+                                 "\t [n] and [m]: To select the tile to place\n" +
+                                 "\t Left click to delete a tile\n " +
+                                 "\t Right click to place a tile or to rotate it if its already placed and the same as the selected tile\n",
+                                 GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
+        }
+        EditorGUILayout.EndFoldoutHeaderGroup();
     }
 
     public override void OnInspectorGUI()
