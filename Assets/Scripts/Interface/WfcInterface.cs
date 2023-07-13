@@ -1,9 +1,9 @@
-using UnityEngine;
 using System.Collections.Generic;
-using UnityEditor;
-using WFC_Model;
-using UnityEngine.Rendering;
 using System.Linq;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.Rendering;
+using WFC_Model;
 
 [ExecuteAlways]
 [RequireComponent(typeof(Grid))]
@@ -124,7 +124,7 @@ public class WfcInterface : MonoBehaviour
         {
             inputMapSizeCheck = inputMapSize;
             inputMapHeightCheck = inputMapHeight;
-            inputMap = new Tilemap(tileSet.GetSymmetryDictionary(),  inputMapSize, inputMapHeight, inputMapSize);
+            inputMap = new Tilemap(tileSet.GetSymmetryDictionary(), inputMapSize, inputMapHeight, inputMapSize);
             model = new WfcModel(inputMap);
 
             outputGridOffset = new Vector3Int(inputMapSize + 1, 0, -outputSize.z / 2);
@@ -633,7 +633,7 @@ public class WfcInterfaceEditor : Editor
 {
     WfcInterface t;
     UnityEngine.Object obj = null;
-    
+
     private void Awake()
     {
         t = (WfcInterface)target;
@@ -691,7 +691,7 @@ public class WfcInterfaceEditor : Editor
 
     private void DrawInstructions()
     {
-      
+
     }
 
     public override void OnInspectorGUI()

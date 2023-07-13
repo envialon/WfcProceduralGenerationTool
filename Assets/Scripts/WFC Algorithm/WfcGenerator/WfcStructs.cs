@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace WFC_Model
 {
@@ -174,7 +173,6 @@ namespace WFC_Model
     {
         public Position position;
         public HashSet<int> possiblePatterns;
-        //first index is the pattern, second is the direction
         public int[,] tileEnablerCountsByDirection;
         public float entrophy;
         public bool collapsed;

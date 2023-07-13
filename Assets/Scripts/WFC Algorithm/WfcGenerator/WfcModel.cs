@@ -1,5 +1,3 @@
-using System;
-
 namespace WFC_Model
 {
     public class WfcModel

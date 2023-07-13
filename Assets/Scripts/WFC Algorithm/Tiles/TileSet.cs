@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using WFC_Model;
 using UnityEngine;
+using WFC_Model;
 
 [CreateAssetMenu(fileName = "newTileSet", menuName = "ScriptableObjects/TileSet", order = 1)]
 public class TileSet : ScriptableObject

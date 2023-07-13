@@ -1,0 +1,35 @@
+Tilemap	PatternSize	NumberOfPatterns	EnableRotation	EnableReflection	NumberOfTests	OutputSize	AverageTrainingTime	AverageGenerationTime
+Rooms	3	94	False	False	5	(5, 5, 5)	0.011	0.103	
+Rooms	3	168	False	True	5	(5, 5, 5)	0.018	0.216	
+Rooms	3	357	True	False	5	(5, 5, 5)	0.057	0.785	
+Rooms	3	645	True	True	5	(5, 5, 5)	0.207	2.211	
+
+Rooms	3	94	False	False	5	(10, 10, 10)	0.02	0.742	
+Rooms	3	168	False	True	5	(10, 10, 10)	0.03	2.292	
+Rooms	3	357	True	False	5	(10, 10, 10)	0.098	6.93	
+Rooms	3	645	True	True	5	(10, 10, 10)	0.264	18.262	
+
+Rooms	3	94	False	False	5	(11, 11, 11)	0.011	1.551	
+Rooms	3	168	False	True	5	(11, 11, 11)	0.017	3.116	
+Rooms	3	357	True	False	5	(11, 11, 11)	0.094	9.432	
+Rooms	3	645	True	True	5	(11, 11, 11)	0.228	24.188	
+
+Rooms	3	94	False	False	5	(12, 12, 12)	0.023	1.98	
+Rooms	3	168	False	True	5	(12, 12, 12)	0.028	4.194	
+Rooms	3	357	True	False	5	(12, 12, 12)	0.09	12.36	
+Rooms	3	645	True	True	5	(12, 12, 12)	0.242	31.687	
+
+Rooms	3	94	False	False	5	(13, 13, 13)	0.011	2.623	
+Rooms	3	168	False	True	5	(13, 13, 13)	0.018	5.359	
+Rooms	3	357	True	False	5	(13, 13, 13)	0.062	16.102	
+Rooms	3	645	True	True	5	(13, 13, 13)	0.21	40.348	
+
+Rooms	3	94	False	False	5	(14, 14, 14)	0.012	3.441	
+Rooms	3	168	False	True	5	(14, 14, 14)	0.047	6.904	
+Rooms	3	357	True	False	5	(14, 14, 14)	0.083	20.133	
+Rooms	3	645	True	True	5	(14, 14, 14)	0.269	43.786	
+
+Rooms	3	94	False	False	5	(15, 15, 15)	0.013	4.253	
+Rooms	3	168	False	True	5	(15, 15, 15)	0.019	8.764	
+Rooms	3	357	True	False	5	(15, 15, 15)	0.058	25.227	
+Rooms	3	645	True	True	5	(15, 15, 15)	0.242	66.418	

@@ -1,11 +1,7 @@
-
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
 using System.Diagnostics;
-
-
+using UnityEditor;
+using UnityEngine;
 using WFC_Model;
 
 public class PerformanceTester : MonoBehaviour
@@ -175,19 +171,21 @@ public class PerformanceTester : MonoBehaviour
 
     public void TestAllNTimes()
     {
-        const int numberOfTests = 1;
+        const int numberOfTests = 5;
         Vector3Int[] sizes = {
-            new Vector3Int(5, 5, 5),
-            new Vector3Int(10,10,10), 
-            new Vector3Int(11, 11, 11),
-            new Vector3Int(12, 12, 12),
-            new Vector3Int(13, 13, 13),
-            new Vector3Int(14, 14, 14),
-            new Vector3Int(15, 15, 15),
+            //new Vector3Int(5, 5, 5),
+            //new Vector3Int(10,10,10),
+            //new Vector3Int(11, 11, 11),
+            //new Vector3Int(12, 12, 12),
+            //new Vector3Int(13, 13, 13),
+            //new Vector3Int(14, 14, 14),
+            //new Vector3Int(15, 15, 15),
+            new Vector3Int(25, 25, 25),
         };
 
         summary = GetHeader();
-        for(patternSize =2; patternSize < 4; patternSize++) {
+        for (patternSize = 2; patternSize < 4; patternSize++)
+        {
             for (int i = 0; i < sizes.Length; i++)
             {
                 foreach (SerializableTilemap stm in tilemapsToTest)
@@ -219,7 +217,7 @@ public class PerformanceTester : MonoBehaviour
         SerializeSummary();
         UnityEngine.Debug.Log(summary);
     }
-    
+
 }
 
 #if UNITY_EDITOR 

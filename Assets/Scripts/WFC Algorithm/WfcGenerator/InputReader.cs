@@ -1,8 +1,6 @@
-using GluonGui.Dialog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Debug = UnityEngine.Debug;
 
 namespace WFC_Model
 {
@@ -312,7 +310,7 @@ namespace WFC_Model
                 {
                     Tile newTile = Tile.DecodeTile(pattern[i], symmetryDictionary);
                     newTile.Reflect();
-                    pattern[i] = Tile.EncodeTile(newTile,  symmetryDictionary);
+                    pattern[i] = Tile.EncodeTile(newTile, symmetryDictionary);
                 }
             }
         }
