@@ -5,20 +5,21 @@ using WFC_Model;
 [CreateAssetMenu(fileName = "newTileSet", menuName = "ScriptableObjects/TileSet", order = 1)]
 public class TileSet : ScriptableObject
 {
-    [SerializeField]
     public List<TileAttributes> tiles;
-
-    private void Awake()
+        
+    public void EnforceFirstTileIsEmpty()
     {
-        //if (tiles is null)
-        //{
-        //    tiles = new List<TileAttributes>();
-        //    tiles.Add(new TileAttributes()); //white space tile must have id 0
-        //}
-        //else if (tiles.Count > 0 && tiles[0].mesh is not null)
-        //{
-        //    tiles.Insert(0, new TileAttributes()); //white space tile must have id 0
-        //}
+        if (tiles is null)
+        {
+            tiles = new List<TileAttributes>
+            {
+                new TileAttributes() //white space tile must have id 0
+            };
+        }
+        else if (tiles.Count > 0 && tiles[0].mesh != null)
+        {
+            tiles.Insert(0, new TileAttributes()); //white space tile must have id 0
+        }
     }
 
     public Mesh GetMesh(int id)
@@ -38,7 +39,7 @@ public class TileSet : ScriptableObject
 
     public Dictionary<int, SymmetryType> GetSymmetryDictionary()
     {
-        Dictionary<int, SymmetryType> symmetryDictionary = new Dictionary<int, SymmetryType>();
+        Dictionary<int, SymmetryType> symmetryDictionary = new();
         for (int i = 0; i < tiles.Count; i++)
         {
             symmetryDictionary.Add(i, tiles[i].symmetry);

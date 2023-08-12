@@ -17,18 +17,18 @@ namespace WFC_Model
 
         public List<int> uncollapsedCellIndices;
 
-        private PatternInfo[] patternInfo;
-        private Dictionary<int, SymmetryType> symmetryDictionary;
+        private readonly PatternInfo[] patternInfo;
+        private readonly Dictionary<int, SymmetryType> symmetryDictionary;
 
-        private int numberOfPatterns;
+        private readonly int numberOfPatterns;
         private int collapsedCount = 0;
 
         private int yOffset;
         private int zOffset;
 
-        private Random random = new Random();
+        private readonly Random random = new();
 
-        private Dictionary<Position, HashSet<int>> removalDictionary;
+        private readonly Dictionary<Position, HashSet<int>> removalDictionary;
 
         private int[,] InitialEnablerCount()
         {
@@ -170,7 +170,7 @@ namespace WFC_Model
 
             int collapsedIndex = -1;
             double randomValue = random.NextDouble();
-            randomValue = randomValue * (sumOfFrecuencies);
+            randomValue *= (sumOfFrecuencies);
 
             for (int i = 0; i < numberOfCandidates; i++)
             {
@@ -214,7 +214,7 @@ namespace WFC_Model
             int neighbourCellIndex = neighbourCoord.x + neighbourCoord.y * yOffset + neighbourCoord.z * zOffset;
             int[,] neighbourEnablers = cellMap[neighbourCellIndex].tileEnablerCountsByDirection;
 
-            List<int> compatiblePatternsToRemove = new List<int>();
+            List<int> compatiblePatternsToRemove = new();
 
             foreach (int patternIndex in removalUpdate.patternIndicesRemoved)
             {
@@ -308,7 +308,7 @@ namespace WFC_Model
             collapsedCount = 0;
 
 
-            Stopwatch sw = new Stopwatch();
+            Stopwatch sw = new();
             sw.Start();
             while (collapsedCount < cellsToBeCollapsed)
             {
@@ -323,7 +323,7 @@ namespace WFC_Model
 
         public Tilemap GetOutputTileIndexGrid()
         {
-            Tilemap output = new Tilemap(symmetryDictionary, width, height, depth);
+            Tilemap output = new(symmetryDictionary, width, height, depth);
             for (int x = 0; x < width; x++)
             {
                 for (int z = 0; z < depth; z++)
@@ -331,7 +331,7 @@ namespace WFC_Model
                     for (int y = 0; y < height; y++)
                     {
                         int patternIndex = cellMap[x + y * yOffset + z * zOffset].GetCollapsedPatternIndex();
-                        output.SetTile(Tile.DecodeTile(patternInfo[patternIndex].GetEncodedTileIndex(), symmetryDictionary),
+                        output.SetTile(Tile.DecodeTile(patternInfo[patternIndex].GetEncodedTileIndex()),
                                        x, y, z);
                     }
                 }

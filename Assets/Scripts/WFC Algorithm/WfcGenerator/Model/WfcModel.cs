@@ -2,7 +2,7 @@ namespace WFC_Model
 {
     public class WfcModel
     {
-        int patternSize = 2;
+        readonly int patternSize = 2;
 
         public InputReader inputReader;
         public WfcSolver solver;
@@ -44,10 +44,11 @@ namespace WFC_Model
 
         public void SetOutputSize(int outputX, int outputY, int outputZ)
         {
-            if (solver != null)
+            if (solver == null)
             {
-                solver.SetOutputSize(outputX, outputY, outputZ);
+                return;
             }
+            solver.SetOutputSize(outputX, outputY, outputZ);
         }
 
         public int GetNumberOfPatterns()

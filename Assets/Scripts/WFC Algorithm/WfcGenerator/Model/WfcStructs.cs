@@ -56,7 +56,7 @@ namespace WFC_Model
             reflected = !reflected;
         }
 
-        private static int mod(int x, int y)
+        private static int Mod(int x, int y)
         {
             return x - y * (int)Math.Floor((double)x / y);
         }
@@ -70,35 +70,41 @@ namespace WFC_Model
                 return 0;
             }
 
-            int output = 0;
-
-
+            int output;
 
             if (tile.reflected)
             {
-                if (symmetry == SymmetryType.T)
+                if (symmetry == SymmetryType.I || symmetry == SymmetryType.D)
                 {
-                    output = (tile.rotation % 2 == 0) ? mod(tile.rotation, 4) : mod(tile.rotation, 4) | (1 << 31);
+                    output = Mod(tile.rotation, 2);
                 }
-                if (symmetry == SymmetryType.D)
+                else if (symmetry == SymmetryType.T)
                 {
-                    output = mod(tile.rotation + 1, 2);
+                    output = (tile.rotation % 2 == 0) ? Mod(tile.rotation, 4) : Mod(tile.rotation, 4) | (1 << 31);
+                }
+                else if (symmetry == SymmetryType.D)
+                {
+                    output = Mod(tile.rotation + 1, 2);
                 }
                 else if (symmetry == SymmetryType.L)
                 {
-                    output = (tile.rotation % 2 == 0) ? mod(tile.rotation + 2, 4) : mod(tile.rotation, 4);
+                    output = (tile.rotation % 2 == 0) ? Mod(tile.rotation + 2, 4) : Mod(tile.rotation, 4);
                     output |= (1 << 31);
+                }
+                else
+                {
+                    output = Mod(tile.rotation, 4) | ((tile.reflected) ? (1 << 31) : 0);
                 }
             }
             else
             {
                 if (symmetry == SymmetryType.I || symmetry == SymmetryType.D)
                 {
-                    output = mod(tile.rotation, 2);
+                    output = Mod(tile.rotation, 2);
                 }
                 else
                 {
-                    output = mod(tile.rotation, 4) | ((tile.reflected) ? (1 << 31) : 0);
+                    output = Mod(tile.rotation, 4) | ((tile.reflected) ? (1 << 31) : 0);
                 }
             }
 
@@ -127,12 +133,10 @@ namespace WFC_Model
         public static bool DecodeReflection(int encodedTile)
         {
             bool output = ((encodedTile >> 31) & 1) == 1;
-            string binary = Convert.ToString(encodedTile, 2).PadLeft(32, '0');
-
             return output;
         }
 
-        public static Tile DecodeTile(int encodedTile, Dictionary<int, SymmetryType> symmetryDictionary)
+        public static Tile DecodeTile(int encodedTile)
         {
             int id = DecodeTileId(encodedTile);
             return new Tile(id, DecodeTileRotation(encodedTile), DecodeReflection(encodedTile));
@@ -161,7 +165,7 @@ namespace WFC_Model
             return new Position(left.x + right.x, left.y + right.y, left.z + right.z);
         }
 
-        public override string ToString()
+        public override readonly string ToString()
         {
             return "{" + x + ", " + y + ", " + z + "}";
         }
@@ -191,7 +195,7 @@ namespace WFC_Model
         float sumOfRelativeFreqLog2;
         int collapsedIndex;
 
-        private static Random random = new Random();
+        private static Random random = new();
 
         public Cell(Position pos, int[] possiblePatterns, in PatternInfo[] patternInfo, in int[,] tileEnablerTemplate, int collapsedValue = -1)
         {
@@ -214,7 +218,7 @@ namespace WFC_Model
         }
 
 
-        public int GetCollapsedPatternIndex()
+        public readonly int GetCollapsedPatternIndex()
         {
             //TO FIX?¿
             return collapsedIndex == -1 ? 0 : collapsedIndex;
@@ -247,12 +251,12 @@ namespace WFC_Model
             }
         }
 
-        public override string ToString()
+        public override readonly string ToString()
         {
             return entrophy.ToString("0.0");
         }
 
-        public int CompareTo(Cell other)
+        public readonly int CompareTo(Cell other)
         {
             if (entrophy < other.entrophy) return -1;
             if (entrophy == other.entrophy) return 0;
@@ -279,7 +283,7 @@ namespace WFC_Model
         public Dictionary<Direction, HashSet<int>> neigbourIndices;
 
 
-        public PatternInfo(int patternId, int[] pattern, int patternSize, int patternHeight, int frecuency = 0, int patternRotation = 0)
+        public PatternInfo(int patternId, int[] pattern, int patternSize, int patternHeight, int frecuency = 0)
         {
             this.pattern = pattern;
             this.id = patternId;
@@ -305,7 +309,7 @@ namespace WFC_Model
             patternInfo.frecuency++;
             return patternInfo;
         }
-        public HashSet<int> GetCompatiblesInDirection(Direction direction)
+        public readonly HashSet<int> GetCompatiblesInDirection(Direction direction)
         {
             return neigbourIndices[direction];
         }
@@ -317,12 +321,12 @@ namespace WFC_Model
             freqTimesFreqLog2 = relativeFrecuency * relativeFrecuencyLog2;
         }
 
-        public int GetEncodedTileIndex()
+        public readonly int GetEncodedTileIndex()
         {
             return pattern[0];
         }
 
-        public override string ToString()
+        public override readonly string ToString()
         {
             return string.Join(".", pattern);
         }
