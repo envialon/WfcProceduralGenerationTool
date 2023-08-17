@@ -4,6 +4,7 @@ using UnityEditor;
 using WFC_Model;
 using UnityEngine.Rendering;
 using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 
 [ExecuteAlways]
 [RequireComponent(typeof(Grid))]
@@ -141,6 +142,36 @@ public class WfcInterface : MonoBehaviour
             outputGridOffset = new Vector3Int(inputMapSize + 1, 0, -outputSize.z / 2);
         }
     }
+    private void Initialize()
+    {
+        if (tileSet is null)
+        {
+            throw new System.Exception("Must assign a tileset on the inspector window.");
+        }
+
+        if (inputMap is null)
+        {
+            inputMap = new Tilemap(tileSet.GetSymmetryDictionary(), inputMapSize, inputMapHeight);
+        }
+
+        lastMapGenerated = new Tilemap(tileSet.GetSymmetryDictionary(), outputSize.x, outputSize.y, outputSize.z);
+        model = new WfcModel(inputMap);
+
+        grid = GetComponent<Grid>();
+        grid.cellSwizzle = GridLayout.CellSwizzle.XYZ;
+
+        boxCollider = GetComponent<BoxCollider>();
+
+        ChangedTileSet();
+        ResizeInputMap();
+        ResizeOutputMap();
+    }
+
+
+    private void Awake()
+    {
+        Initialize();
+    }
 
     private void OnEnable()
     {
@@ -154,22 +185,7 @@ public class WfcInterface : MonoBehaviour
         Camera.onPreCull -= DrawWithCamera;
     }
 
-    private void Initialize()
-    {
-        inputMap = new Tilemap(tileSet.GetSymmetryDictionary(), inputMapSize, inputMapHeight);
-        lastMapGenerated = new Tilemap(tileSet.GetSymmetryDictionary(), outputSize.x, outputSize.y, outputSize.z);
-        model = new WfcModel(inputMap);
 
-        grid = GetComponent<Grid>();
-        grid.cellSwizzle = GridLayout.CellSwizzle.XYZ;
-
-        boxCollider = GetComponent<BoxCollider>();
-
-
-        ChangedTileSet();
-        ResizeInputMap();
-        ResizeOutputMap();
-    }
 
     private void DrawWithCamera(Camera cam)
     {
@@ -180,7 +196,6 @@ public class WfcInterface : MonoBehaviour
             {
                 DrawGeneratedMap(cam);
             }
-
         }
     }
 
@@ -587,7 +602,6 @@ public class WfcInterface : MonoBehaviour
         }
         output.normals = vertices;
 
-        //output.normals = mesh.normals;
         output.triangles = Enumerable.Reverse(mesh.triangles).ToArray();
         output.uv = mesh.uv;
         output.normals = mesh.normals;
@@ -643,52 +657,53 @@ public class WfcInterfaceEditor : Editor
 
     private void TrainingEditor()
     {
-
-        GUILayout.BeginHorizontal();
-        t.model.enablePatternReflection = EditorGUILayout.Toggle("Enable pattern reflection", t.model.enablePatternReflection);
-        t.model.enablePatternRotations = EditorGUILayout.Toggle("Enable pattern rotation", t.model.enablePatternRotations);
-        GUILayout.EndHorizontal();
-
-        GUILayout.BeginHorizontal();
-        t.model.sandwichPatterns = EditorGUILayout.Toggle("Sandwich patterns", t.model.sandwichPatterns);
-        GUILayout.EndHorizontal();
-
-        GUILayout.BeginHorizontal();
-        t.model.horizontalPeriodicInput = EditorGUILayout.Toggle("Horizontal periodic input", t.model.horizontalPeriodicInput);
-        t.model.verticalPeriodicInput = EditorGUILayout.Toggle("Vertical periodic input", t.model.verticalPeriodicInput);
-        GUILayout.EndHorizontal();
-
-        GUILayout.BeginHorizontal();
-        t.model.depthFirstPropagation = EditorGUILayout.Toggle("Deep-First propagation", t.model.depthFirstPropagation);
-        GUILayout.EndHorizontal();
-
-
-        GUILayout.Space(20);
-
-        obj = EditorGUILayout.ObjectField("Serialized input map file:", obj, typeof(UnityEngine.Object), false);
-
-
-        GUILayout.BeginHorizontal();
-
-        if (GUILayout.Button("Load serialized input map") && obj)
+        if (t.model is not null)
         {
-            t.LoadSerializedInputMap(AssetDatabase.GetAssetPath(obj));
+            GUILayout.BeginHorizontal();
+            t.model.enablePatternReflection = EditorGUILayout.Toggle("Enable pattern reflection", t.model.enablePatternReflection);
+            t.model.enablePatternRotations = EditorGUILayout.Toggle("Enable pattern rotation", t.model.enablePatternRotations);
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            t.model.sandwichPatterns = EditorGUILayout.Toggle("Sandwich patterns", t.model.sandwichPatterns);
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            t.model.horizontalPeriodicInput = EditorGUILayout.Toggle("Horizontal periodic input", t.model.horizontalPeriodicInput);
+            t.model.verticalPeriodicInput = EditorGUILayout.Toggle("Vertical periodic input", t.model.verticalPeriodicInput);
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            t.model.depthFirstPropagation = EditorGUILayout.Toggle("Deep-First propagation", t.model.depthFirstPropagation);
+            GUILayout.EndHorizontal();
+
+
+            GUILayout.Space(20);
+
+            obj = EditorGUILayout.ObjectField("Serialized input map file:", obj, typeof(UnityEngine.Object), false);
+
+
+            GUILayout.BeginHorizontal();
+
+            if (GUILayout.Button("Load serialized input map") && obj)
+            {
+                t.LoadSerializedInputMap(AssetDatabase.GetAssetPath(obj));
+            }
+
+            if (GUILayout.Button("Serialize current input map"))
+            {
+                t.SerializeInputMap();
+            }
+
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(10);
+
+            if (GUILayout.Button("Read input"))
+            {
+                t.ReadInput();
+            }
         }
-
-        if (GUILayout.Button("Serialize current input map"))
-        {
-            t.SerializeInputMap();
-        }
-
-        GUILayout.EndHorizontal();
-
-        GUILayout.Space(10);
-
-        if (GUILayout.Button("Read input"))
-        {
-            t.ReadInput();
-        }
-
     }
 
     private void DrawInstructions()

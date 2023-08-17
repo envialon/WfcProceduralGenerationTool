@@ -13,6 +13,7 @@ public class SerializableTilemap : ScriptableObject
     public void SetFromTilemap(Tilemap tm, TileSet tileSet)
     {
         this.tilemap = new Tilemap(tm, tileSet.GetSymmetryDictionary());
+        this.tileSet = tileSet;
     }
 
     public Tilemap GetTilemap()
