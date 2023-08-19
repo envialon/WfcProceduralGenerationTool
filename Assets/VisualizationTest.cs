@@ -34,7 +34,7 @@ public class VisualizationTestEditor : UnityEditor.Editor
         if (GUILayout.Button("Generate"))
         {
             Debug.Log("");
-            test.filter.mesh = test.wfc.CreateMeshFromOutput();
+          //  test.filter.mesh = test.wfc.CreateMeshFromOutput();
             test.SetMaterials(test.wfc.tileSet);
         }
     }

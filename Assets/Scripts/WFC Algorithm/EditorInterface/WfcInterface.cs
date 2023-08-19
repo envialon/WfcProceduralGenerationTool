@@ -185,8 +185,6 @@ public class WfcInterface : MonoBehaviour
         Camera.onPreCull -= DrawWithCamera;
     }
 
-
-
     private void DrawWithCamera(Camera cam)
     {
         if (cam && tileSet)
@@ -199,7 +197,7 @@ public class WfcInterface : MonoBehaviour
         }
     }
 
-    private Vector3 GetRotationOffset(Tile currentTile)
+    private static Vector3 GetRotationOffset(Tile currentTile)
     {
         switch ((currentTile.rotation, currentTile.reflected))
         {
@@ -221,17 +219,17 @@ public class WfcInterface : MonoBehaviour
         }
     }
 
-    private Quaternion GetRotationFromTile(Tile currentTile)
+    private static Quaternion GetRotationFromTile(Tile currentTile)
     {
         int rotation = currentTile.rotation;
         return Quaternion.Euler(new Vector3(0, 90 * rotation, 0));
     }
 
-    private Matrix4x4 GetTransformMatrixFromTile(Tile currentTile, Vector3 tilePos)
+    private static Matrix4x4 GetTransformMatrixFromTile(Tile currentTile, Vector3 tilePos, Vector3 positionOffset)
     {
         Quaternion rotation = GetRotationFromTile(currentTile);
         Vector3 rotationOffset = GetRotationOffset(currentTile);
-        return Matrix4x4.TRS(transform.position + tilePos + rotationOffset,
+        return Matrix4x4.TRS(positionOffset + tilePos + rotationOffset,
                                             rotation,
                                             Vector3.one);
 
@@ -244,7 +242,7 @@ public class WfcInterface : MonoBehaviour
         if (mesh)
         {
 
-            Matrix4x4 currentTRS = GetTransformMatrixFromTile(currentTile, tilePos);
+            Matrix4x4 currentTRS = GetTransformMatrixFromTile(currentTile, tilePos, transform.position);
             Vector3 s = currentTRS.lossyScale;
             bool needToConvertCulling = Mathf.Sign(s.x * s.y * s.z) < 0;
             new CommandBuffer().SetInvertCulling(needToConvertCulling);
@@ -299,12 +297,11 @@ public class WfcInterface : MonoBehaviour
         }
     }
 
-
-    private Mesh[] CreateMeshGroups()
+    private static Mesh[] CreateMeshGroups(TileSet tileSet, Tilemap tilemap)
     {
-        int outputX = lastMapGenerated.width;
-        int outputY = lastMapGenerated.height;
-        int outputZ = lastMapGenerated.depth;
+        int outputX = tilemap.width;
+        int outputY = tilemap.height;
+        int outputZ = tilemap.depth;
 
         Dictionary<int, List<(Tile, Vector3Int)>> tilesById = new Dictionary<int, List<(Tile, Vector3Int)>>();
 
@@ -322,7 +319,7 @@ public class WfcInterface : MonoBehaviour
             {
                 for (int j = 0; j < outputZ; j++)
                 {
-                    Tile tile = lastMapGenerated.GetTile(i, k, j);
+                    Tile tile = tilemap.GetTile(i, k, j);
                     if (tilesById.ContainsKey(tile.id))
                     {
                         tilesById[tile.id].Add((tile, new Vector3Int(i, k, j)));
@@ -360,7 +357,7 @@ public class WfcInterface : MonoBehaviour
             {
                 if (mesh is not null)
                 {
-                    template.transform = GetTransformMatrixFromTile(currentTile, currentPos);
+                    template.transform = GetTransformMatrixFromTile(currentTile, currentPos, Vector3.zero);
                     combineByTile.Add(template);
 
                 }
@@ -372,9 +369,9 @@ public class WfcInterface : MonoBehaviour
         return submeshes;
     }
 
-    public Mesh CreateMeshFromOutput()
+    public static Mesh CreateMeshFromMap(TileSet tileSet, Tilemap tilemap)
     {
-        Mesh[] submeshes = CreateMeshGroups();
+        Mesh[] submeshes = CreateMeshGroups(tileSet, tilemap);
 
         CombineInstance[] combine = new CombineInstance[submeshes.Length];
         int index = 0;
@@ -482,14 +479,7 @@ public class WfcInterface : MonoBehaviour
             //Debug.Log("Hit at: " + hit.point + " Corresponds to cell " + cellPosition);
             if (mouseButton == 1)
             {
-                //if (selectedTile == GetClickedOnTile(cellPosition.x, cellPosition.y, cellPosition.z).id)
-                //{
-                //    ReflectTile(cellPosition);
-                //}
-                //else
-                //{
                 DeleteTile(cellPosition);
-                //}
             }
             else if (selectedTile == GetClickedOnTile(cellPosition.x, cellPosition.y, cellPosition.z).id)
             {
@@ -624,7 +614,12 @@ public class WfcInterface : MonoBehaviour
         }
     }
 
-    public void Generate()
+    public Tilemap Generate()
+    {
+        return model.Generate(outputSize.x, outputSize.y, outputSize.z);
+    }
+
+    public void GenerateAndRender()
     {
         //Debug.Log(inputMap);
         lastMapGenerated = model.Generate(outputSize.x, outputSize.y, outputSize.z);
@@ -747,7 +742,7 @@ public class WfcInterfaceEditor : Editor
 
         if (GUILayout.Button("Generate"))
         {
-            t.Generate();
+            t.GenerateAndRender();
         }
         if (GUILayout.Button("Generate from incomplete output"))
         {
