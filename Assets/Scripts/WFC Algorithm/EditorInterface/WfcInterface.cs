@@ -560,6 +560,16 @@ public class WfcInterface : MonoBehaviour
     {
         TilemapSerializer.SerializeTilemap(inputMap, tileSet, inputMapSerializationPath);
     }
+    public void LoadSerializedInputMap(SerializableTilemap tilemap)
+    { 
+        ClearOutputMap();
+        inputMap = tilemap.tilemap;
+        tileSet = tilemap.tileSet;
+        inputMapSize = inputMap.depth;
+        inputMapHeight = inputMap.height;
+        RefreshCollider();
+        ChangedTileSet();
+    }
 
     public void LoadSerializedInputMap(string path)
     {
