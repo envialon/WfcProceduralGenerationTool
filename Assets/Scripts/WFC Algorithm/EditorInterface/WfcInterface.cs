@@ -31,6 +31,7 @@ public class WfcInterface : MonoBehaviour
     public int selectedLayer = 0;
 
     public bool selectOutputMap = false;
+    public bool RenderMaps = true;
 
     public TileSet tileSet;
     private TileSet tileSetCheck = null;
@@ -71,10 +72,13 @@ public class WfcInterface : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        if (selectOutputMap) { DrawOutputMeshGizmos(); }
-        else
+        if (RenderMaps)
         {
-            DrawInputMeshGizmos();
+            if (selectOutputMap) { DrawOutputMeshGizmos(); }
+            else
+            {
+                DrawInputMeshGizmos();
+            }
         }
     }
 
@@ -176,8 +180,12 @@ public class WfcInterface : MonoBehaviour
     private void OnEnable()
     {
         Initialize();
+
         Camera.onPreCull -= DrawWithCamera;
-        Camera.onPreCull += DrawWithCamera;
+        if (RenderMaps)
+        {
+            Camera.onPreCull += DrawWithCamera;
+        }
     }
 
     private void OnDisable()
@@ -561,7 +569,7 @@ public class WfcInterface : MonoBehaviour
         TilemapSerializer.SerializeTilemap(inputMap, tileSet, inputMapSerializationPath);
     }
     public void LoadSerializedInputMap(SerializableTilemap tilemap)
-    { 
+    {
         ClearOutputMap();
         inputMap = tilemap.GetTilemap();
         tileSet = tilemap.GetTileSet();
