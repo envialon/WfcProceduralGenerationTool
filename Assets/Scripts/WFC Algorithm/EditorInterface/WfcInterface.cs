@@ -195,7 +195,7 @@ public class WfcInterface : MonoBehaviour
 
     private void DrawWithCamera(Camera cam)
     {
-        if (cam && tileSet)
+        if (RenderMaps && cam && tileSet)
         {
             DrawInputMap(cam);
             if (lastMapGenerated != null)
@@ -345,7 +345,6 @@ public class WfcInterface : MonoBehaviour
 
 
             List<CombineInstance> combineByTile = new List<CombineInstance>();
-            Debug.Log("adfs");
             Mesh mesh = tileSet.GetMesh(currentId);
             if (mesh is null) continue;
 
@@ -482,7 +481,7 @@ public class WfcInterface : MonoBehaviour
         {
             Vector3Int cellPosition = GetCellCoords(hit.point);
 
-            Debug.Log(cellPosition);
+            // Debug.Log(cellPosition);
 
             //Debug.Log("Hit at: " + hit.point + " Corresponds to cell " + cellPosition);
             if (mouseButton == 1)
@@ -561,7 +560,7 @@ public class WfcInterface : MonoBehaviour
     public void ReadInput()
     {
         model.ReadInput(inputMap, patternSize);
-        Debug.Log(model.inputReader.GetPatternSummary());
+        //Debug.Log(model.inputReader.GetPatternSummary());
     }
 
     public void SerializeInputMap()
@@ -647,9 +646,9 @@ public class WfcInterface : MonoBehaviour
 
     public void CompleteOutputMap()
     {
-        Debug.Log(lastMapGenerated.ToString());
+        //Debug.Log(lastMapGenerated.ToString());
         lastMapGenerated = model.Generate(lastMapGenerated);
-        Debug.Log(lastMapGenerated.ToString());
+        //Debug.Log(lastMapGenerated.ToString());
     }
 
 }
