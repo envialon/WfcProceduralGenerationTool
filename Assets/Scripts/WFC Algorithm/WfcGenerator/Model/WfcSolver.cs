@@ -316,7 +316,7 @@ namespace WFC_Model
                 Propagate();
             }
             sw.Stop();
-            UnityEngine.Debug.Log(sw.ElapsedMilliseconds);
+           // UnityEngine.Debug.Log(sw.ElapsedMilliseconds);
 
             return GetOutputTileIndexGrid();
         }
