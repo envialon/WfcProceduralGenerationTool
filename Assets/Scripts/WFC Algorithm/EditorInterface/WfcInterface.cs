@@ -1,48 +1,34 @@
-using UnityEngine;
 using System.Collections.Generic;
-using UnityEditor;
-using WFC_Model;
-using UnityEngine.Rendering;
 using System.Linq;
-using System.Diagnostics.CodeAnalysis;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.Rendering;
+using WFC_Model;
 
 [ExecuteAlways]
-[RequireComponent(typeof(Grid))]
+[RequireComponent(typeof(WfcGenerator))]
 [RequireComponent(typeof(BoxCollider))]
 public class WfcInterface : MonoBehaviour
 {
     private const string inputMapSerializationPath = "Assets/Generated/";
 
     public int patternSize = 2;
-
     public int inputMapSize = 10;
-    private int inputMapSizeCheck = 0;
-
     public int inputMapHeight = 1;
-    private int inputMapHeightCheck = 0;
-
     public int selectedTile = 0;
-
     public Vector3Int outputSize = new Vector3Int(20, 1, 20);
-    private Vector3Int outputSizeCheck = Vector3Int.zero;
+    public int selectedLayer = 0;
+    public bool selectOutputMap = false;
+    public TileSet tileSet;
+
 
     private Vector3Int outputGridOffset;
-
-    public int selectedLayer = 0;
-
-    public bool selectOutputMap = false;
-    public bool RenderMaps = true;
-
-    public TileSet tileSet;
     private TileSet tileSetCheck = null;
-
     private Grid grid;
     private BoxCollider boxCollider;
-
-    public WfcModel model;
+    private WfcGenerator generator;
     private Tilemap inputMap;
     private Tilemap lastMapGenerated;
-
     private Mesh[] mirroredMeshes;
 
     private void DrawOutputMeshGizmos()
@@ -52,10 +38,8 @@ public class WfcInterface : MonoBehaviour
         {
             for (int j = 0; j <= outputSize.z; j++)
             {
-
                 Gizmos.DrawLine(new Vector3(outputGridOffset.x, selectedLayer, i + outputGridOffset.z) + pos, new Vector3(outputSize.x + outputGridOffset.x, selectedLayer, i + outputGridOffset.z) + pos);
                 Gizmos.DrawLine(new Vector3(i + outputGridOffset.x, selectedLayer, outputGridOffset.z) + pos, new Vector3(i + outputGridOffset.x, selectedLayer, outputSize.z + outputGridOffset.z) + pos);
-
             }
         }
     }
@@ -72,13 +56,10 @@ public class WfcInterface : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        if (RenderMaps)
+        if (selectOutputMap) { DrawOutputMeshGizmos(); }
+        else
         {
-            if (selectOutputMap) { DrawOutputMeshGizmos(); }
-            else
-            {
-                DrawInputMeshGizmos();
-            }
+            DrawInputMeshGizmos();
         }
     }
 
@@ -86,8 +67,6 @@ public class WfcInterface : MonoBehaviour
     {
         ChangedTileSet();
         ResizeInputMap();
-        ResizeOutputMap();
-
     }
 
     private void ChangedTileSet()
@@ -123,29 +102,13 @@ public class WfcInterface : MonoBehaviour
         }
     }
 
-    private void ResizeInputMap()
+    public void ResizeInputMap()
     {
-        if (inputMapSize != inputMapSizeCheck || inputMapHeight != inputMapHeightCheck)
-        {
-            inputMapSizeCheck = inputMapSize;
-            inputMapHeightCheck = inputMapHeight;
-            inputMap = new Tilemap(tileSet.GetSymmetryDictionary(), inputMapSize, inputMapHeight, inputMapSize);
-            model = new WfcModel(inputMap);
-
-            outputGridOffset = new Vector3Int(inputMapSize + 1, 0, -outputSize.z / 2);
-
-            RefreshCollider();
-        }
+        inputMap = new Tilemap(tileSet.GetSymmetryDictionary(), inputMapSize, inputMapHeight, inputMapSize);
+        outputGridOffset = new Vector3Int(inputMapSize + 1, 0, -outputSize.z / 2);
+        RefreshCollider();
     }
 
-    private void ResizeOutputMap()
-    {
-        if (outputSizeCheck != outputSize && model is not null)
-        {
-            model.SetOutputSize(outputSize.x, outputSize.y, outputSize.z);
-            outputGridOffset = new Vector3Int(inputMapSize + 1, 0, -outputSize.z / 2);
-        }
-    }
     private void Initialize()
     {
         if (tileSet is null)
@@ -158,8 +121,10 @@ public class WfcInterface : MonoBehaviour
             inputMap = new Tilemap(tileSet.GetSymmetryDictionary(), inputMapSize, inputMapHeight);
         }
 
+        if (generator is null) { generator = GetComponent<WfcGenerator>(); }
+
         lastMapGenerated = new Tilemap(tileSet.GetSymmetryDictionary(), outputSize.x, outputSize.y, outputSize.z);
-        model = new WfcModel(inputMap);
+
 
         grid = GetComponent<Grid>();
         grid.cellSwizzle = GridLayout.CellSwizzle.XYZ;
@@ -168,7 +133,6 @@ public class WfcInterface : MonoBehaviour
 
         ChangedTileSet();
         ResizeInputMap();
-        ResizeOutputMap();
     }
 
 
@@ -180,12 +144,8 @@ public class WfcInterface : MonoBehaviour
     private void OnEnable()
     {
         Initialize();
-
         Camera.onPreCull -= DrawWithCamera;
-        if (RenderMaps)
-        {
-            Camera.onPreCull += DrawWithCamera;
-        }
+        Camera.onPreCull += DrawWithCamera;
     }
 
     private void OnDisable()
@@ -195,7 +155,7 @@ public class WfcInterface : MonoBehaviour
 
     private void DrawWithCamera(Camera cam)
     {
-        if (RenderMaps && cam && tileSet)
+        if (cam && tileSet)
         {
             DrawInputMap(cam);
             if (lastMapGenerated != null)
@@ -557,12 +517,6 @@ public class WfcInterface : MonoBehaviour
         lastMapGenerated.Clear();
     }
 
-    public void ReadInput()
-    {
-        model.ReadInput(inputMap, patternSize);
-        //Debug.Log(model.inputReader.GetPatternSummary());
-    }
-
     public void SerializeInputMap()
     {
         TilemapSerializer.SerializeTilemap(inputMap, tileSet, inputMapSerializationPath);
@@ -632,25 +586,15 @@ public class WfcInterface : MonoBehaviour
         }
     }
 
-    public Tilemap Generate()
-    {
-        return model.Generate(outputSize.x, outputSize.y, outputSize.z);
-    }
-
     public void GenerateAndRender()
     {
-        //Debug.Log(inputMap);
-        lastMapGenerated = model.Generate(outputSize.x, outputSize.y, outputSize.z);
-        //Debug.Log(lastMapGenerated.ToString());
+        lastMapGenerated = generator.Generate(inputMap, outputSize);
     }
 
     public void CompleteOutputMap()
     {
-        //Debug.Log(lastMapGenerated.ToString());
-        lastMapGenerated = model.Generate(lastMapGenerated);
-        //Debug.Log(lastMapGenerated.ToString());
+        lastMapGenerated = generator.Generate(inputMap, lastMapGenerated);
     }
-
 }
 
 
@@ -670,53 +614,28 @@ public class WfcInterfaceEditor : Editor
 
     private void TrainingEditor()
     {
-        if (t.model is not null)
+
+        GUILayout.Space(20);
+
+        obj = EditorGUILayout.ObjectField("Serialized input map file:", obj, typeof(UnityEngine.Object), false);
+
+
+        GUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("Load serialized input map") && obj)
         {
-            GUILayout.BeginHorizontal();
-            t.model.enablePatternReflection = EditorGUILayout.Toggle("Enable pattern reflection", t.model.enablePatternReflection);
-            t.model.enablePatternRotations = EditorGUILayout.Toggle("Enable pattern rotation", t.model.enablePatternRotations);
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            t.model.sandwichPatterns = EditorGUILayout.Toggle("Sandwich patterns", t.model.sandwichPatterns);
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            t.model.horizontalPeriodicInput = EditorGUILayout.Toggle("Horizontal periodic input", t.model.horizontalPeriodicInput);
-            t.model.verticalPeriodicInput = EditorGUILayout.Toggle("Vertical periodic input", t.model.verticalPeriodicInput);
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            t.model.depthFirstPropagation = EditorGUILayout.Toggle("Deep-First propagation", t.model.depthFirstPropagation);
-            GUILayout.EndHorizontal();
-
-
-            GUILayout.Space(20);
-
-            obj = EditorGUILayout.ObjectField("Serialized input map file:", obj, typeof(UnityEngine.Object), false);
-
-
-            GUILayout.BeginHorizontal();
-
-            if (GUILayout.Button("Load serialized input map") && obj)
-            {
-                t.LoadSerializedInputMap(AssetDatabase.GetAssetPath(obj));
-            }
-
-            if (GUILayout.Button("Serialize current input map"))
-            {
-                t.SerializeInputMap();
-            }
-
-            GUILayout.EndHorizontal();
-
-            GUILayout.Space(10);
-
-            if (GUILayout.Button("Read input"))
-            {
-                t.ReadInput();
-            }
+            t.LoadSerializedInputMap(AssetDatabase.GetAssetPath(obj));
         }
+
+        if (GUILayout.Button("Serialize current input map"))
+        {
+            t.SerializeInputMap();
+        }
+
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(10);
+
     }
 
     private void DrawInstructions()
@@ -736,11 +655,37 @@ public class WfcInterfaceEditor : Editor
         EditorGUILayout.EndFoldoutHeaderGroup();
     }
 
+    private void DrawInputFields()
+    {
+
+        t.patternSize = EditorGUILayout.IntField("Pattern size", t.patternSize);
+
+
+
+        EditorGUILayout.BeginHorizontal();
+        int inputMapSize = EditorGUILayout.IntField("Input map size", t.inputMapSize);
+        int inputMapHeight = EditorGUILayout.IntField("Input map height", t.inputMapHeight);
+
+        if (inputMapHeight != t.inputMapHeight || inputMapSize != t.inputMapSize)
+        {
+            t.inputMapSize = inputMapSize;
+            t.inputMapHeight = inputMapHeight;
+            t.ResizeInputMap();
+        }
+        EditorGUILayout.EndHorizontal();
+
+        t.outputSize = EditorGUILayout.Vector3IntField("Output size", t.outputSize);
+
+        EditorGUILayout.Space(5);
+
+        t.tileSet = (TileSet)EditorGUILayout.ObjectField("Tileset", t.tileSet, typeof(TileSet), false);
+    }
+
     public override void OnInspectorGUI()
     {
         DrawInstructions();
 
-        DrawDefaultInspector();
+        DrawInputFields();
 
         if (GUILayout.Button("Clear"))
         {

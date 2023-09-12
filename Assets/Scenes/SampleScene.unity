@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -304,6 +304,7 @@ GameObject:
   - component: {fileID: 1339589962}
   - component: {fileID: 1339589961}
   - component: {fileID: 1339589964}
+  - component: {fileID: 1339589965}
   - component: {fileID: 1339589963}
   m_Layer: 0
   m_Name: WfcInterface
@@ -323,8 +324,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 15, y: 0, z: 15}
-  m_Center: {x: 7.5, y: 0, z: 7.5}
+  m_Size: {x: 12, y: 0, z: 12}
+  m_Center: {x: 6, y: 0, z: 6}
 --- !u!4 &1339589962
 Transform:
   m_ObjectHideFlags: 0
@@ -353,13 +354,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   patternSize: 3
-  inputMapSize: 15
-  inputMapHeight: 2
+  inputMapSize: 12
+  inputMapHeight: 1
   selectedTile: 3
   outputSize: {x: 50, y: 1, z: 50}
   selectedLayer: 0
   selectOutputMap: 0
-  tileSet: {fileID: 11400000, guid: e6ef6a49b8ab6d242a58b8cba0362832, type: 2}
+  RenderMaps: 1
+  tileSet: {fileID: 11400000, guid: 43d87efc2f9a6014cb055b492a787204, type: 2}
 --- !u!156049354 &1339589964
 Grid:
   m_ObjectHideFlags: 0
@@ -372,3 +374,15 @@ Grid:
   m_CellGap: {x: 0, y: 0, z: 0}
   m_CellLayout: 0
   m_CellSwizzle: 0
+--- !u!114 &1339589965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1339589959}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a8bcf4e8ef8e804ab360bb87178d74e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
