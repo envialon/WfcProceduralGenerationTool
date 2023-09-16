@@ -614,9 +614,6 @@ public class WfcInterfaceEditor : Editor
 
     private void TrainingEditor()
     {
-
-        GUILayout.Space(20);
-
         obj = EditorGUILayout.ObjectField("Serialized input map file:", obj, typeof(UnityEngine.Object), false);
 
 
@@ -633,9 +630,6 @@ public class WfcInterfaceEditor : Editor
         }
 
         GUILayout.EndHorizontal();
-
-        GUILayout.Space(10);
-
     }
 
     private void DrawInstructions()
@@ -659,9 +653,6 @@ public class WfcInterfaceEditor : Editor
     {
 
         t.patternSize = EditorGUILayout.IntField("Pattern size", t.patternSize);
-
-
-
         EditorGUILayout.BeginHorizontal();
         int inputMapSize = EditorGUILayout.IntField("Input map size", t.inputMapSize);
         int inputMapHeight = EditorGUILayout.IntField("Input map height", t.inputMapHeight);
@@ -679,6 +670,7 @@ public class WfcInterfaceEditor : Editor
         EditorGUILayout.Space(5);
 
         t.tileSet = (TileSet)EditorGUILayout.ObjectField("Tileset", t.tileSet, typeof(TileSet), false);
+        EditorGUILayout.Space(5);
     }
 
     public override void OnInspectorGUI()
@@ -697,7 +689,7 @@ public class WfcInterfaceEditor : Editor
             t.ClearOutputMap();
         }
 
-        GUILayout.Space(20);
+        GUILayout.Space(10);
 
         TrainingEditor();
 
