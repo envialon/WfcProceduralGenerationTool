@@ -10,7 +10,7 @@ using WFC_Model;
 [RequireComponent(typeof(BoxCollider))]
 public class WfcInterface : MonoBehaviour
 {
-    private const string inputMapSerializationPath = "Assets/Generated/";
+    private const string inputMapSerializationPath = "Assets/WfcGenerator/GeneratedInputMaps/";
 
     public int patternSize = 2;
     public int inputMapSize = 10;
@@ -104,6 +104,10 @@ public class WfcInterface : MonoBehaviour
 
     public void ResizeInputMap()
     {
+        if (tileSet is null)
+        {
+            return;
+        }
         inputMap = new Tilemap(tileSet.GetSymmetryDictionary(), inputMapSize, inputMapHeight, inputMapSize);
         outputGridOffset = new Vector3Int(inputMapSize + 1, 0, -outputSize.z / 2);
         RefreshCollider();
