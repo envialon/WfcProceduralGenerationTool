@@ -61,7 +61,7 @@ namespace WFC_Model
             return x - y * (int)Math.Floor((double)x / y);
         }
 
-        private static int EncodeRotationAndRotation(Tile tile, in Dictionary<int, SymmetryType> symmetryDictionary)
+        private static int EncodeRotationAndReflection(Tile tile, in Dictionary<int, SymmetryType> symmetryDictionary)
         {
             SymmetryType symmetry = symmetryDictionary[tile.id];
 
@@ -114,7 +114,7 @@ namespace WFC_Model
 
         public static int EncodeTile(Tile tile, in Dictionary<int, SymmetryType> symmetryDictionary)
         {
-            int encoded = (tile.id * 4 + EncodeRotationAndRotation(tile, symmetryDictionary));
+            int encoded = (tile.id * 4 + EncodeRotationAndReflection(tile, symmetryDictionary));
             return encoded;
         }
 
