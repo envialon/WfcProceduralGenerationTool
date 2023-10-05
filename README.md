@@ -1,4 +1,4 @@
-# WFC_Procedural_Generator_Framework
+# WfcProceduralGenerationTool
 
 ## Description <a id="description"></a>
 This is my final project for university. I chose to develop it when I found out Maxim Gumin's [Wave Function Collapse](https://github.com/mxgmn/WaveFunctionCollapse), I thought it was such a cool algorithm and I couldn't take it out of my head :D. 
