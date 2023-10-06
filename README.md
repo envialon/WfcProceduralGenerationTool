@@ -1,7 +1,7 @@
 # WfcProceduralGenerationTool
 
 ## Description <a id="description"></a>
-This is my final project for university. I chose to develop it when I found out Maxim Gumin's [Wave Function Collapse](https://github.com/mxgmn/WaveFunctionCollapse), I thought it was such a cool algorithm and I couldn't take it out of my head :D. 
+This is my final project for university. I chose to develop it when I found out Maxim Gumin's [Wave Function Collapse](https://github.com/mxgmn/WaveFunctionCollapse), I thought it was such a cool algorithm and couldn't take it out of my head :D. 
 
 The project consist of my own implementation of a tile-based WFC generator, with a strong focus of making it as generalist as possible, and a custom editor in order to handle tilemap manipulation and to facilitate the interaction with the algorithm. The idea is that anyone can model a tileset on any 3D mesh modeling software and use this to generate tile-based levels/maps with WFC.
 
