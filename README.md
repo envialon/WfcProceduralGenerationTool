@@ -29,10 +29,12 @@ To experiment with the tool you can just attach the `WfcInterface` script to an 
 
 Having an input map created (either making it by hand or loading a serialized one) you can then start generating output maps with the button on the editor, you can tweak parameters to change the behaviour of the WFC generation from the `WfcGenerator` and `WfcInterface` inspector window.
 
-Example with two generations with the same input tilemap and parameters except for patternSize. On the left patternSize == 2, on the right patternSize == 3:
+Example with two generations with the same input tilemap and parameters except for patternSize:
 
-![PatternSize2](/docs/imgs/PatternSize2.png)
-![PatternSize3](/docs/imgs/PatternSize3.png)
+patternSize == 2           |  patternSize == 3
+:-------------------------:|:-------------------------:
+![PatternSize2](/docs/imgs/PatternSize2.png) |  ![PatternSize3](/docs/imgs/PatternSize3.png)
+
 
 
 ## Implementation Details <a id="Implementation"></a>
@@ -44,8 +46,10 @@ A `TileSet` is a scriptable object with essentially just a list of `TileAttribut
 
 Here's the two simple tilesets I've made: 
 
-![TestTileset](/docs/imgs/TestTileset.png)
-![IslandTileset](/docs/imgs/IslandTileset.png)
+testTileSet        |         islandTileSet
+:-------------------------:|:-------------------------:
+![TestTileset](/docs/imgs/TestTileset.png) |  ![IslandTileset](/docs/imgs/IslandTileset.png)
+
 
 ### Tilemap <a id="Tilemap"></a>
 A `Tilemap` basically contains a flattened array of encoded tiles as integers. It must not be confused with `SerializableTilemap` which is just a `ScriptableObject` wrapper for serializing input tilemaps from the `WfcInterface` inspector window.
