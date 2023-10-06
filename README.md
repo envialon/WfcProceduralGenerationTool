@@ -5,15 +5,21 @@ This is my final project for university. I chose to develop it when I found out 
 
 The project consist of my own implementation of a tile-based WFC generator, with a strong focus of making it as generalist as possible, and a custom editor in order to handle tilemap manipulation and to facilitate the interaction with the algorithm. The idea is that anyone can model a tileset on any 3D mesh modeling software and use this to generate tile-based levels/maps with WFC.
 
+![generation example](/docs/imgs/example.gif)
+
+The WFC Overlapping model was chosen because of its flexibility and minimal user input, since the tile adjacencies can be extracted from an sample map, instead of having to manually declare each one by hand. 
+
+Another great functionality that WFC supports and has been implemented is being able to autocomplete maps: 
+
+![autocomplete](/docs/imgs/autocomplete.gif)
+
 ## Table of contents <a id="ContentTable"></a>
 1. [Description][def]
 2. [Table of contents][def2]
 3. [How to use][def3]
 4. [Implementation Details][def4]
     1. [Tileset][def5]
-    2. [Tilemap][def6]
     3. [WfcGenerator][def7]
-    4. [WfcInterface][def8]
     
 
 ## How to use <a id="HowTo"></a>
@@ -23,12 +29,30 @@ To experiment with the tool you can just attach the `WfcInterface` script to an 
 
 Having an input map created (either making it by hand or loading a serialized one) you can then start generating output maps with the button on the editor, you can tweak parameters to change the behaviour of the WFC generation from the `WfcGenerator` and `WfcInterface` inspector window.
 
+Example with two generations with the same input tilemap and parameters except for patternSize. On the left patternSize == 2, on the right patternSize == 3:
+
+![PatternSize2](/docs/imgs/PatternSize2.png)
+![PatternSize3](/docs/imgs/PatternSize3.png)
+
+
 ## Implementation Details <a id="Implementation"></a>
 
 ### Tileset and TileAttributes <a id="Tileset"></a>
 A `TileSet` is a scriptable object with essentially just a list of `TileAttributes`. You should be able to create one right-clicking on the project window and navigating to Create>ScriptableObjects>TileSet.
 
 `TileAttributes` is a struct that contains the `Mesh`, `Material` and `SymmetryType` of every Tile. The `SymmetryType` is an important attribute to get right for your tiles if you want to use the pattern rotation or reflection parameters to generate maps, undesired generation results are expected if your tiles are not correctly classified with their respective symmetry type, check [Wave Function Collapse](https://github.com/mxgmn/WaveFunctionCollapse) original repo for an explanation of tile symmetries.
+
+Here's the two simple tilesets I've made: 
+
+![TestTileset](/docs/imgs/TestTileset.png)
+![IslandTileset](/docs/imgs/IslandTileset.png)
+
+### Tilemap <a id="Tilemap"></a>
+A `Tilemap` basically contains a flattened array of encoded tiles as integers. It must not be confused with `SerializableTilemap` which is just a `ScriptableObject` wrapper for serializing input tilemaps from the `WfcInterface` inspector window.
+
+In the following pic there are two tilemaps, the input map made by hand (small one) and the generated output map (the bigger one):
+
+![IslandMap](/docs/imgs/island.png)
 
 ### WfcGenerator<a id="WfcGenerator"></a>
 `WfcGenerator` was separated from the interface just in case it needs to be used to generate using already serialized input tilemaps, for example to use as a level generator. 
